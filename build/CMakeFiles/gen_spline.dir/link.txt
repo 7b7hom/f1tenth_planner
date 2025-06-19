@@ -1,0 +1,1 @@
+/usr/bin/g++ -g CMakeFiles/gen_spline.dir/src/gen_spline.cpp.o -o bin/gen_spline 
