@@ -1,5 +1,4 @@
 /home/jimin1203/misys/f1tenth_planner/CMakeFiles/main.dir
-/home/jimin1203/misys/f1tenth_planner/CMakeFiles/gen_spline.dir
 /home/jimin1203/misys/f1tenth_planner/CMakeFiles/edit_cache.dir
 /home/jimin1203/misys/f1tenth_planner/CMakeFiles/rebuild_cache.dir
 /home/jimin1203/misys/f1tenth_planner/CMakeFiles/list_install_components.dir

@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.h": "c",
+        "*.html": "html",
+        "alignedvector3": "cpp",
+        "complex": "cpp"
+    }
+}

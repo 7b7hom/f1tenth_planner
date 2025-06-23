@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start CMakeFiles CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jimin1203/misys/f1tenth_planner/CMakeFiles /home/jimin1203/misys/f1tenth_planner//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/jimin1203/misys/f1tenth_planner/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -174,43 +174,6 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-#=============================================================================
-# Target rules for targets named gen_spline
-
-# Build rule for target.
-gen_spline: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 gen_spline
-.PHONY : gen_spline
-
-# fast build rule for target.
-gen_spline/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/gen_spline.dir/build.make CMakeFiles/gen_spline.dir/build
-.PHONY : gen_spline/fast
-
-src/gen_spline.o: src/gen_spline.cpp.o
-.PHONY : src/gen_spline.o
-
-# target to build an object file
-src/gen_spline.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/gen_spline.dir/build.make CMakeFiles/gen_spline.dir/src/gen_spline.cpp.o
-.PHONY : src/gen_spline.cpp.o
-
-src/gen_spline.i: src/gen_spline.cpp.i
-.PHONY : src/gen_spline.i
-
-# target to preprocess a source file
-src/gen_spline.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/gen_spline.dir/build.make CMakeFiles/gen_spline.dir/src/gen_spline.cpp.i
-.PHONY : src/gen_spline.cpp.i
-
-src/gen_spline.s: src/gen_spline.cpp.s
-.PHONY : src/gen_spline.s
-
-# target to generate assembly for a file
-src/gen_spline.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/gen_spline.dir/build.make CMakeFiles/gen_spline.dir/src/gen_spline.cpp.s
-.PHONY : src/gen_spline.cpp.s
-
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -247,11 +210,7 @@ help:
 	@echo "... install/strip"
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
-	@echo "... gen_spline"
 	@echo "... main"
-	@echo "... src/gen_spline.o"
-	@echo "... src/gen_spline.i"
-	@echo "... src/gen_spline.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
