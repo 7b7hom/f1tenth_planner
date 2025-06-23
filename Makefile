@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jimin1203/misys/f1tenth_planner/CMakeFiles /home/jimin1203/misys/f1tenth_planner//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start CMakeFiles CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jimin1203/misys/f1tenth_planner/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start CMakeFiles 0
 .PHONY : all
 
 # The main clean target
