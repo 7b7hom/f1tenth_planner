@@ -27,6 +27,7 @@
 #define __x_sampling "x_sampling"
 #define __y_sampling "y_sampling"
 #define __delta_s "delta_s"
+#define __psi "psi_racetraj_rad"
 
 using namespace std;
 using namespace rapidcsv;

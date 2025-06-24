@@ -159,30 +159,38 @@ void samplePointsFromRaceline(const DVector& kappa,
 
 // }
 
-#if 0
+
+#if 1
 void calcHeading(DVector &x_raceline,
                  DVector &y_raceline,
                  DVector &delta_s,
                  DVector &psi) {
     size_t N = x_raceline.size();
     psi.resize(N);
-
+    
     double dx, dy;
     for (size_t i = 0; i < N; ++i) {
-        dx = x_raceline[i+1] - y_raceline[i];
-        dy = y_raceline[i+1] - y_raceline[i];
+        
+        if (i != N -1) {
+            dx = x_raceline[i+1] - x_raceline[i];
+            dy = y_raceline[i+1] - y_raceline[i];
+        } else {
+            dx = x_raceline[0] - x_raceline[N - 1];
+            dy = y_raceline[0] - y_raceline[N - 1];
+        } 
+    psi[i] = atan2(dy, dx) - M_PI_2;
+
+    while (psi[i] > M_PI) psi[i] -= 2.0 * M_PI;
+    while (psi[i] < -M_PI) psi[i] += 2.0 * M_PI;
     }
+
 }
 
-void genNode(DMap& map, DVector& x_sampling, DVector& y_sampling, float lat_resolution) {
-    
-    // sampling함에 따라 psi를 새로 계산해야 함.
-    DVector psi;
-    calcHeading(x_sampling,
-                y_sampling,
-                map[__delta_s],
-                psi);
+void genNode(DMap &gtpl_map,
+             DMap &sampling_map,
+             float lat_resolution) {
 
+    // sampling함에 따라 psi를 새로 계산해야 함.
 }
 #endif
 
@@ -220,14 +228,22 @@ int main() {
             sampling_map[__s_racetraj].push_back(gtpl_map[__s_racetraj][idx]);
         }
     
-    writeDMapToCSV("inputs/sampling_map", sampling_map);
+    // writeDMapToCSV("inputs/sampling_map", sampling_map);
     // map_size(sampling_map); // (51, 3)
 
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
     // map_size(sampling_map); // (51, 4)
-
-    // genNode(gtpl_map, x_sampling, y_sampling, params.LAT_RESOLUTION);
+    calcHeading(sampling_map[__x_sampling],
+                sampling_map[__y_sampling],
+                gtpl_map[__delta_s],
+                sampling_map[__psi]);
     
+    // genNode(gtpl_map,
+    //         sampling_map,
+    //         params.LAT_RESOLUTION);
+    
+    // sampling points' info 
+    writeDMapToCSV("inputs/sampling_map", sampling_map);
     // visual process 
     plt::clf();
 
