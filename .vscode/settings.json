@@ -3,6 +3,7 @@
         "*.h": "c",
         "*.html": "html",
         "alignedvector3": "cpp",
-        "complex": "cpp"
+        "complex": "cpp",
+        "fstream": "cpp"
     }
 }

@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/g++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/jimin1203/misys/f1tenth_planner/include -I/home/jimin1203/misys/f1tenth_planner/include/Eigen3
+CXX_INCLUDES = -I/home/jimin1203/misys/f1tenth_planner/include -isystem /usr/include/eigen3
 
 CXX_FLAGS = -g
 

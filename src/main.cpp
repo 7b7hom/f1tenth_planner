@@ -2,6 +2,7 @@
 #include "config.h"
 
 DMap gtpl_map;
+DMap sampling_map;
 
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
@@ -49,13 +50,22 @@ void map_size(DMap& map) {
 }
 
 // Dvector를 Map 구조로 추가(연산)
-void addDVectorToMap(DMap& map, string attr) {
-    size_t len = map[__x_ref].size();
+void addDVectorToMap(DMap &map,
+                     string attr,
+                     const IVector *idx_array = nullptr) {
+    size_t len;
+    if (idx_array == nullptr) {
+        len = map[__x_ref].size();
+    } 
+    else {
+        len = idx_array->size();
+    }
+    // cout << "attr: "<< attr << " / len:" << len << endl;
+
     DVector x_out(len), y_out(len);
     string x_label = "x_" + attr;
     string y_label = "y_" + attr;
     
-
     if (!attr.compare("bound_r")) {
         // cout << "addDVectorToMap:" << attr << endl;
         for (size_t i = 0; i < len; ++i) {
@@ -96,7 +106,7 @@ void addDVectorToMap(DMap& map, string attr) {
     // delta_s[0] = 0 
     else if (!attr.compare("delta_s")) {
         // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < map[__s_racetraj].size() - 1; ++i) {
+        for (size_t i = 0; i < len - 1; ++i) {
             x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i]; // 마지막 원소는 0
         }
         map[attr] = x_out; 
@@ -145,6 +155,37 @@ void samplePointsFromRaceline(const DVector& kappa,
     // cout << "size: " << idx_array.size() << endl;
 }
 
+// void storeNode() {
+
+// }
+
+#if 0
+void calcHeading(DVector &x_raceline,
+                 DVector &y_raceline,
+                 DVector &delta_s,
+                 DVector &psi) {
+    size_t N = x_raceline.size();
+    psi.resize(N);
+
+    double dx, dy;
+    for (size_t i = 0; i < N; ++i) {
+        dx = x_raceline[i+1] - y_raceline[i];
+        dy = y_raceline[i+1] - y_raceline[i];
+    }
+}
+
+void genNode(DMap& map, DVector& x_sampling, DVector& y_sampling, float lat_resolution) {
+    
+    // sampling함에 따라 psi를 새로 계산해야 함.
+    DVector psi;
+    calcHeading(x_sampling,
+                y_sampling,
+                map[__delta_s],
+                psi);
+
+}
+#endif
+
 int main() {
     DMap gtpl_map;
     IVector idx_sampling;
@@ -170,13 +211,22 @@ int main() {
                              params.LON_STRAIGHT_STEP,
                              params.CURVE_THR,
                              idx_sampling);
-    
-    DVector x_sampling, y_sampling;
+
+    // DVector x_sampling, y_sampling;
 
     for (int idx : idx_sampling) {
-            x_sampling.push_back(gtpl_map[__x_raceline][idx]);
-            y_sampling.push_back(gtpl_map[__y_raceline][idx]);
+            sampling_map[__x_sampling].push_back(gtpl_map[__x_raceline][idx]);
+            sampling_map[__y_sampling].push_back(gtpl_map[__y_raceline][idx]);
+            sampling_map[__s_racetraj].push_back(gtpl_map[__s_racetraj][idx]);
         }
+    
+    writeDMapToCSV("inputs/sampling_map", sampling_map);
+    // map_size(sampling_map); // (51, 3)
+
+    addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
+    // map_size(sampling_map); // (51, 4)
+
+    // genNode(gtpl_map, x_sampling, y_sampling, params.LAT_RESOLUTION);
     
     // visual process 
     plt::clf();
@@ -185,7 +235,7 @@ int main() {
 	plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "black"}});
     plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
-    plt::scatter(x_sampling, y_sampling, 40.0, {{"color", "pink"}});
+    plt::scatter(sampling_map[__x_sampling], sampling_map[__y_sampling], 30.0, {{"color", "red"}});
 
 	plt::title("Track");
     plt::grid(true);

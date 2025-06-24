@@ -38,11 +38,18 @@ install(
   EXPORT install_targets
 )
 
-# find_package(Eigen3 REQUIRED)
+find_package(Eigen3 REQUIRED)
+
+if (Eigen3_FOUND)
+    message(STATUS "Eigen3 Found! - ${Eigen3_DIR}")
+    set(Eigen3_LIBS Eigen3::Eigen)    
+
+    message(STATUS "Eigen3 Found! - ${Eigen3_INCLUDE_DIRS}")
+    message(STATUS "Eigen3 Found! - ${Eigen3_LIBS}")
+endif()
 
 # include 경로 설정 
 include_directories(${PROJECT_SOURCE_DIR}/include)
-include_directories(${PROJECT_SOURCE_DIR}/include/Eigen3)
 
 # main
 add_executable(main src/main.cpp)
@@ -50,9 +57,9 @@ target_link_libraries(main PRIVATE matplotlib_cpp)
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # gen_spline
-# add_executable(gen_spline src/gen_spline.cpp)
-# # target_link_libraries(gen_spline PRIVATE Eigen3::Eigen)
-# set_target_properties(gen_spline PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+add_executable(gen_spline src/gen_spline.cpp)
+target_link_libraries(gen_spline PRIVATE Eigen3::Eigen)
+set_target_properties(gen_spline PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Install headers
 install(FILES
