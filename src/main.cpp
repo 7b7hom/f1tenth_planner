@@ -159,8 +159,6 @@ void samplePointsFromRaceline(const DVector& kappa,
 
 // }
 
-
-#if 1
 void calcHeading(DVector &x_raceline,
                  DVector &y_raceline,
                  DVector &delta_s,
@@ -191,10 +189,9 @@ void calcHeading(DVector &x_raceline,
 void genNode(DMap &gtpl_map,
              DMap &sampling_map,
              float lat_resolution) {
+    
 
-    // sampling함에 따라 psi를 새로 계산해야 함.
 }
-#endif
 
 void plotHeading(const DVector &x,
                  const DVector &y,
@@ -216,7 +213,7 @@ void plotHeading(const DVector &x,
         DVector y_line = {y[i], y[i] + dy};
         plt::plot(x_line, y_line, {{"color", "green"}});
 
-        #if 0
+        #if 1
         // 화살촉 
         theta = std::atan2(dy, dx);
         arrow_len = 0.2 * scale;
@@ -264,6 +261,7 @@ void visual() {
 
 
 int main() {
+    // map<int, int> layer;
     IVector idx_sampling;
     Offline_Params params;
 
@@ -300,6 +298,7 @@ int main() {
     // map_size(sampling_map); // (51, 3)
 
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
+
     // map_size(sampling_map); // (51, 4)
     calcHeading(sampling_map[__x_sampling],
                 sampling_map[__y_sampling],
