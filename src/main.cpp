@@ -181,15 +181,14 @@ void calcHeading(DVector &x_raceline,
 
     while (psi[i] > M_PI) psi[i] -= 2.0 * M_PI;
     while (psi[i] < -M_PI) psi[i] += 2.0 * M_PI;
+    cout << i<< ": " << psi[i] << endl;
     }
-
+    
 }
 
 void genNode(DMap &gtpl_map,
              DMap &sampling_map,
              float lat_resolution) {
-    
-    
 
 
 }
@@ -251,10 +250,10 @@ void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r
 	// plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "black"}});
     plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
-    plt::scatter(sampling_map[__x_sampling], sampling_map[__y_sampling], 30.0, {{"color", "red"}});
+    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
 
-    plotHeading(sampling_map[__x_sampling],
-                sampling_map[__y_sampling],
+    plotHeading(sampling_map[__x_raceline],
+                sampling_map[__y_raceline],
                 sampling_map[__psi]);
 
     plt::plot(sampling_map[__x_bound_l], sampling_map[__y_bound_l], {{"color", "orange"}});
@@ -300,31 +299,42 @@ int main() {
                              params.LON_STRAIGHT_STEP,
                              params.CURVE_THR,
                              idx_sampling);
+    
+    for (const auto& [key, vec] : gtpl_map) {
+        for (int idx : idx_sampling) {
+            if (idx >= 0 && idx < vec.size()) {
+                sampling_map[key].push_back(vec[idx]);
+            }
+        }
+    }
 
+    
+    #if 0
     for (int idx : idx_sampling) {
-            sampling_map[__x_sampling].push_back(gtpl_map[__x_raceline][idx]);
-            sampling_map[__y_sampling].push_back(gtpl_map[__y_raceline][idx]);
+            sampling_map[__x_raceline].push_back(gtpl_map[__x_raceline][idx]);
+            sampling_map[__y_raceline].push_back(gtpl_map[__y_raceline][idx]);
             sampling_map[__s_racetraj].push_back(gtpl_map[__s_racetraj][idx]);
             sampling_map[__x_bound_l].push_back(gtpl_map[__x_bound_l][idx]);
             sampling_map[__x_bound_r].push_back(gtpl_map[__x_bound_r][idx]);
             sampling_map[__y_bound_l].push_back(gtpl_map[__y_bound_l][idx]);
             sampling_map[__y_bound_r].push_back(gtpl_map[__y_bound_r][idx]);
         }
-    
+    #endif
     // writeDMapToCSV("inputs/sampling_map", sampling_map);
     // map_size(sampling_map); // (51, 3)
 
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
+    
 
     // map_size(sampling_map); // (51, 4)
 
     // 추후 저장될 예정 
-    calcHeading(sampling_map[__x_sampling],
-                sampling_map[__y_sampling],
+    calcHeading(sampling_map[__x_raceline],
+                sampling_map[__y_raceline],
                 sampling_map[__psi]);
     
     vector<double> psi_bound_l, psi_bound_r;
-
+    writeDMapToCSV("inputs/sampling_map1.csv", sampling_map);
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
     calcHeading(sampling_map[__x_bound_l],
                 sampling_map[__y_bound_l],
@@ -334,9 +344,9 @@ int main() {
                 sampling_map[__y_bound_r],
                 psi_bound_r);   
     
-    genNode(gtpl_map,
-            sampling_map,
-            params.LAT_RESOLUTION);
+    // genNode(gtpl_map,
+    //         sampling_map,
+    //         params.LAT_RESOLUTION);
 
     // sampling points' info 
     writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
