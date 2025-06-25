@@ -30,7 +30,7 @@ struct Offline_Params {
         float STEPSIZE_APPROX=2.5;  // Spline sampling interval (smaller values improve collision-check accuracy)
 
         // [VEHICLE]
-        float VEH_WIDTH=2.8;    // Vehicle width (m); increase for greater safety margin
+        float VEH_WIDTH=3.6;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=4.7;   // vehicle length in m (in order to obtain a safety distance in follow mode)
         float VEH_TURN=7.0;     // Min turn radius (m); splines below this are excluded.
 

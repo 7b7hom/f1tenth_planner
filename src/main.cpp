@@ -161,7 +161,6 @@ void samplePointsFromRaceline(const DVector& kappa,
 
 void calcHeading(DVector &x_raceline,
                  DVector &y_raceline,
-                 DVector &delta_s,
                  DVector &psi) {
 
     size_t N = x_raceline.size();
@@ -190,6 +189,8 @@ void genNode(DMap &gtpl_map,
              DMap &sampling_map,
              float lat_resolution) {
     
+    
+
 
 }
 
@@ -231,20 +232,23 @@ void plotHeading(const DVector &x,
         #endif
 
     }
+        // raceline 좌표와 psi 프린팅 
+        #if 0
         for (size_t i = 0; i < x.size(); ++i) {
         ostringstream label;
         label.precision(2);
         label << fixed << "(" << x[i] << ", " << y[i] << ")\nψ=" << psi[i];
 
         plt::text(x[i], y[i], label.str());
-    }
+        #endif
+    
 }
 
-void visual() {
+void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r) {
     plt::clf();
 
-	plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "black"}});
-	plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "black"}});
+	// plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "black"}});
+	// plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "black"}});
     plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
     plt::scatter(sampling_map[__x_sampling], sampling_map[__y_sampling], 30.0, {{"color", "red"}});
@@ -252,6 +256,17 @@ void visual() {
     plotHeading(sampling_map[__x_sampling],
                 sampling_map[__y_sampling],
                 sampling_map[__psi]);
+
+    plt::plot(sampling_map[__x_bound_l], sampling_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(sampling_map[__x_bound_r], sampling_map[__y_bound_r], {{"color", "orange"}});
+
+    // plotHeading(sampling_map[__x_bound_l],
+    //             sampling_map[__y_bound_l],
+    //             psi_bound_l);
+
+    // plotHeading(sampling_map[__x_bound_r],
+    //             sampling_map[__y_bound_r],
+    //             psi_bound_r);
 
     plt::title("Track");
     plt::grid(true);
@@ -261,7 +276,7 @@ void visual() {
 
 
 int main() {
-    // map<int, int> layer;
+    map<int, int> layer;
     IVector idx_sampling;
     Offline_Params params;
 
@@ -286,12 +301,14 @@ int main() {
                              params.CURVE_THR,
                              idx_sampling);
 
-    // DVector x_sampling, y_sampling;
-
     for (int idx : idx_sampling) {
             sampling_map[__x_sampling].push_back(gtpl_map[__x_raceline][idx]);
             sampling_map[__y_sampling].push_back(gtpl_map[__y_raceline][idx]);
             sampling_map[__s_racetraj].push_back(gtpl_map[__s_racetraj][idx]);
+            sampling_map[__x_bound_l].push_back(gtpl_map[__x_bound_l][idx]);
+            sampling_map[__x_bound_r].push_back(gtpl_map[__x_bound_r][idx]);
+            sampling_map[__y_bound_l].push_back(gtpl_map[__y_bound_l][idx]);
+            sampling_map[__y_bound_r].push_back(gtpl_map[__y_bound_r][idx]);
         }
     
     // writeDMapToCSV("inputs/sampling_map", sampling_map);
@@ -300,20 +317,31 @@ int main() {
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
 
     // map_size(sampling_map); // (51, 4)
+
+    // 추후 저장될 예정 
     calcHeading(sampling_map[__x_sampling],
                 sampling_map[__y_sampling],
-                gtpl_map[__delta_s],
                 sampling_map[__psi]);
     
-    // genNode(gtpl_map,
-    //         sampling_map,
-    //         params.LAT_RESOLUTION);
+    vector<double> psi_bound_l, psi_bound_r;
+
+    // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
+    calcHeading(sampling_map[__x_bound_l],
+                sampling_map[__y_bound_l],
+                psi_bound_l);
+
+    calcHeading(sampling_map[__x_bound_r],
+                sampling_map[__y_bound_r],
+                psi_bound_r);   
+    
+    genNode(gtpl_map,
+            sampling_map,
+            params.LAT_RESOLUTION);
 
     // sampling points' info 
-    writeDMapToCSV("inputs/sampling_map", sampling_map);
+    writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
     
     // visual process 
-    visual();
-
+    visual(psi_bound_l, psi_bound_r);
     return 0;
 }
