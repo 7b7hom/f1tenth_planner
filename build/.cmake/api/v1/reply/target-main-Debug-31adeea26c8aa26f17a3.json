@@ -67,6 +67,11 @@
 					"backtrace" : 3,
 					"isSystem" : true,
 					"path" : "/home/jimin1203/.local/lib/python3.10/site-packages/numpy/_core/include"
+				},
+				{
+					"backtrace" : 3,
+					"isSystem" : true,
+					"path" : "/usr/include/eigen3"
 				}
 			],
 			"language" : "CXX",

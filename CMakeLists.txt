@@ -53,7 +53,7 @@ include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # main
 add_executable(main src/main.cpp)
-target_link_libraries(main PRIVATE matplotlib_cpp)
+target_link_libraries(main PRIVATE matplotlib_cpp Eigen3::Eigen)
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # gen_spline

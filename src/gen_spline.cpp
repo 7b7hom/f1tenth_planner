@@ -1,9 +1,8 @@
-#include <Eigen/Dense>
+#include "graph_planner.hpp"
 #include <vector>
 #include <cmath>
 #include <iostream>
 
-using namespace Eigen;
 using namespace std;
 
 // 스플라인 결과를 담기 위한 구조체: x, y 방향 계수, 행렬 M, 정규화된 노멀 벡터

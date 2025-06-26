@@ -4,6 +4,9 @@
         "*.html": "html",
         "alignedvector3": "cpp",
         "complex": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "iosfwd": "cpp",
+        "random": "cpp",
+        "map": "cpp"
     }
 }

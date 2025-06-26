@@ -155,9 +155,11 @@ void samplePointsFromRaceline(const DVector& kappa,
     // cout << "size: " << idx_array.size() << endl;
 }
 
-// void storeNode() {
-
-// }
+double normalizeAngle(double angle) {
+    while (angle > M_PI)  angle -= 2.0 * M_PI;
+    while (angle < -M_PI) angle += 2.0 * M_PI;
+    return angle;
+}
 
 void calcHeading(DVector &x_raceline,
                  DVector &y_raceline,
@@ -179,20 +181,81 @@ void calcHeading(DVector &x_raceline,
         } 
     psi[i] = atan2(dy, dx) - M_PI_2;
         
-    while (psi[i] > M_PI) psi[i] -= 2.0 * M_PI;
-    while (psi[i] < -M_PI) psi[i] += 2.0 * M_PI;
+    normalizeAngle(psi[i]);
 
     }
     // cout << i<< ": " << psi[i] << endl;
     // cout << psi.size() << endl;
-}
-
-void genNode(DMap &gtpl_map,
-             DMap &sampling_map,
-             float lat_resolution) {
-
 
 }
+
+void genNode(const DVector& psi_bound_l,
+            const DVector& psi_bound_r,
+            const double veh_width,
+            const float lat_resolution) {
+
+    const size_t N = sampling_map[__alpha].size();
+    IVector raceline_index_array;
+
+    // sampling대로, 즉 layer 별로
+    for (size_t i = 0; i < N; ++i)    {
+        // raceline 기준 인덱스
+        int raceline_index = floor(
+            (sampling_map[__width_left][i] - veh_width / (2.0 + sampling_map[__alpha][i]) / lat_resolution));
+        raceline_index_array.push_back(raceline_index);
+
+        // 알파 보간 시작점
+        double s = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+
+        // lateral offset 값 생성
+        DVector temp_alphas;
+        for (double a = s; a < sampling_map[__width_right][i] - veh_width / 2.0; a += lat_resolution)
+            temp_alphas.push_back(a);
+
+        // 위치 계산
+        Vector2d ref_pt(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
+
+        vector<Vector2d> pos_list;
+        for (double a : temp_alphas)
+            pos_list.push_back(ref_pt + norm_vec * a);
+
+        // heading 보간
+        DVector psi_interp;
+
+        // 왼쪽
+        if (abs(psi_bound_l[i] - sampling_map[__psi][i]) < M_PI) {
+            for (int k = 0; k <= raceline_index; ++k)
+                psi_interp.push_back(normalizeAngle(psi_bound_l[i] + (map[__psi][i] - psi_bound_l[i]) * k / raceline_index));
+        }
+        else {
+            double bl = psi_bound_l[i] + 2 * M_PI * (psi_bound_l[i] < 0);
+            double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+            for (int k = 0; k <= raceline_index; ++k)
+                psi_interp.push_back(normalizeAngle(bl + (p - bl) * k / raceline_index));
+        }
+
+        // 오른쪽
+        int remain = temp_alphas.size() - raceline_index;
+        DVector psi_interp_r;
+        if (abs(psi_bound_r[i] - sampling_map[__psi][i]) < M_PI) {
+            for (int k = 0; k < remain; ++k)
+                psi_interp_r.push_back(normalizeAngle(sampling_map[__psi][i] + (psi_bound_r[i] - sampling_map[__psi][i]) * k / remain));
+        }
+        else {
+            double br = psi_bound_r[i] + 2 * M_PI * (psi_bound_r[i] < 0);
+            double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+            for (int k = 0; k < remain; ++k)
+                psi_interp_r.push_back(normalizeAngle(p + (br - p) * k / remain));
+        }
+
+        psi_interp.pop_back(); // 중복 제거
+        psi_interp.insert(psi_interp.end(), psi_interp_r.begin(), psi_interp_r.end());
+
+        // layer 자료구조 저장
+
+        }
+    }
 
 void plotHeading(const DVector &x,
                  const DVector &y,
@@ -253,12 +316,12 @@ void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
 
-    plotHeading(sampling_map[__x_raceline],
-                sampling_map[__y_raceline],
-                sampling_map[__psi]);
+    // plotHeading(sampling_map[__x_raceline],
+    //             sampling_map[__y_raceline],
+    //             sampling_map[__psi]);
 
-    plt::plot(sampling_map[__x_bound_l], sampling_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(sampling_map[__x_bound_r], sampling_map[__y_bound_r], {{"color", "orange"}});
+    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
     // plotHeading(sampling_map[__x_bound_l],
     //             sampling_map[__y_bound_l],
@@ -300,6 +363,8 @@ int main() {
                              params.LON_STRAIGHT_STEP,
                              params.CURVE_THR,
                              idx_sampling);
+
+    // cout << "idx size:" << idx_sampling.size() << endl;
     
     for (const auto& [key, vec] : gtpl_map) {
         for (int idx : idx_sampling) {
@@ -309,7 +374,6 @@ int main() {
         }
     }
 
-    
     #if 0
     for (int idx : idx_sampling) {
             sampling_map[__x_raceline].push_back(gtpl_map[__x_raceline][idx]);
@@ -345,9 +409,9 @@ int main() {
                 sampling_map[__y_bound_r],
                 psi_bound_r);   
     
-    // genNode(gtpl_map,
-    //         sampling_map,
-    //         params.LAT_RESOLUTION);
+    genNode(sampling_map, psi_bound_l, psi_bound_r,
+            params.VEH_WIDTH,
+            params.LAT_RESOLUTION);
 
     // sampling points' info 
     writeDMapToCSV("inputs/sampling_map.csv", sampling_map);

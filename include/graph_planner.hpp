@@ -6,6 +6,7 @@
 #include <string>
 #include <iomanip>  
 #include <cmath>
+#include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
 
@@ -31,6 +32,7 @@
 
 using namespace std;
 using namespace rapidcsv;
+using namespace Eigen;
 namespace plt = matplotlibcpp;
 
 // 유지보수를 위하여 typedef로 선언 
