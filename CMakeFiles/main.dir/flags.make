@@ -4,7 +4,7 @@
 # compile CXX with /usr/bin/c++
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/seop/misys/f1tenth_planner/include -isystem /usr/include/python3.10 -isystem /home/seop/.local/lib/python3.10/site-packages/numpy/core/include
+CXX_INCLUDES = -I/home/jimin1203/misys/f1tenth_planner/include -isystem /usr/include/python3.10 -isystem /home/jimin1203/.local/lib/python3.10/site-packages/numpy/_core/include
 
 CXX_FLAGS = 
 

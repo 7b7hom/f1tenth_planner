@@ -178,12 +178,13 @@ void calcHeading(DVector &x_raceline,
             dy = y_raceline[0] - y_raceline[N - 1];
         } 
     psi[i] = atan2(dy, dx) - M_PI_2;
-
+        
     while (psi[i] > M_PI) psi[i] -= 2.0 * M_PI;
     while (psi[i] < -M_PI) psi[i] += 2.0 * M_PI;
-    cout << i<< ": " << psi[i] << endl;
+
     }
-    
+    // cout << i<< ": " << psi[i] << endl;
+    // cout << psi.size() << endl;
 }
 
 void genNode(DMap &gtpl_map,
@@ -327,14 +328,14 @@ int main() {
     
 
     // map_size(sampling_map); // (51, 4)
-
+    writeDMapToCSV("inputs/sampling_mapbefore.csv", sampling_map);
     // 추후 저장될 예정 
     calcHeading(sampling_map[__x_raceline],
                 sampling_map[__y_raceline],
                 sampling_map[__psi]);
     
     vector<double> psi_bound_l, psi_bound_r;
-    writeDMapToCSV("inputs/sampling_map1.csv", sampling_map);
+    
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
     calcHeading(sampling_map[__x_bound_l],
                 sampling_map[__y_bound_l],
