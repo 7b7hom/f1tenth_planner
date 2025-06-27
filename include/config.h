@@ -8,7 +8,7 @@ const int rl_s = 7;
 struct Offline_Params {
 
         // [LATTICE]
-        float LAT_RESOLUTION=0.5;       // Lateral spacing (m) between nodes along each normal
+        float LAT_RESOLUTION=0.2;       // Lateral spacing (m) between nodes along each normal
         float VARIABLE_HEADING=true;    // Determines if node headings are interpolated between boundary and race line angles (else: match race line).
         
         float LON_STRAIGHT_STEP=2.2;   // Max distance (m) between norm vectors along straights on the reference line
@@ -30,7 +30,7 @@ struct Offline_Params {
         float STEPSIZE_APPROX=2.5;  // Spline sampling interval (smaller values improve collision-check accuracy)
 
         // [VEHICLE]
-        float VEH_WIDTH=3.6;    // Vehicle width (m); increase for greater safety margin
+        float VEH_WIDTH=0.5;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=4.7;   // vehicle length in m (in order to obtain a safety distance in follow mode)
         float VEH_TURN=7.0;     // Min turn radius (m); splines below this are excluded.
 

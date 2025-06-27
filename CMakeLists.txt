@@ -9,6 +9,10 @@ include(GNUInstallDirs)
 set(PACKAGE_NAME matplotlib_cpp)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/${PACKAGE_NAME}/cmake)
 
+find_package(Python COMPONENTS Interpreter Development REQUIRED)
+
+include_directories(${Python_INCLUDE_DIRS})
+
 # Library target
 add_library(matplotlib_cpp INTERFACE)
 target_include_directories(matplotlib_cpp
@@ -58,7 +62,7 @@ set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_D
 
 # gen_spline
 add_executable(gen_spline src/gen_spline.cpp)
-target_link_libraries(gen_spline PRIVATE Eigen3::Eigen)
+target_link_libraries(gen_spline PRIVATE Eigen3::Eigen ${Python_LIBRARIES})
 set_target_properties(gen_spline PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Install headers

@@ -193,30 +193,66 @@ void genNode(const DVector& psi_bound_l,
             const DVector& psi_bound_r,
             const double veh_width,
             const float lat_resolution) {
-    
+
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
 
-    // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
-    for (size_t i = 0; i < N; ++i){ 
-        // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 추후 이를 기준으로 node의 첫 번째 기준을 삼을 예정.
-        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2) / lat_resolution);
+    // sampling대로, 즉 layer 별로
+    for (size_t i = 0; i < N; ++i)    {
+        // raceline 기준 인덱스
+        int raceline_index = floor(
+            (sampling_map[__width_left][i] - veh_width / (2.0 + sampling_map[__alpha][i]) / lat_resolution));
         raceline_index_array.push_back(raceline_index);
-        
-        // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
-        // cout << "layer 내에서 raceline index:" << raceline_index << endl;
-        // cout << "-----" << endl;
 
+        // 알파 보간 시작점
         double s = sampling_map[__alpha][i] - raceline_index * lat_resolution;
-        DVector node_alphas;
-        for (double i = s; i <= sampling_map[__width_right][i]; ++lat_resolution) 
-            node_alphas.push_back(i);
-        
 
+        // lateral offset 값 생성
+        DVector temp_alphas;
+        for (double a = s; a < sampling_map[__width_right][i] - veh_width / 2.0; a += lat_resolution)
+            temp_alphas.push_back(a);
 
-        
+        // 위치 계산
+        Vector2d ref_pt(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
 
+        vector<Vector2d> pos_list;
+        for (double a : temp_alphas)
+            pos_list.push_back(ref_pt + norm_vec * a);
 
+        // heading 보간
+        DVector psi_interp;
+
+        // 왼쪽
+        if (abs(psi_bound_l[i] - sampling_map[__psi][i]) < M_PI) {
+            for (int k = 0; k <= raceline_index; ++k)
+                psi_interp.push_back(normalizeAngle(psi_bound_l[i] + (sampling_map[__psi][i] - psi_bound_l[i]) * k / raceline_index));
+        }
+        else {
+            double bl = psi_bound_l[i] + 2 * M_PI * (psi_bound_l[i] < 0);
+            double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+            for (int k = 0; k <= raceline_index; ++k)
+                psi_interp.push_back(normalizeAngle(bl + (p - bl) * k / raceline_index));
+        }
+
+        // 오른쪽
+        int remain = temp_alphas.size() - raceline_index;
+        DVector psi_interp_r;
+        if (abs(psi_bound_r[i] - sampling_map[__psi][i]) < M_PI) {
+            for (int k = 0; k < remain; ++k)
+                psi_interp_r.push_back(normalizeAngle(sampling_map[__psi][i] + (psi_bound_r[i] - sampling_map[__psi][i]) * k / remain));
+        }
+        else {
+            double br = psi_bound_r[i] + 2 * M_PI * (psi_bound_r[i] < 0);
+            double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+            for (int k = 0; k < remain; ++k)
+                psi_interp_r.push_back(normalizeAngle(p + (br - p) * k / remain));
+        }
+
+        psi_interp.pop_back(); // 중복 제거
+        psi_interp.insert(psi_interp.end(), psi_interp_r.begin(), psi_interp_r.end());
+
+        // layer 자료구조 저장
 
         }
     }
