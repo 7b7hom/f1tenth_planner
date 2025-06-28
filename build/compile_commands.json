@@ -6,7 +6,7 @@
 },
 {
   "directory": "/home/jimin1203/misys/f1tenth_planner/build",
-  "command": "/usr/bin/g++  -I/home/jimin1203/misys/f1tenth_planner/include -isystem /usr/include/eigen3 -g -o CMakeFiles/gen_spline.dir/src/gen_spline.cpp.o -c /home/jimin1203/misys/f1tenth_planner/src/gen_spline.cpp",
+  "command": "/usr/bin/g++  -I/usr/include/python3.10 -I/home/jimin1203/misys/f1tenth_planner/include -isystem /usr/include/eigen3 -g -o CMakeFiles/gen_spline.dir/src/gen_spline.cpp.o -c /home/jimin1203/misys/f1tenth_planner/src/gen_spline.cpp",
   "file": "/home/jimin1203/misys/f1tenth_planner/src/gen_spline.cpp"
 }
 ]

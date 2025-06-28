@@ -192,7 +192,7 @@ void calcHeading(DVector &x_raceline,
 void genNode(const DVector& psi_bound_l,
             const DVector& psi_bound_r,
             const double veh_width,
-            const float lat_resolution) {
+            float lat_resolution) {
     
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
@@ -212,8 +212,16 @@ void genNode(const DVector& psi_bound_l,
         for (double i = s; i <= sampling_map[__width_right][i]; ++lat_resolution) 
             node_alphas.push_back(i);
         
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
 
+        Vector2d node_pos;
 
+        for (double alpha : node_alphas)
+            node_pos = ref_xy + norm_vec * alpha;
+
+        // cout << "ref_xy" << endl;
+        // cout << ref_xy << endl;
         
 
 

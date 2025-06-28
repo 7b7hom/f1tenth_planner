@@ -92,6 +92,7 @@ gen_spline_EXTERNAL_OBJECTS =
 
 bin/gen_spline: CMakeFiles/gen_spline.dir/src/gen_spline.cpp.o
 bin/gen_spline: CMakeFiles/gen_spline.dir/build.make
+bin/gen_spline: /usr/lib/x86_64-linux-gnu/libpython3.10.so
 bin/gen_spline: CMakeFiles/gen_spline.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/jimin1203/misys/f1tenth_planner/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable bin/gen_spline"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/gen_spline.dir/link.txt --verbose=$(VERBOSE)

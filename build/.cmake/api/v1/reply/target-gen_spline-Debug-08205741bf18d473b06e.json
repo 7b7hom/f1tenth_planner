@@ -11,8 +11,8 @@
 		"commands" : 
 		[
 			"add_executable",
-			"include_directories",
-			"target_link_libraries"
+			"target_link_libraries",
+			"include_directories"
 		],
 		"files" : 
 		[
@@ -26,19 +26,25 @@
 			{
 				"command" : 0,
 				"file" : 0,
-				"line" : 60,
+				"line" : 64,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 52,
+				"line" : 65,
 				"parent" : 0
 			},
 			{
 				"command" : 2,
 				"file" : 0,
-				"line" : 61,
+				"line" : 14,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 56,
 				"parent" : 0
 			}
 		]
@@ -55,11 +61,15 @@
 			"includes" : 
 			[
 				{
-					"backtrace" : 2,
+					"backtrace" : 3,
+					"path" : "/usr/include/python3.10"
+				},
+				{
+					"backtrace" : 4,
 					"path" : "/home/jimin1203/misys/f1tenth_planner/include"
 				},
 				{
-					"backtrace" : 3,
+					"backtrace" : 2,
 					"isSystem" : true,
 					"path" : "/usr/include/eigen3"
 				}
@@ -91,6 +101,11 @@
 			{
 				"fragment" : "",
 				"role" : "flags"
+			},
+			{
+				"backtrace" : 2,
+				"fragment" : "/usr/lib/x86_64-linux-gnu/libpython3.10.so",
+				"role" : "libraries"
 			}
 		],
 		"language" : "CXX"
