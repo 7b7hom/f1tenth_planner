@@ -57,5 +57,7 @@ struct Node {
     bool raceline;
 };
 
+
+
 void readDmapFromCSV(const string& pathname, DMap& map);
 void writeDMaptoCSV(const string& pathname, const DMap& map, char delimiter);

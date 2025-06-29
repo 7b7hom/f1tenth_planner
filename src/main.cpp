@@ -3,7 +3,7 @@
 
 DMap gtpl_map;
 DMap sampling_map;
-vector<vector<Node>> all_layers;
+
 
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
@@ -190,25 +190,21 @@ void calcHeading(DVector &x_raceline,
 
 }
 
-void genNode(const DVector& psi_bound_l,
-            const DVector& psi_bound_r,
+void genNode(IVector& nodesInLayer,
+            vector<vector<Node>>& all_layers,
             const double veh_width,
             float lat_resolution) {
     
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
     Vector2d node_pos;
-
-    // DVector node_alphas;
-    // MatrixXd ref_xy(N, 2);
-    // MatrixXd norm_vec(N, 2);
-
+    
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
-        node.layer_idx = i;
-        // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 추후 이를 기준으로 node의 첫 번째 기준을 삼을 예정.
-        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2) / lat_resolution);
+        node.layer_idx = i; 
+        // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
+        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
         raceline_index_array.push_back(raceline_index);
         
         // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
@@ -217,15 +213,16 @@ void genNode(const DVector& psi_bound_l,
 
         Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
         Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
-        // 첫 시작 alpha가 s
-        double s = sampling_map[__alpha][i] - raceline_index * lat_resolution;
-        int node_idx = 0;
-        int node_num = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
         
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+        int node_idx = 0;
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
+        nodesInLayer.push_back(num_nodes);
+
         vector<Node> layer_nodes;
-        // cout << i << "번째 layer의 node 개수는 " << node_num << "이다." << endl;
+        // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
         // node별 loop 
-        for (double alpha = s; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
+        for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
             // node_alphas.push_back(alpha);
             // node의 좌표 계산.
             node_pos = ref_xy + alpha * norm_vec;
@@ -240,15 +237,15 @@ void genNode(const DVector& psi_bound_l,
             double psi_interp;
             if (node_idx < raceline_index) {
                 
-                if (abs(psi_bound_l[i] - sampling_map[__psi][i]) >= M_PI) 
+                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) 
                 {   
-                    double bl = psi_bound_l[i] + 2 * M_PI * (psi_bound_l[i] < 0);
+                    double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
                     double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
                     psi_interp = bl + (p - bl) * node_idx / raceline_index;
                                        
                 }
                 else {
-                    psi_interp = psi_bound_l[i] + (sampling_map[__psi][i] - psi_bound_l[i]) * (node_idx+1) / raceline_index;
+                    psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
                 }
                 node.psi = normalizeAngle(psi_interp);
             }
@@ -257,15 +254,15 @@ void genNode(const DVector& psi_bound_l,
                 node.psi = psi_interp;
             }
             else {
-                int remain = node_num - raceline_index - 1;
+                int remain = num_nodes - raceline_index - 1;
                 double t = static_cast<double>(node_idx - raceline_index) / max(remain, 1);  // 0 ~ 1
-                psi_interp = sampling_map[__psi][i] + t * (psi_bound_r[i] - sampling_map[__psi][i]);
+                psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
                 node.psi = normalizeAngle(psi_interp);
             }
             // cout << i << "번째 레이어의" <<node_idx << "번째 노드의 psi는" << node.psi << endl;
             
             layer_nodes.push_back(node);
-            node_idx++;
+            ++node_idx;
         }
         all_layers.push_back(layer_nodes);
 
@@ -329,8 +326,7 @@ void plotHeading(const DVector &x,
         #endif
 }
 
-void plotNodeHeadings(const vector<vector<Node>>& all_layers, double scale = 0.5) {
-    using vector;
+void plotHeading(const vector<vector<Node>>& all_layers, double scale = 0.5) {
 
     for (const auto& layer_nodes : all_layers) {
         for (const auto& node : layer_nodes) {
@@ -358,21 +354,20 @@ void plotNodeHeadings(const vector<vector<Node>>& all_layers, double scale = 0.5
     }
 }
 
-void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r) {
+void visual(const vector<vector<Node>>& all_layers) {
     plt::clf();
 
-	// plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "black"}});
-	// plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "black"}});
+    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+
     // plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
+
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
 
     plotHeading(sampling_map[__x_raceline],
                 sampling_map[__y_raceline],
                 sampling_map[__psi]);
-
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
     // plotHeading(sampling_map[__x_bound_l],
     //             sampling_map[__y_bound_l],
@@ -382,8 +377,7 @@ void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r
     //             sampling_map[__y_bound_r],
     //             psi_bound_r);
 
-    plotNodeHeadings(all_layers, 0.5);
-
+    plotHeading(all_layers);
 
     plt::title("Track");
     plt::grid(true);
@@ -465,9 +459,11 @@ int main() {
 
     sampling_map[__psi_bound_l] = psi_bound_l;
     sampling_map[__psi_bound_r] = psi_bound_r;
+    IVector nodesInLayer;
+    vector<vector<Node>> all_layers;
 
-    genNode(sampling_map[__psi_bound_l], 
-            sampling_map[__psi_bound_r],
+    genNode(nodesInLayer,
+            all_layers,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
@@ -475,6 +471,6 @@ int main() {
     writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
     
     // visual process 
-    visual(psi_bound_l, psi_bound_r);
+    visual(all_layers);
     return 0;
 }
