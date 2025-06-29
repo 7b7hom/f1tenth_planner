@@ -28,7 +28,8 @@
 #define __x_bound_l "x_bound_l"
 #define __y_bound_l "y_bound_l"
 #define __delta_s "delta_s"
-
+#define __psi_bound_l "psi_bound_l"
+#define __psi_bound_r "psi_bound_r"
 
 using namespace std;
 using namespace rapidcsv;
@@ -48,6 +49,7 @@ typedef vector<int, int> doubleIVector;
 
 struct Node {
     int layer_idx;
+    int node_idx;
     double x;
     double y;
     double psi;

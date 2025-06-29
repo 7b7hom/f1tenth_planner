@@ -155,10 +155,9 @@ void samplePointsFromRaceline(const DVector& kappa,
     // cout << "size: " << idx_array.size() << endl;
 }
 
-double normalizeAngle(double angle) {
+void normalizeAngle(double& angle) {
     while (angle > M_PI)  angle -= 2.0 * M_PI;
     while (angle < -M_PI) angle += 2.0 * M_PI;
-    return angle;
 }
 
 void calcHeading(DVector &x_raceline,
@@ -222,7 +221,7 @@ void genNode(const DVector& psi_bound_l,
 
         // heading 보간
         DVector psi_interp;
-
+// 
         // 왼쪽
         if (abs(psi_bound_l[i] - sampling_map[__psi][i]) < M_PI) {
             for (int k = 0; k <= raceline_index; ++k)
@@ -234,6 +233,7 @@ void genNode(const DVector& psi_bound_l,
             for (int k = 0; k <= raceline_index; ++k)
                 psi_interp.push_back(normalizeAngle(bl + (p - bl) * k / raceline_index));
         }
+        
 
         // 오른쪽
         int remain = temp_alphas.size() - raceline_index;

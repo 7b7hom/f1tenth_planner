@@ -3,6 +3,7 @@
 
 DMap gtpl_map;
 DMap sampling_map;
+vector<vector<Node>> all_layers;
 
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
@@ -196,9 +197,16 @@ void genNode(const DVector& psi_bound_l,
     
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
+    Vector2d node_pos;
+
+    // DVector node_alphas;
+    // MatrixXd ref_xy(N, 2);
+    // MatrixXd norm_vec(N, 2);
 
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
+        Node node;
+        node.layer_idx = i;
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 추후 이를 기준으로 node의 첫 번째 기준을 삼을 예정.
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2) / lat_resolution);
         raceline_index_array.push_back(raceline_index);
@@ -207,33 +215,75 @@ void genNode(const DVector& psi_bound_l,
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
         // cout << "-----" << endl;
 
-        double s = sampling_map[__alpha][i] - raceline_index * lat_resolution;
-        DVector node_alphas;
-        for (double i = s; i <= sampling_map[__width_right][i]; ++lat_resolution) 
-            node_alphas.push_back(i);
-        
         Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
         Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
-
-        Vector2d node_pos;
-
-        for (double alpha : node_alphas)
-            node_pos = ref_xy + norm_vec * alpha;
-
-        // cout << "ref_xy" << endl;
-        // cout << ref_xy << endl;
+        // 첫 시작 alpha가 s
+        double s = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+        int node_idx = 0;
+        int node_num = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
         
+        vector<Node> layer_nodes;
+        // cout << i << "번째 layer의 node 개수는 " << node_num << "이다." << endl;
+        // node별 loop 
+        for (double alpha = s; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
+            // node_alphas.push_back(alpha);
+            // node의 좌표 계산.
+            node_pos = ref_xy + alpha * norm_vec;
+            // node의 layer내의 인덱스 계산.
+            node.node_idx = node_idx;
+            node.x = node_pos.x();
+            node.y = node_pos.y();
+            node.psi = 0.0;
+            node.kappa = 0.0;        
+            node.raceline = (node_idx == raceline_index);
 
-
-
+            double psi_interp;
+            if (node_idx < raceline_index) {
+                
+                if (abs(psi_bound_l[i] - sampling_map[__psi][i]) >= M_PI) 
+                {   
+                    double bl = psi_bound_l[i] + 2 * M_PI * (psi_bound_l[i] < 0);
+                    double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+                    psi_interp = bl + (p - bl) * node_idx / raceline_index;
+                                       
+                }
+                else {
+                    psi_interp = psi_bound_l[i] + (sampling_map[__psi][i] - psi_bound_l[i]) * (node_idx+1) / raceline_index;
+                }
+                node.psi = normalizeAngle(psi_interp);
+            }
+            else if (node_idx == raceline_index) {
+                psi_interp = sampling_map[__psi][i];
+                node.psi = psi_interp;
+            }
+            else {
+                int remain = node_num - raceline_index - 1;
+                double t = static_cast<double>(node_idx - raceline_index) / max(remain, 1);  // 0 ~ 1
+                psi_interp = sampling_map[__psi][i] + t * (psi_bound_r[i] - sampling_map[__psi][i]);
+                node.psi = normalizeAngle(psi_interp);
+            }
+            // cout << i << "번째 레이어의" <<node_idx << "번째 노드의 psi는" << node.psi << endl;
+            
+            layer_nodes.push_back(node);
+            node_idx++;
         }
+        all_layers.push_back(layer_nodes);
+
+        // cout << i << "번째 Layer의" << endl;
+        // for (size_t i =0; i < node_pos.size(); ++i) {        
+        //     cout << i << "번째 Node" << endl;
+        //     cout << node_pos[i] << endl;
+        // }
+                // 각 node의 psi, kappa 계산하는 로직 추가
+
     }
+}
 
 void plotHeading(const DVector &x,
                  const DVector &y,
                  const DVector &psi,
-                 double scale = 0.5) {
-
+                 double scale = 0.5)
+{
     double dx, dy;
     double theta, arrow_len;
     double angle;
@@ -251,7 +301,7 @@ void plotHeading(const DVector &x,
 
         #if 1
         // 화살촉 
-        theta = std::atan2(dy, dx);
+        theta = atan2(dy, dx);
         arrow_len = 0.2 * scale;
         angle = M_PI / 6.0;  // 30 degrees
 
@@ -275,8 +325,37 @@ void plotHeading(const DVector &x,
         label << fixed << "(" << x[i] << ", " << y[i] << ")\nψ=" << psi[i];
 
         plt::text(x[i], y[i], label.str());
+    }
         #endif
-    
+}
+
+void plotNodeHeadings(const vector<vector<Node>>& all_layers, double scale = 0.5) {
+    using vector;
+
+    for (const auto& layer_nodes : all_layers) {
+        for (const auto& node : layer_nodes) {
+            double dx = scale * cos(node.psi + M_PI_2);
+            double dy = scale * sin(node.psi + M_PI_2);
+
+            DVector x_line = {node.x, node.x + dx};
+            DVector y_line = {node.y, node.y + dy};
+            plt::plot(x_line, y_line, {{"color", "purple"}});
+
+            // 화살촉 (arrowhead)
+            double theta = atan2(dy, dx);
+            double arrow_len = 0.2 * scale;
+            double angle = M_PI / 6.0;
+
+            double x_arrow1 = node.x + dx - arrow_len * cos(theta - angle);
+            double y_arrow1 = node.y + dy - arrow_len * sin(theta - angle);
+
+            double x_arrow2 = node.x + dx - arrow_len * cos(theta + angle);
+            double y_arrow2 = node.y + dy - arrow_len * sin(theta + angle);
+
+            plt::plot({node.x + dx, x_arrow1}, {node.y + dy, y_arrow1}, {{"color", "purple"}});
+            plt::plot({node.x + dx, x_arrow2}, {node.y + dy, y_arrow2}, {{"color", "purple"}});
+        }
+    }
 }
 
 void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r) {
@@ -284,13 +363,13 @@ void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r
 
 	// plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "black"}});
 	// plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "black"}});
-    plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
+    // plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
 
-    // plotHeading(sampling_map[__x_raceline],
-    //             sampling_map[__y_raceline],
-    //             sampling_map[__psi]);
+    plotHeading(sampling_map[__x_raceline],
+                sampling_map[__y_raceline],
+                sampling_map[__psi]);
 
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
     plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
@@ -302,6 +381,9 @@ void visual(const vector<double> &psi_bound_l, const vector<double> &psi_bound_r
     // plotHeading(sampling_map[__x_bound_r],
     //             sampling_map[__y_bound_r],
     //             psi_bound_r);
+
+    plotNodeHeadings(all_layers, 0.5);
+
 
     plt::title("Track");
     plt::grid(true);
@@ -364,13 +446,13 @@ int main() {
     
 
     // map_size(sampling_map); // (51, 4)
-    writeDMapToCSV("inputs/sampling_mapbefore.csv", sampling_map);
+    // writeDMapToCSV("inputs/sampling_mapbefore.csv", sampling_map);
     // 추후 저장될 예정 
     calcHeading(sampling_map[__x_raceline],
                 sampling_map[__y_raceline],
                 sampling_map[__psi]);
     
-    vector<double> psi_bound_l, psi_bound_r;
+    DVector psi_bound_l, psi_bound_r;
     
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
     calcHeading(sampling_map[__x_bound_l],
@@ -379,10 +461,13 @@ int main() {
 
     calcHeading(sampling_map[__x_bound_r],
                 sampling_map[__y_bound_r],
-                psi_bound_r);   
-    
-    genNode(psi_bound_l, 
-            psi_bound_r,
+                psi_bound_r);  
+
+    sampling_map[__psi_bound_l] = psi_bound_l;
+    sampling_map[__psi_bound_r] = psi_bound_r;
+
+    genNode(sampling_map[__psi_bound_l], 
+            sampling_map[__psi_bound_r],
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 

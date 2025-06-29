@@ -7,6 +7,9 @@
         "fstream": "cpp",
         "iosfwd": "cpp",
         "random": "cpp",
-        "map": "cpp"
+        "map": "cpp",
+        "vector": "cpp",
+        "deque": "cpp",
+        "string": "cpp"
     }
 }
