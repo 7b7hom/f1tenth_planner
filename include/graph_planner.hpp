@@ -36,16 +36,10 @@ using namespace rapidcsv;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
-// 유지보수를 위하여 typedef로 선언 
 typedef vector<double> DVector;
 typedef vector<int>    IVector;
 typedef map<string, DVector> DMap;
 typedef map<string, IVector> IMap;
-
-#if 0
-typedef vector<int, int> doubleIVector;
-
-#endif
 
 struct Node {
     int layer_idx;

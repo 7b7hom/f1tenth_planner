@@ -191,7 +191,7 @@ void calcHeading(DVector &x_raceline,
 }
 
 void genNode(IVector& nodesInLayer,
-            vector<vector<Node>>& all_layers,
+            vector<vector<Node>>& nodesPerLayer,
             const double veh_width,
             float lat_resolution) {
     
@@ -264,7 +264,7 @@ void genNode(IVector& nodesInLayer,
             layer_nodes.push_back(node);
             ++node_idx;
         }
-        all_layers.push_back(layer_nodes);
+        nodesPerLayer.push_back(layer_nodes);
 
         // cout << i << "번째 Layer의" << endl;
         // for (size_t i =0; i < node_pos.size(); ++i) {        
@@ -326,15 +326,20 @@ void plotHeading(const DVector &x,
         #endif
 }
 
-void plotHeading(const vector<vector<Node>>& all_layers, double scale = 0.5) {
-
-    for (const auto& layer_nodes : all_layers) {
+void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) {
+    DVector x_line, y_line;
+    DVector node_x, node_y;
+    for (const auto& layer_nodes : nodesPerLayer) {
         for (const auto& node : layer_nodes) {
             double dx = scale * cos(node.psi + M_PI_2);
             double dy = scale * sin(node.psi + M_PI_2);
 
-            DVector x_line = {node.x, node.x + dx};
-            DVector y_line = {node.y, node.y + dy};
+            node_x.push_back(node.x);
+            node_y.push_back(node.y);
+            plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}});
+
+            x_line = {node.x, node.x + dx};
+            y_line = {node.y, node.y + dy};
             plt::plot(x_line, y_line, {{"color", "purple"}});
 
             // 화살촉 (arrowhead)
@@ -350,11 +355,13 @@ void plotHeading(const vector<vector<Node>>& all_layers, double scale = 0.5) {
 
             plt::plot({node.x + dx, x_arrow1}, {node.y + dy, y_arrow1}, {{"color", "purple"}});
             plt::plot({node.x + dx, x_arrow2}, {node.y + dy, y_arrow2}, {{"color", "purple"}});
+            
         }
+        
     }
 }
 
-void visual(const vector<vector<Node>>& all_layers) {
+void visual(const vector<vector<Node>>& nodesPerLayer) {
     plt::clf();
 
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
@@ -377,7 +384,9 @@ void visual(const vector<vector<Node>>& all_layers) {
     //             sampling_map[__y_bound_r],
     //             psi_bound_r);
 
-    plotHeading(all_layers);
+    plotHeading(nodesPerLayer);
+
+    
 
     plt::title("Track");
     plt::grid(true);
@@ -387,7 +396,6 @@ void visual(const vector<vector<Node>>& all_layers) {
 
 
 int main() {
-    map<int, int> layer;
     IVector idx_sampling;
     Offline_Params params;
 
@@ -421,56 +429,42 @@ int main() {
             }
         }
     }
-
-    #if 0
-    for (int idx : idx_sampling) {
-            sampling_map[__x_raceline].push_back(gtpl_map[__x_raceline][idx]);
-            sampling_map[__y_raceline].push_back(gtpl_map[__y_raceline][idx]);
-            sampling_map[__s_racetraj].push_back(gtpl_map[__s_racetraj][idx]);
-            sampling_map[__x_bound_l].push_back(gtpl_map[__x_bound_l][idx]);
-            sampling_map[__x_bound_r].push_back(gtpl_map[__x_bound_r][idx]);
-            sampling_map[__y_bound_l].push_back(gtpl_map[__y_bound_l][idx]);
-            sampling_map[__y_bound_r].push_back(gtpl_map[__y_bound_r][idx]);
-        }
-    #endif
     // writeDMapToCSV("inputs/sampling_map", sampling_map);
     // map_size(sampling_map); // (51, 3)
 
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
     
-
     // map_size(sampling_map); // (51, 4)
-    // writeDMapToCSV("inputs/sampling_mapbefore.csv", sampling_map);
+
     // 추후 저장될 예정 
     calcHeading(sampling_map[__x_raceline],
                 sampling_map[__y_raceline],
                 sampling_map[__psi]);
     
-    DVector psi_bound_l, psi_bound_r;
-    
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
     calcHeading(sampling_map[__x_bound_l],
                 sampling_map[__y_bound_l],
-                psi_bound_l);
+                sampling_map[__psi_bound_l]);
 
     calcHeading(sampling_map[__x_bound_r],
                 sampling_map[__y_bound_r],
-                psi_bound_r);  
+                sampling_map[__psi_bound_r]);  
 
-    sampling_map[__psi_bound_l] = psi_bound_l;
-    sampling_map[__psi_bound_r] = psi_bound_r;
+    // sampling_map[__psi_bound_l] = psi_bound_l;
+    // sampling_map[__psi_bound_r] = psi_bound_r;
+
     IVector nodesInLayer;
-    vector<vector<Node>> all_layers;
+    vector<vector<Node>> nodesPerLayer;
 
     genNode(nodesInLayer,
-            all_layers,
+            nodesPerLayer,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
     // sampling points' info 
-    writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
+    // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
     
     // visual process 
-    visual(all_layers);
+    visual(nodesPerLayer);
     return 0;
 }
