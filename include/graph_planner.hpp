@@ -6,6 +6,7 @@
 #include <string>
 #include <iomanip>  
 #include <cmath>
+#include <memory>
 #include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
@@ -51,7 +52,12 @@ struct Node {
     bool raceline;
 };
 
-
+struct SplineResult {
+    MatrixXd coeffs_x;
+    MatrixXd coeffs_y;
+    MatrixXd M;
+    MatrixXd normvec_normalized;
+};
 
 void readDmapFromCSV(const string& pathname, DMap& map);
 void writeDMaptoCSV(const string& pathname, const DMap& map, char delimiter);

@@ -190,15 +190,14 @@ void calcHeading(DVector &x_raceline,
 
 }
 
-void genNode(IVector &nodesInLayer,
-            vector<vector<Node>> &nodesPerLayer,
-            Vector2d &node_pos,
+void genNode(IVector& nodesInLayer,
+            vector<vector<Node>>& nodesPerLayer,
             const double veh_width,
             float lat_resolution) {
     
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
-    
+    Vector2d node_pos;
     
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
@@ -276,191 +275,84 @@ void genNode(IVector &nodesInLayer,
 
     }
 }
-#if 1
 
-VectorXd computeEuclideanDistances(const vector<Vector2d>& path) {
-    int N = static_cast<int>(path.size()) - 1;
-    VectorXd dists(N);
-    for (int i = 0; i < N; ++i) {
-        dists(i) = (path[i + 1] - path[i]).norm();
-    }
-    return dists;
-}
+#include <vector>
+#include <cmath>
+#include <algorithm>
+#include <stdexcept>
+#include <chrono>
+#include "GraphBase.hpp"     // GraphBase 정의 포함
+#include "spline_utils.hpp"   // calc_splines 함수 포함
+#include "progressbar.hpp"    // 진행률 표시
 
-unique_ptr<SplineResult> calcSplines(
-    const vector<Vector2d>& path,
-    const VectorXd *el_lengths = nullptr,
-    double psi_s = NAN,
-    double psi_e = NAN,
-    bool use_dist_scaling = true)
-{
-    vector<Vector2d> updated_path = path;
-    bool closed = (path.front() - path.back()).norm() < 1e-6;
+using namespace std;
+using namespace std::chrono;
 
-    if (closed) {
-        updated_path.push_back(path[1]);  // path[1] 복사해서 끝에 추가
-    }
-
-    int no_splines = static_cast<int>(updated_path.size()) - 1;
-    VectorXd ds = (el_lengths == nullptr) ? computeEuclideanDistances(updated_path) : *el_lengths;
-
-    MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
-    VectorXd b_x = VectorXd::Zero(no_splines * 4);
-    VectorXd b_y = VectorXd::Zero(no_splines * 4);
-
-    for (int j = 0; j < no_splines; ++j) {
-        int row0 = j * 4;
-        M(row0, row0) = 1;
-        b_x(row0) = updated_path[j].x();
-        b_y(row0) = updated_path[j].y();
-
-        RowVector4d T;
-        double d = ds(j);
-        T << 1, d, d * d, d * d * d;
-
-        for (int k = 0; k < 4; ++k)
-            M(row0 + 1, row0 + k) = T(k);
-
-        b_x(row0 + 1) = updated_path[j + 1].x();
-        b_y(row0 + 1) = updated_path[j + 1].y();
-    }
-
-    for (int j = 0; j < no_splines - 1; ++j) {
-        int row = 2 * no_splines + j;
-        double d = ds(j);
-        RowVector4d T;
-        T << 0, 1, 2 * d, 3 * d * d;
-        for (int k = 0; k < 4; ++k) {
-            M(row, 4 * j + k) = T(k);
-            M(row, 4 * (j + 1) + k) = -T(k);
-        }
-    }
-
-    for (int j = 0; j < no_splines - 1; ++j) {
-        int row = 3 * no_splines - 1 + j;
-        double d = ds(j);
-        RowVector4d T;
-        T << 0, 0, 2, 6 * d;
-        for (int k = 0; k < 4; ++k) {
-            M(row, 4 * j + k) = T(k);
-            M(row, 4 * (j + 1) + k) = -T(k);
-        }
-    }
-
-    if (!isnan(psi_s)) {
-        M.row(4 * no_splines - 2).setZero();
-        M(4 * no_splines - 2, 1) = 1;
-        b_x(4 * no_splines - 2) = cos(psi_s);
-        b_y(4 * no_splines - 2) = sin(psi_s);
-    }
-
-    if (!isnan(psi_e)) {
-        double d = ds(no_splines - 1);
-        M.row(4 * no_splines - 1).setZero();
-        M(4 * no_splines - 1, 4 * (no_splines - 1) + 1) = 1;
-        M(4 * no_splines - 1, 4 * (no_splines - 1) + 2) = 2 * d;
-        M(4 * no_splines - 1, 4 * (no_splines - 1) + 3) = 3 * d * d;
-        b_x(4 * no_splines - 1) = cos(psi_e);
-        b_y(4 * no_splines - 1) = sin(psi_e);
-    }
-
-    VectorXd x_les = M.colPivHouseholderQr().solve(b_x);
-    VectorXd y_les = M.colPivHouseholderQr().solve(b_y);
-
-    MatrixXd coeffs_x = Map<MatrixXd>(x_les.data(), 4, no_splines).transpose();
-    MatrixXd coeffs_y = Map<MatrixXd>(y_les.data(), 4, no_splines).transpose();
-
-    MatrixXd normvec(no_splines, 2);
-    for (int i = 0; i < no_splines; ++i) {
-        double dx = coeffs_x(i, 1);
-        double dy = coeffs_y(i, 1);
-        normvec(i, 0) = -dy;
-        normvec(i, 1) = dx;
-    }
-
-    VectorXd norms = normvec.rowwise().norm();
-    MatrixXd normvec_normalized(no_splines, 2);
-    for (int i = 0; i < no_splines; ++i)
-        normvec_normalized.row(i) = normvec.row(i) / norms(i);
-
-    return make_unique<SplineResult>(SplineResult{coeffs_x, coeffs_y, M, normvec_normalized});
-}
-
-
-void genEdges(const vector<vector<Node>> &nodesPerLayer,
-              Vector2d &node_pos,
-              const double lat_offset,
-              const double stepsize_approx,
-              const double min_vel = 0.0,
+void genEdges(const vector<vector<pair<Vector2d, double>>> &state_pos,  // <pos, psi>
+              GraphBase &graph_base,
+              double stepsize_approx,
+              double min_vel_race = 0.0,
               bool closed = true) {
 
-    if (lat_offset <= 0.0) {
-        throw invalid_argument("Too small lateral offset!");
+    if (graph_base.lat_offset <= 0.0) {
+        throw invalid_argument("Requested too small lateral offset! A lateral offset larger than zero must be allowed!");
     }
 
-    vector<Vector2d> raceline_cl;
-    Vector2d start_point();
+    // prepare raceline coefficients
+    vector<Vector2d> raceline_cl = graph_base.raceline;
+    raceline_cl.push_back(graph_base.raceline.front());  // 닫힌 경로용
 
-    if (closed) {
-        raceline_cl.push_back(node_pos.x(), node_pos.y());  // node_pos가 vector<Vector2d>라 가정
-    }   
-    // node_pos 스플라인 계수 계산
-    auto raceline_result = calcSplines(raceline_cl);
+    MatrixXd x_coeff_r, y_coeff_r;
+    tie(x_coeff_r, y_coeff_r, ignore, ignore) = calcSplines(raceline_cl);
 
-    const MatrixXd& x_coeff_r = raceline_result->coeffs_x;
-    const MatrixXd& y_coeff_r = raceline_result->coeffs_y;
+    auto tic = steady_clock::now();
 
-    for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
-        size_t start_layer = i;
-        size_t end_layer = i + 1;
+    for (size_t i = 0; i < state_pos.size(); ++i) {
+        printProgressBar(i, state_pos.size() - 1, "Calculate splines");
 
-        if (end_layer >= nodesPerLayer.size()) {
-            if (closed)
-                end_layer -= nodesPerLayer.size();
-            else
+        int start_layer = i;
+        int end_layer = i + 1;
+
+        if (end_layer >= state_pos.size()) {
+            if (closed) {
+                end_layer -= state_pos.size();
+            } else {
                 break;
+            }
         }
 
-        for (size_t start_n = 0; start_n < nodesPerLayer[start_layer].size(); ++start_n) {
-            const Node& start_node = nodesPerLayer[start_layer][start_n];
+        for (size_t start_n = 0; start_n < state_pos[start_layer].size(); ++start_n) {
+            int end_n_ref = graph_base.raceline_index[end_layer] + start_n - graph_base.raceline_index[start_layer];
 
-            // raceline index 비교를 위해 기준 index 필요
-            int ref_start_idx = /* 예: raceline에서의 index 저장 벡터가 필요 */;
-            int ref_end_idx = /* 마찬가지로 end_layer에서의 raceline index */;
-
-            int end_n_ref = ref_end_idx + start_n - ref_start_idx;
-
-            // 거리 계산
-            Vector2d d_start(start_node.x, start_node.y);
-            const auto& end_layer_nodes = nodesPerLayer[end_layer];
-            int clipped_idx = clamp(end_n_ref, 0, (int)end_layer_nodes.size() - 1);
-            Vector2d d_end(end_layer_nodes[clipped_idx].x, end_layer_nodes[clipped_idx].y);
+            Vector2d d_start = state_pos[start_layer][start_n].first;
+            int end_idx_clipped = clamp(end_n_ref, 0, (int)state_pos[end_layer].size() - 1);
+            Vector2d d_end = state_pos[end_layer][end_idx_clipped].first;
 
             double dist = (d_end - d_start).norm();
-            int lat_steps = static_cast<int>(round(dist * lat_offset / start_node.lat_resolution));
+            int lat_steps = static_cast<int>(round(dist * graph_base.lat_offset / graph_base.lat_resolution));
 
-            for (int end_n = max(0, end_n_ref - lat_steps); end_n <= min((int)end_layer_nodes.size() - 1, end_n_ref + lat_steps); ++end_n) {
-                const Node& end_node = end_layer_nodes[end_n];
-
+            for (int end_n = max(0, end_n_ref - lat_steps); end_n <= min((int)state_pos[end_layer].size() - 1, end_n_ref + lat_steps); ++end_n) {
                 MatrixXd x_coeff, y_coeff;
-
-                if (start_node.raceline && end_node.raceline) {
+                if (graph_base.raceline_index[end_layer] == end_n && graph_base.raceline_index[start_layer] == start_n) {
                     x_coeff = x_coeff_r.row(start_layer);
                     y_coeff = y_coeff_r.row(start_layer);
                 } else {
-                    vector<Vector2d> path = { Vector2d(start_node.x, start_node.y), Vector2d(end_node.x, end_node.y) };
-                    auto result = calcSplines(path, nullptr, start_node.psi, end_node.psi);
-                    x_coeff = result->coeffs_x;
-                    y_coeff = result->coeffs_y;
+                    vector<Vector2d> path = {state_pos[start_layer][start_n].first, state_pos[end_layer][end_n].first};
+                    double psi_s = state_pos[start_layer][start_n].second;
+                    double psi_e = state_pos[end_layer][end_n].second;
+                    tie(x_coeff, y_coeff, ignore, ignore) = calcSplines(path, psi_s, psi_e);
                 }
 
-                // addEdge(start_layer, start_n, end_layer, end_n, x_coeff, y_coeff);
+                graph_base.addEdge(start_layer, start_n, end_layer, end_n, x_coeff, y_coeff);
             }
         }
     }
+
+    auto toc = steady_clock::now();
+    duration<double> elapsed = toc - tic;
+    cout << "Edge generation completed in " << elapsed.count() << " seconds." << endl;
 }
 
-#endif
 
 void plotHeading(const DVector &x,
                  const DVector &y,
@@ -641,11 +533,9 @@ int main() {
 
     IVector nodesInLayer;
     vector<vector<Node>> nodesPerLayer;
-    Vector2d node_pos(static_cast<int>(idx_sampling.size()), 2);
 
     genNode(nodesInLayer,
             nodesPerLayer,
-            node_pos,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
