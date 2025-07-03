@@ -190,15 +190,14 @@ void calcHeading(DVector &x_raceline,
 
 }
 
-void genNode(IVector& nodesInLayer,
-            vector<vector<Node>>& nodesPerLayer,
+void genNode(NodeMap& nodesPerLayer,
             const double veh_width,
             float lat_resolution) {
     
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
     Vector2d node_pos;
-    
+    nodesPerLayer.resize(N); 
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
@@ -217,9 +216,8 @@ void genNode(IVector& nodesInLayer,
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
         int node_idx = 0;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
-        nodesInLayer.push_back(num_nodes);
+        nodesPerLayer[i].resize(num_nodes); 
 
-        vector<Node> layer_nodes;
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
         // node별 loop 
         for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
@@ -261,10 +259,9 @@ void genNode(IVector& nodesInLayer,
             }
             // cout << i << "번째 레이어의" <<node_idx << "번째 노드의 psi는" << node.psi << endl;
             
-            layer_nodes.push_back(node);
+            nodesPerLayer[i][node_idx] = node;
             ++node_idx;
         }
-        nodesPerLayer.push_back(layer_nodes);
 
         // cout << i << "번째 Layer의" << endl;
         // for (size_t i =0; i < node_pos.size(); ++i) {        
@@ -326,7 +323,7 @@ void plotHeading(const DVector &x,
         #endif
 }
 
-void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) {
+void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     DVector x_line, y_line;
     DVector node_x, node_y;
     for (const auto& layer_nodes : nodesPerLayer) {
@@ -338,11 +335,13 @@ void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) 
             node_y.push_back(node.y);
             plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}});
 
+            #if 0
             x_line = {node.x, node.x + dx};
             y_line = {node.y, node.y + dy};
             plt::plot(x_line, y_line, {{"color", "purple"}});
 
             // 화살촉 (arrowhead)
+            
             double theta = atan2(dy, dx);
             double arrow_len = 0.2 * scale;
             double angle = M_PI / 6.0;
@@ -355,13 +354,13 @@ void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) 
 
             plt::plot({node.x + dx, x_arrow1}, {node.y + dy, y_arrow1}, {{"color", "purple"}});
             plt::plot({node.x + dx, x_arrow2}, {node.y + dy, y_arrow2}, {{"color", "purple"}});
-            
+            #endif
         }
         
     }
 }
 
-void visual(const vector<vector<Node>>& nodesPerLayer) {
+void visual(const NodeMap& nodesPerLayer) {
     plt::clf();
 
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
@@ -384,9 +383,9 @@ void visual(const vector<vector<Node>>& nodesPerLayer) {
     //             sampling_map[__y_bound_r],
     //             psi_bound_r);
 
-    plotHeading(nodesPerLayer);
 
-    
+    // 노드마다 psi확인할 수 있는 용도 
+    plotHeading(nodesPerLayer);
 
     plt::title("Track");
     plt::grid(true);
@@ -453,11 +452,9 @@ int main() {
     // sampling_map[__psi_bound_l] = psi_bound_l;
     // sampling_map[__psi_bound_r] = psi_bound_r;
 
-    IVector nodesInLayer;
-    vector<vector<Node>> nodesPerLayer;
+    NodeMap nodesPerLayer;
 
-    genNode(nodesInLayer,
-            nodesPerLayer,
+    genNode(nodesPerLayer,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 

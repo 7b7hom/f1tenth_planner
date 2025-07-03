@@ -36,11 +36,6 @@ using namespace rapidcsv;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
-typedef vector<double> DVector;
-typedef vector<int>    IVector;
-typedef map<string, DVector> DMap;
-typedef map<string, IVector> IMap;
-
 struct Node {
     int layer_idx;
     int node_idx;
@@ -51,7 +46,10 @@ struct Node {
     bool raceline;
 };
 
+typedef vector<double> DVector;
+typedef vector<int>    IVector;
+typedef map<string, DVector> DMap;
+typedef map<string, IVector> IMap;
+typedef vector<vector<Node>> NodeMap;
 
 
-void readDmapFromCSV(const string& pathname, DMap& map);
-void writeDMaptoCSV(const string& pathname, const DMap& map, char delimiter);
