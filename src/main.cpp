@@ -395,6 +395,7 @@ void visual(const NodeMap& nodesPerLayer) {
 
 
 int main() {
+    #if 0
     IVector idx_sampling;
     Offline_Params params;
 
@@ -463,5 +464,47 @@ int main() {
     
     // visual process 
     visual(nodesPerLayer);
+    #endif
+
+    // Graph sample code 
+    Graph directedGraph(true);
+    ITuple t1(0, 0);
+    ITuple t2(0, 1);
+    ITuple t3(1, 0);
+    ITuple t4(0, 2);
+    // spline 생성 후 edge로 집어넣음.
+    directedGraph.addEdge(t1, 3);// push_back이라서 sorting은 되지 않음. 
+    directedGraph.addEdge(t1, 4);
+    directedGraph.addEdge(t1, 5);
+    directedGraph.addEdge(t3, 2);
+    directedGraph.addEdge(t4, 3);
+    // 실제 로직은 node idx가 작은 순서대로 그래프가 그러질 예정이라 괜찮을 듯.
+    // grpah 전체 print 
+    cout << "---처음 Graph---" << endl;
+    directedGraph.printGraph();
+
+    IVector child1;
+    // t1 노드의 뒤로 연결된(child) node들을 뽑아온다.
+    // directedGraph.getChildIdx(t1, child1);
+
+    // Error Index(child가 없는 경우 runtime_error)
+    // directedGraph.getChildIdx(t2, child);
+    
+    // (0, n)이라는 임의의 노드 n이 (1, 3)을 들고 있는 경우 해당 list에서 3번 삭제
+    // 이후 child 노드가 그 뒤로 연결된 spline이 없는 경우 parent의 adjList에서 child 노드를 삭제하기 위하여 필요함.
+    vector<ITuple> parent; 
+    // 0번째 layer에서 1번째 layer의 3번 노드를 들고 있는 노드가 있는지 찾고 parent로 반환함.
+    directedGraph.getParentNode(0, 3, parent); 
+    
+    cout << "---0번째 Layer의 node 중에서 1번째 Layer의 3번째 노드와 엣지로 연결되어 있는 노드의 idx---" << endl;
+    for (size_t i = 0; i < parent.size(); ++i) {
+        cout << get<1>(parent[i]) << endl;
+        // 해당 엣지 삭제
+        directedGraph.removeEdge(parent[i], 3);
+    }
+    cout << "---위의 엣지를 제거한 후 graph 상태---" << endl;
+    // 결과 확인용 
+    directedGraph.printGraph();
+
     return 0;
 }
