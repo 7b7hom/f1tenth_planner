@@ -55,62 +55,16 @@ typedef vector<vector<Node>> NodeMap;
 typedef tuple<int, int> ITuple;
 typedef map<ITuple, IVector> TupleMap;
 
-// TUM의 GraphBase 역할 
 class Graph {
 private:
-    TupleMap adjList;
+    TupleMap adjLists;
     bool isDirected;
+
 public:
-    Graph(bool directed = true) {
-        isDirected = directed;
-    }
-    
-    void addEdge(ITuple srcKey, int destIdx) {
-        adjList[srcKey].push_back(destIdx);
-    }
-
-    void printGraph() const {
-        for (const auto& [key, neighbors] : adjList) {
-            cout << "(" << get<0>(key) << "," << get<1>(key) << ")" << ": ";
-            for (int dest : neighbors) {
-                cout << dest << " -> ";
-            }
-            cout << "NULL\n";
-        }
-    }
-
-    void getChildIdx(ITuple srcKey, IVector& childIdx) {
-        if (adjList[srcKey].size() <= 0) 
-            throw runtime_error{"Unable to print child node for srcKey"};
-        for (const auto& value : adjList[srcKey]) {
-            childIdx.push_back(value);
-        }
-    }
-    // 코드 수정 필요. 제기능은 함.  
-    void getParentNode(int target_layer, int value, vector<ITuple>& parent) {
-        for (auto& [key, vec] : adjList) {
-            if (get<0>(key) == target_layer) {
-                    for (auto it = adjList[key].begin(); it != adjList[key].end(); it++) {
-                        if (*it == value) {
-                            parent.push_back(key);
-                        }
-                    }
-                        
-                }
-            }
-        }
-
-    void removeEdge(ITuple& parent, int value) {
-        for (auto& [key, vec] : adjList) {
-            if (key == parent) {
-                auto it = remove(vec.begin(), vec.end(), value);
-                if (it != vec.end()) {
-                    vec.erase(it, vec.end());
-                }
-            }
-        }
-    }
-
+    Graph(bool directed = true);
+    void addEdge(ITuple srcKey, int destIdx);
+    void printGraph();
+    void getChildIdx(ITuple srcKey, IVector& childIdx);
+    void getParentNode(int target_layer, int value, vector<ITuple>& parent);
+    void removeEdge(ITuple& parent, int value);
 };
-
-

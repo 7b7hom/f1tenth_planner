@@ -4,7 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
@@ -467,7 +466,7 @@ int main() {
     #endif
 
     // Graph sample code 
-    Graph directedGraph(true);
+    Graph directedGraph;
     ITuple t1(0, 0);
     ITuple t2(0, 1);
     ITuple t3(1, 0);
