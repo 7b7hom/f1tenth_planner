@@ -47,8 +47,8 @@ struct Node {
     bool raceline;
 };
 
-typedef vector<double> DVector;
-typedef vector<int>    IVector;
+typedef vector<double> DVector; // Double type의 벡터
+typedef vector<int>    IVector; // Int type의 벡터
 typedef map<string, DVector> DMap;
 typedef map<string, IVector> IMap;
 typedef vector<vector<Node>> NodeMap;
