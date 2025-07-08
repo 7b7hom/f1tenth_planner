@@ -1,13 +1,242 @@
 #include "graph_planner.hpp"
 #include "config.h"
 
-// 스플라인 결과를 담기 위한 구조체: x, y 방향 계수, 행렬 M, 정규화된 노멀 벡터
-struct SplineResult {
-    MatrixXd coeffs_x;          // 각 구간의 x 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
-    MatrixXd coeffs_y;          // 각 구간의 y 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
-    MatrixXd M;                 // 스플라인 계수 계산에 사용된 시스템 행렬
-    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
-};
+DMap gtpl_map;
+DMap sampling_map;
+
+// --- 실행하기 위해서 main에서 가져온 부분 ---
+
+// CSV를 읽어서 DMap으로 변경
+void readDMapFromCSV(const string& pathname, DMap& map) {
+    Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
+    vector<string> labels = csv.GetColumnNames();
+    for (const auto& label : labels)
+        map[label] = csv.GetColumn<double>(label);
+}
+
+// DMap을 CSV에 작성
+void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',') {
+    ofstream file(pathname);
+    if (!file.is_open()) throw runtime_error("Can't open file.");
+    size_t num_cols = map.size();
+    size_t num_rows = map.begin()->second.size();
+    size_t i = 0;
+    for (const auto& [key, _] : map) {
+        file << key;
+        if (++i != num_cols) file << delimiter;
+    }
+    file << '\n';
+    for (size_t row = 0; row < num_rows; ++row) {
+        size_t j = 0;
+        for (const auto& [_, col] : map) {
+            file << col[row];
+            if (++j != num_cols) file << delimiter;
+        }
+        file << '\n';
+    }
+    file.close();
+}
+
+// Debug용 함수: map의 columns, rows 개수 print
+void map_size(DMap& map) {
+    size_t num_cols = map.size();
+    size_t num_rows = map.begin()->second.size();
+    cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
+}
+
+// DVector를 Map 구조로 추가(연산)
+void addDVectorToMap(DMap &map, string attr, const IVector *idx_array = nullptr) {
+    size_t len;
+    if (idx_array == nullptr) {
+        len = map[__x_ref].size();
+    } else {
+        len = idx_array->size();
+    }
+    DVector x_out(len), y_out(len);
+    string x_label = "x_" + attr;
+    string y_label = "y_" + attr;
+    
+    if (!attr.compare("bound_r")) {
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__width_right][i];
+            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__width_right][i];
+        }
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    } else if (!attr.compare("bound_l")) {
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] - map[__x_normvec][i] * map[__width_left][i];
+            y_out[i] = map[__y_ref][i] - map[__y_normvec][i] * map[__width_left][i];
+        }
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    } else if (!attr.compare("raceline")) {
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__alpha][i];
+            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__alpha][i];
+        }
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    } else if (!attr.compare("delta_s")) {
+        for (size_t i = 0; i < len - 1; ++i) {
+            x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i];
+        }
+        map[attr] = x_out;
+    }
+}
+
+// 레이싱 라인에서 경로 계획을 위한 layer가 될 지점들을 샘플링
+void samplePointsFromRaceline(const DVector& kappa, const DVector& dist,
+                              double d_curve, double d_straight, double curve_th, IVector& idx_array) {
+    const size_t n = kappa.size();
+    double cur_dist = 0.0;
+    double next_dist = 0.0;
+    double next_dist_min = 0.0;
+    for (size_t i = 0; i < n; ++i) {
+        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_th) {
+            next_dist = cur_dist;
+        }
+        if ((cur_dist + dist[i]) > next_dist) {
+            idx_array.push_back(static_cast<int>(i));
+            if (fabs(kappa[i]) < curve_th) {
+                next_dist += d_straight;
+            } else {
+                next_dist += d_curve;
+            }
+            next_dist_min = cur_dist + d_curve;
+        }
+        cur_dist += dist[i];
+    }
+}
+
+// 주어진 각도를 -PI에서 PI 사이의 값으로 정규화
+double normalizeAngle(double angle) {
+    while (angle > M_PI)  angle -= 2.0 * M_PI;
+    while (angle < -M_PI) angle += 2.0 * M_PI;
+    return angle;
+}
+
+// 주어진 X, Y 좌표 벡터를 기반으로 각 지점에서의 헤딩(Heading, 진행 방향 각도)을 계산
+void calcHeading(DVector &x_raceline, DVector &y_raceline, DVector &psi) {
+    size_t N = x_raceline.size();
+    psi.resize(N);
+    double dx, dy;
+    for (size_t i = 0; i < N; ++i) {
+        if (i != N -1) {
+            dx = x_raceline[i+1] - x_raceline[i];
+            dy = y_raceline[i+1] - y_raceline[i];
+        } else { // 닫힌 회로 가정
+            dx = x_raceline[0] - x_raceline[N - 1];
+            dy = y_raceline[0] - y_raceline[N - 1];
+        }
+        psi[i] = atan2(dy, dx) - M_PI_2;
+        normalizeAngle(psi[i]);
+    }
+}
+
+// 샘플링된 레이어마다 경로 계획을 위한 Node(차량이 횡방향으로 이동 가능한 위치들) 생성
+void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolution) {
+    const size_t N = sampling_map[__alpha].size();
+    IVector raceline_index_array;
+    Vector2d node_pos;
+    nodesPerLayer.resize(N); 
+
+    for (size_t i = 0; i < N; ++i){ 
+        Node node;
+        node.layer_idx = i; 
+        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
+        raceline_index_array.push_back(raceline_index);
+        
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
+        
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+        int node_idx = 0;
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
+        nodesPerLayer[i].resize(num_nodes); 
+
+        for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
+            node_pos = ref_xy + alpha * norm_vec;
+            node.node_idx = node_idx;
+            node.x = node_pos.x();
+            node.y = node_pos.y();
+            node.psi = 0.0;
+            node.kappa = 0.0;        
+            node.raceline = (node_idx == raceline_index);
+
+            double psi_interp;
+            if (node_idx < raceline_index) {
+                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) {  
+                    double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
+                    double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+                    psi_interp = bl + (p - bl) * node_idx / raceline_index;
+                } else {
+                    psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
+                }
+                node.psi = normalizeAngle(psi_interp);
+            }
+            else if (node_idx == raceline_index) {
+                psi_interp = sampling_map[__psi][i];
+                node.psi = psi_interp;
+            }
+            else {
+                int remain = num_nodes - raceline_index - 1;
+                double t = static_cast<double>(node_idx - raceline_index) / max(remain, 1); 
+                psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
+                node.psi = normalizeAngle(psi_interp);
+            }
+            nodesPerLayer[i][node_idx] = node;
+            ++node_idx;
+        }
+    }
+}
+
+// 주어진 X, Y 좌표에서 해당 psi (헤딩) 방향을 화살표로 시각화
+void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale = 0.5) {
+    double dx, dy;
+    double theta, arrow_len;
+    double angle;
+    double x_arrow1, y_arrow1;
+    double x_arrow2, y_arrow2;
+
+    for (size_t i = 0; i < x.size(); ++i) {
+        dx = scale * cos(psi[i] + M_PI_2);
+        dy = scale * sin(psi[i] + M_PI_2);
+        DVector x_line = {x[i], x[i] + dx};
+        DVector y_line = {y[i], y[i] + dy};
+        plt::plot(x_line, y_line, {{"color", "green"}});
+
+        #if 1 // 화살촉 그리기
+        theta = atan2(dy, dx);
+        arrow_len = 0.2 * scale;
+        angle = M_PI / 6.0;
+
+        x_arrow1 = x[i] + dx - arrow_len * cos(theta - angle);
+        y_arrow1 = y[i] + dy - arrow_len * sin(theta - angle);
+        x_arrow2 = x[i] + dx - arrow_len * cos(theta + angle);
+        y_arrow2 = y[i] + dy - arrow_len * sin(theta + angle);
+
+        plt::plot({x[i] + dx, x_arrow1}, {y[i] + dy, y_arrow1}, {{"color", "green"}});
+        plt::plot({x[i] + dx, x_arrow2}, {y[i] + dy, y_arrow2}, {{"color", "green"}});
+        #endif
+    }
+}
+
+// NodeMap에 저장된 모든 노드들을 보라색 점으로 플로팅하고, 각 노드의 헤딩을 화살표로 시각화
+void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
+    DVector node_x, node_y;
+    for (const auto& layer_nodes : nodesPerLayer) {
+        for (const auto& node : layer_nodes) {
+            node_x.push_back(node.x);
+            node_y.push_back(node.y);
+        }
+    }
+    plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}, {"label", "Nodes"}});
+}
+
+
+// --- spline 관련 함수들 ---
+// 여기부터 코딩
 
 VectorXd computeEuclideanDistances(const MatrixXd& path) {
     int N = path.rows() - 1;
@@ -333,6 +562,142 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
     }
 }
 
-int main(){
 
+// 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
+void visual(const NodeMap& nodesPerLayer, const Graph& graph) {
+    plt::clf();
+
+    // 트랙 경계선
+    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+
+    // 레이싱 라인 및 샘플링된 포인트
+    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
+    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
+    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+
+    // 노드들
+    plotHeading(nodesPerLayer);
+
+    // --- Graph 엣지 (스플라인) 시각화 ---
+    Offline_Params params; // params는 visual 함수 내부에서 직접 접근하거나 인자로 받아야 합니다.
+    for (const auto& layer_nodes : nodesPerLayer) {
+        for (const auto& current_node : layer_nodes) {
+            ITuple src_key(current_node.layer_idx, current_node.node_idx);
+            IVector child_nodes_idx;
+
+            try {
+                graph.getChildIdx(src_key, child_nodes_idx);
+            } catch (const std::runtime_error& e) {
+                continue;
+            }
+            
+            for (int dest_node_idx : child_nodes_idx) {
+                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
+                // next_node_idx 유효성 검사 추가 (인덱스 범위 체크)
+                if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
+                     cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl;
+                    continue;
+                }
+                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
+
+                MatrixXd spline_path(2, 2);
+                spline_path << current_node.x, current_node.y,
+                               next_node.x, next_node.y;
+                
+                double psi_s = current_node.psi;
+                double psi_e = next_node.psi;
+
+                VectorXd el_lengths(1);
+                el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
+
+                SplineResult res;
+                try {
+                    res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
+                } catch (const std::exception& e) {
+                    continue;
+                }
+
+                // 계산된 스플라인 계수를 사용하여 곡선 그리기
+                DVector spline_x_pts, spline_y_pts;
+                const int num_spline_segments = 10; 
+                for (int k = 0; k <= num_spline_segments; ++k) {
+                    double t_eval = static_cast<double>(k) / num_spline_segments;
+                    SplinePoint sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval, res.ds(0), true);
+                    spline_x_pts.push_back(sp.x);
+                    spline_y_pts.push_back(sp.y);
+                }
+                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}, {"label", "Valid Splines"}});
+            }
+        }
+    }
+
+    plt::title("Track and Planned Graph");
+    plt::grid(true);
+    plt::axis("equal");
+    plt::legend();
+    plt::show();
+}
+
+// 전체 경로 계획 파이프라인을 실행하는 함수
+void runPlanningPipeline(const Offline_Params& params, const std::string& map_file_in, const std::string& map_file_out) {
+    // 1. 트랙 데이터 로드 및 전처리
+    readDMapFromCSV(map_file_in, gtpl_map); // gen_spline.cpp의 전역 gtpl_map에 로드
+    addDVectorToMap(gtpl_map, "bound_r");
+    addDVectorToMap(gtpl_map, "bound_l");
+    addDVectorToMap(gtpl_map, "raceline");
+    addDVectorToMap(gtpl_map, "delta_s");
+    writeDMapToCSV(map_file_out, gtpl_map);
+
+    // 2. 레이어 샘플링
+    IVector idx_sampling;
+    samplePointsFromRaceline(gtpl_map[__kappa], gtpl_map[__delta_s],
+                             params.LON_CURVE_STEP, params.LON_STRAIGHT_STEP,
+                             params.CURVE_THR, idx_sampling);
+    
+    // 샘플링된 인덱스를 사용하여 gtpl_map에서 데이터를 복사하여 sampling_map 채우기
+    for (const auto& [key, vec] : gtpl_map) {
+        sampling_map[key].reserve(idx_sampling.size()); 
+        for (int idx : idx_sampling) {
+            if (idx >= 0 && idx < (int)vec.size()) { 
+                sampling_map[key].push_back(vec[idx]);
+            }
+        }
+    }
+    addDVectorToMap(sampling_map, "delta_s", &idx_sampling); 
+    
+    calcHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+    calcHeading(sampling_map[__x_bound_l], sampling_map[__y_bound_l], sampling_map[__psi_bound_l]);
+    calcHeading(sampling_map[__x_bound_r], sampling_map[__y_bound_r], sampling_map[__psi_bound_r]);
+
+    // 3. 노드 그리드 생성
+    NodeMap nodesPerLayer;
+    genNode(nodesPerLayer, params.VEH_WIDTH, params.LAT_RESOLUTION);
+
+    // 4. 스플라인 생성 및 유효성 검사, 최종 그래프 구축
+    Graph directedGraph; 
+    generateGraphEdges(directedGraph, nodesPerLayer, params);
+
+    // 5. 최종 그래프 연결 확인 (Print Graph)
+    cout << "\n--- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---" << endl;
+    directedGraph.printGraph();
+
+    // 6. 결과 시각화 (Plotting)
+    visual(nodesPerLayer, directedGraph, params); 
+}
+
+
+// --- main 함수 ---
+int main() {
+    // 1. 경로 계획 파라미터 로드
+    Offline_Params params; 
+
+    // 2. 입력 및 출력 파일 경로 설정
+    std::string map_file_in = "inputs/gtpl_levine.csv"; 
+    std::string map_file_out = "inputs/gtpl_levine_out.csv"; 
+
+    // 3. 전체 경로 계획 파이프라인 실행
+    runPlanningPipeline(params, map_file_in, map_file_out);
+
+    return 0;
 }
