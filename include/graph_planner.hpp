@@ -47,6 +47,20 @@ struct Node {
     bool raceline;
 };
 
+struct SplineResult {
+    MatrixXd coeffs_x;
+    MatrixXd coeffs_y;
+    MatrixXd M;
+    MatrixXd normvec_normalized;
+    VectorXd ds;
+};
+
+struct SplinePoint {
+    double x, y;
+    double psi;
+    double kappa;
+};
+
 typedef vector<double> DVector; // Double type의 벡터
 typedef vector<int>    IVector; // Int type의 벡터
 typedef map<string, DVector> DMap;
