@@ -18,8 +18,11 @@ matplotlibcpp: header-only/system 내 Python (dev), numpy, matplotlib 필요
 2025.07.07
 - calcSpline()까지 구현
 
-2025.07.08 -> visual 전까지 완료(orin 보드를 못 사용해서 시각화 전까지의 로직 구현)
-2025.07.08 -> visual, runPlanningPipeline ai 돌려서 대충 채워놓음(실행해봐야하니까........), gen_spline.cpp에서 모든 로직 실행하도록 정리함.
+2025.07.08
+- visual 전까지 완료(orin 보드를 못 사용해서 시각화 전까지의 로직 구현)
+
+2025.07.08
+- visual, runPlanningPipeline ai 돌려서 대충 채워놓고, gen_spline.cpp에서 모든 로직 실행하도록 정리함.(실행 목적..)
 
 ## gen_spline 흐름
 - computeEuclideanDistances
