@@ -17,6 +17,7 @@ matplotlibcpp: header-only/system 내 Python (dev), numpy, matplotlib 필요
 ## gen_spline
 2025.07.07
 - calcSpline()까지 구현
+
 2025.07.08 -> visual 전까지 완료(orin 보드를 못 사용해서 시각화 전까지의 로직 구현)
 
 ## gen_spline 흐름
