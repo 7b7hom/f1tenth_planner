@@ -33,27 +33,21 @@ void Graph::getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx) {
         childNodeIdx.push_back(value);
     }
 }
-// 코드 수정 필요. 제기능은 함.  
-// void Graph::getParentNode(int target_layer, int value, IPairVector& parent) {
-//     for (auto& [key, vec] : adjLists) {
-//         if (get<0>(key) == target_layer) {
-//                 for (auto it = adjLists[key].begin(); it != adjLists[key].end(); it++) {
-//                     if (*it == value) {
-//                         parent.push_back(key);
-//                     }
-//                 }
-                    
-//             }
-//         }
-//     }
+// 코드 수정 필요. 제기능은 함.
+void Graph::getParentNode(IPair &srcNodeIdx, IPairVector &parent) {
+    for (auto &[key, vec] : adjLists) {
+        if (key.first == (srcNodeIdx.first) - 1) {
+            for (const auto &value : vec) {
+                if (value == srcNodeIdx) parent.push_back(key);
+                }
+            }
+        }
+    }
 
-// void Graph::removeEdge(IPair& parent, int value) {
-//     for (auto& [key, vec] : adjLists) {
-//         if (key == parent) {
-//             auto it = remove(vec.begin(), vec.end(), value);
-//             if (it != vec.end()) {
-//                 vec.erase(it, vec.end());
-//             }
-//         }
-//     }
-// }
+// parent와 연결된 노드 리스트에서 delNodeIdx를 삭제한다.
+void Graph::removeEdge(IPair& delNodeIdx, IPairVector& parent) {
+    for (size_t i = 0; i < parent.size(); ++i) {
+        adjLists[parent[i]].erase(remove(adjLists[parent[i]].begin(), adjLists[parent[i]].end(), delNodeIdx), 
+                                        adjLists[parent[i]].end());
+    }
+}

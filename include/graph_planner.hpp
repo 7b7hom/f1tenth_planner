@@ -72,6 +72,6 @@ public:
     void addEdge(IPair srcNodeIdx, IPair destNodeIdx);
     void printGraph();
     void getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx);
-    void getParentNode(int target_layer, int value, IPairVector& parent);
-    void removeEdge(IPair& parent, int value);
+    void getParentNode(IPair& srcNodeIdx, IPairVector& parent);
+    void removeEdge(IPair& srcNodeIdx, IPairVector& parent);
 };
