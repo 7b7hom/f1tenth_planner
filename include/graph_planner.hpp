@@ -6,7 +6,11 @@
 #include <string>
 #include <iomanip>  
 #include <cmath>
+<<<<<<< HEAD
 #include <memory>
+=======
+#include <algorithm>
+>>>>>>> jimin1
 #include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
@@ -37,11 +41,6 @@ using namespace rapidcsv;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
-typedef vector<double> DVector;
-typedef vector<int>    IVector;
-typedef map<string, DVector> DMap;
-typedef map<string, IVector> IMap;
-
 struct Node {
     int layer_idx;
     int node_idx;
@@ -52,12 +51,31 @@ struct Node {
     bool raceline;
 };
 
-struct SplineResult {
-    MatrixXd coeffs_x;
-    MatrixXd coeffs_y;
-    MatrixXd M;
-    MatrixXd normvec_normalized;
-};
+typedef vector<double> DVector;
+typedef vector<int>    IVector;
+typedef map<string, DVector> DMap;
+typedef map<string, IVector> IMap;
 
-void readDmapFromCSV(const string& pathname, DMap& map);
-void writeDMaptoCSV(const string& pathname, const DMap& map, char delimiter);
+typedef vector<vector<Node>> NodeMap;
+// typedef tuple<int, int> ITuple;
+// typedef map<ITuple, IVector> TupleMap;
+
+typedef pair<int, int> IPair; // <layerIdx, nodeIdx>
+typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vector
+typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
+#define LayerIdx(pair) (pair.first)
+#define NodeIdx(pair) (pair.second)
+
+class Graph {
+private:
+    IPairAdjList adjLists;
+    bool isDirected;
+
+public:
+    Graph(bool directed = true);
+    void addEdge(IPair srcNodeIdx, IPair destNodeIdx);
+    void printGraph();
+    void getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx);
+    void getParentNode(IPair& srcNodeIdx, IPairVector& parent);
+    void removeEdge(IPair& srcNodeIdx, IPairVector& parent);
+};

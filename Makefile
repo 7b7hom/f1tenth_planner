@@ -187,6 +187,30 @@ gen_spline/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/gen_spline.dir/build.make CMakeFiles/gen_spline.dir/build
 .PHONY : gen_spline/fast
 
+include/graph.o: include/graph.cpp.o
+.PHONY : include/graph.o
+
+# target to build an object file
+include/graph.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.o
+.PHONY : include/graph.cpp.o
+
+include/graph.i: include/graph.cpp.i
+.PHONY : include/graph.i
+
+# target to preprocess a source file
+include/graph.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.i
+.PHONY : include/graph.cpp.i
+
+include/graph.s: include/graph.cpp.s
+.PHONY : include/graph.s
+
+# target to generate assembly for a file
+include/graph.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.s
+.PHONY : include/graph.cpp.s
+
 src/gen_spline.o: src/gen_spline.cpp.o
 .PHONY : src/gen_spline.o
 
@@ -249,6 +273,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... gen_spline"
 	@echo "... main"
+	@echo "... include/graph.o"
+	@echo "... include/graph.i"
+	@echo "... include/graph.s"
 	@echo "... src/gen_spline.o"
 	@echo "... src/gen_spline.i"
 	@echo "... src/gen_spline.s"

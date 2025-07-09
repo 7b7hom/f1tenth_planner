@@ -4,7 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
@@ -190,9 +189,7 @@ void calcHeading(DVector &x_raceline,
 
 }
 
-void genNode(IVector &nodesInLayer,
-            vector<vector<Node>> &nodesPerLayer,
-            Vector2d &node_pos,
+void genNode(NodeMap& nodesPerLayer,
             const double veh_width,
             float lat_resolution) {
     
@@ -218,9 +215,8 @@ void genNode(IVector &nodesInLayer,
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
         int node_idx = 0;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
-        nodesInLayer.push_back(num_nodes);
+        nodesPerLayer[i].resize(num_nodes); 
 
-        vector<Node> layer_nodes;
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
         // node별 loop 
         for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
@@ -262,10 +258,9 @@ void genNode(IVector &nodesInLayer,
             }
             // cout << i << "번째 레이어의" <<node_idx << "번째 노드의 psi는" << node.psi << endl;
             
-            layer_nodes.push_back(node);
+            nodesPerLayer[i][node_idx] = node;
             ++node_idx;
         }
-        nodesPerLayer.push_back(layer_nodes);
 
         // cout << i << "번째 Layer의" << endl;
         // for (size_t i =0; i < node_pos.size(); ++i) {        
@@ -512,7 +507,7 @@ void plotHeading(const DVector &x,
         #endif
 }
 
-void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) {
+void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     DVector x_line, y_line;
     DVector node_x, node_y;
     for (const auto& layer_nodes : nodesPerLayer) {
@@ -524,11 +519,13 @@ void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) 
             node_y.push_back(node.y);
             plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}});
 
+            #if 0
             x_line = {node.x, node.x + dx};
             y_line = {node.y, node.y + dy};
             plt::plot(x_line, y_line, {{"color", "purple"}});
 
             // 화살촉 (arrowhead)
+            
             double theta = atan2(dy, dx);
             double arrow_len = 0.2 * scale;
             double angle = M_PI / 6.0;
@@ -541,13 +538,13 @@ void plotHeading(const vector<vector<Node>>& nodesPerLayer, double scale = 0.5) 
 
             plt::plot({node.x + dx, x_arrow1}, {node.y + dy, y_arrow1}, {{"color", "purple"}});
             plt::plot({node.x + dx, x_arrow2}, {node.y + dy, y_arrow2}, {{"color", "purple"}});
-            
+            #endif
         }
         
     }
 }
 
-void visual(const vector<vector<Node>>& nodesPerLayer) {
+void visual(const NodeMap& nodesPerLayer) {
     plt::clf();
 
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
@@ -570,9 +567,9 @@ void visual(const vector<vector<Node>>& nodesPerLayer) {
     //             sampling_map[__y_bound_r],
     //             psi_bound_r);
 
-    plotHeading(nodesPerLayer);
 
-    
+    // 노드마다 psi확인할 수 있는 용도 
+    plotHeading(nodesPerLayer);
 
     plt::title("Track");
     plt::grid(true);
@@ -582,6 +579,7 @@ void visual(const vector<vector<Node>>& nodesPerLayer) {
 
 
 int main() {
+    #if 0
     IVector idx_sampling;
     Offline_Params params;
 
@@ -639,13 +637,9 @@ int main() {
     // sampling_map[__psi_bound_l] = psi_bound_l;
     // sampling_map[__psi_bound_r] = psi_bound_r;
 
-    IVector nodesInLayer;
-    vector<vector<Node>> nodesPerLayer;
-    Vector2d node_pos(static_cast<int>(idx_sampling.size()), 2);
+    NodeMap nodesPerLayer;
 
-    genNode(nodesInLayer,
-            nodesPerLayer,
-            node_pos,
+    genNode(nodesPerLayer,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
@@ -654,5 +648,56 @@ int main() {
     
     // visual process 
     visual(nodesPerLayer);
+    #endif
+
+    // Graph sample code 
+    Graph directedGraph;
+    IPair t1 = make_pair(0, 0);
+    IPair t2 = make_pair(0, 1);
+    IPair t3 = make_pair(1, 0);
+    IPair t4 = make_pair(0, 2);
+    IPair t5 = make_pair(1, 2);
+    IPair t6 = make_pair(1, 5);
+    IPair t7 = make_pair(1, 6);
+    // spline 생성 후 edge로 집어넣음.
+    directedGraph.addEdge(t1, t3);// push_back이라서 sorting은 되지 않음. 
+    directedGraph.addEdge(t1, t5);
+    directedGraph.addEdge(t1, t6);
+    directedGraph.addEdge(t2, t5);
+    directedGraph.addEdge(t4, t7);
+    // 실제 로직은 node idx가 작은 순서대로 그래프가 그러질 예정이라 괜찮을 듯.
+    // grpah 전체 print 
+    cout << "---처음 Graph---" << endl;
+    directedGraph.printGraph();
+
+    IPairVector child1;
+    // t1 노드의 뒤로 연결된(child) node들을 뽑아온다.
+    // directedGraph.getChildIdx(t1, child1);
+
+    // for (size_t i =0; i < child1.size(); ++i) {
+    //     cout << child1[i].first << ", " << child1[i].second << "/ ";
+    // }
+    
+    // Error Index(child가 없는 경우 runtime_error)
+    // directedGraph.getChildIdx(t5, child1);
+    
+    // (0, n)이라는 임의의 노드 n이 t5(1, 2)을 들고 있는 경우 해당 list에서 t5 삭제
+    // 이후 child 노드가 그 뒤로 연결된 spline이 없는 경우 parent의 adjList에서 child 노드를 삭제하기 위하여 필요함.
+    IPairVector parent; 
+    // t5 노드를 들고 있는 노드가 있는지 1. 찾고 2. parent로 반환함.
+    directedGraph.getParentNode(t5, parent); 
+    
+    cout << "---0번째 Layer의 node 중에서 1번째 Layer의 3번째 노드와 엣지로 연결되어 있는 노드의 idx---" << endl;
+    for (size_t i = 0; i < parent.size(); ++i) {
+        cout << parent[i].first << ", " << parent[i].second << endl;
+ 
+    }
+    directedGraph.removeEdge(t5, parent);
+    cout << "---위의 엣지를 제거한 후 graph 상태---" << endl;
+    // 결과 확인용 
+    directedGraph.printGraph();
+
+
+
     return 0;
 }
