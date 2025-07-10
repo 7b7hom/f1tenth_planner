@@ -19,8 +19,8 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',') {
     ofstream file(pathname);
     if (!file.is_open()) throw runtime_error("Can't open file.");
 
-    size_t num_cols = map.size();
-    size_t num_rows = map.begin()->second.size();
+    size_t num_cols = map.size();   // 열 개수 = map의 key 개수
+    size_t num_rows = map.begin()->second.size();   // 행 개수 = 첫 번째 key의 값의 길이
 
     // Header
     size_t i = 0;
@@ -56,10 +56,10 @@ void addDVectorToMap(DMap &map,
                      const IVector *idx_array = nullptr) {
     size_t len;
     if (idx_array == nullptr) {
-        len = map[__x_ref].size();
+        len = map[__x_ref].size();  // 지정X -> 전체 데이터 대상
     } 
     else {
-        len = idx_array->size();
+        len = idx_array->size();    // 지정한 인덱스 수만큼
     }
     // cout << "attr: "<< attr << " / len:" << len << endl;
 
@@ -197,7 +197,7 @@ void genNode(NodeMap& nodesPerLayer,
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
     Vector2d node_pos;
-    nodesPerLayer.resize(N); 
+    nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
@@ -210,12 +210,12 @@ void genNode(NodeMap& nodesPerLayer,
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
         // cout << "-----" << endl;
 
-        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
-        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 기준선에서의 위치
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
         
-        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
-        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;  // num_nodes : 좌우 총 가능한 노드 수
         nodesPerLayer[i].resize(num_nodes); 
 
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;

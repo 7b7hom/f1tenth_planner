@@ -59,7 +59,24 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
                 scaling(i) = ds(i) / ds(i + 1);  // 인접 구간 간의 거리 비율 계산
             }
         }
+
+        // 3. 행렬 M 구성
+        // 각 스플라인은 x, y 각각에 대해 4개의 계수(a0 ~ a3) 가짐
+        // 따라서 N개의 점이면, N-1개의 스플라인 구간 * 4개의 계수 = 총 4(N-1)개의 계수 발생
+
+        // 위치 조건(각 스플라인은 시작점과 끝점에서 위치가 정확히 맞아야 함) : 식 2*(N-1)개
+        // 1차 도함수 연속(기울기 연속) : 식 (N-2)개
+        // 2차 도함수 연속(곡률 연속) : 식 (N-2)개
+        // 양 끝 점(경계 조건) : 식 2개
     
+
+        SplineResult result;
+        result.coeffs_x = MatrixXd::Zero(no_splines, 4);
+        result.coeffs_y = MatrixXd::Zero(no_splines, 4);
+        result.M = MatrixXd::Zero(1, 1); // dummy
+        result.normvec_normalized = MatrixXd::Zero(no_splines, 2);
+
+    return result;
 
 }
 
