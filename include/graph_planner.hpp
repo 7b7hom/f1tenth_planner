@@ -6,12 +6,9 @@
 #include <string>
 #include <iomanip>  
 #include <cmath>
-<<<<<<< HEAD
-#include <memory>
-=======
 #include <algorithm>
->>>>>>> jimin1
 #include <Eigen/Dense>
+#include "config.h"
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
 
@@ -79,3 +76,10 @@ public:
     void getParentNode(IPair& srcNodeIdx, IPairVector& parent);
     void removeEdge(IPair& srcNodeIdx, IPairVector& parent);
 };
+
+extern DMap gtpl_map;
+extern DMap sampling_map;
+
+void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
+void plotHeading(const NodeMap& nodesPerLayer, double scale);
+void visual(const NodeMap& nodesPerLayer);

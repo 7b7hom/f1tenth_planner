@@ -3,6 +3,8 @@ file(REMOVE_RECURSE
   "CMakeFiles/main.dir/include/graph.cpp.o.d"
   "CMakeFiles/main.dir/src/main.cpp.o"
   "CMakeFiles/main.dir/src/main.cpp.o.d"
+  "CMakeFiles/main.dir/src/plotting.cpp.o"
+  "CMakeFiles/main.dir/src/plotting.cpp.o.d"
   "bin/main"
   "bin/main.pdb"
 )

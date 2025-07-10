@@ -57,18 +57,18 @@ RM = /usr/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/jimin1203/misys/f1tenth_planner
+CMAKE_SOURCE_DIR = /home/seop/misys/f1tenth_planner
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/jimin1203/misys/f1tenth_planner
+CMAKE_BINARY_DIR = /home/seop/misys/f1tenth_planner
 
 #=============================================================================
 # Targets provided globally by CMake.
 
 # Special rule for the target edit_cache
 edit_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
-	/usr/bin/cmake -E echo No\ interactive\ CMake\ dialog\ available.
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
+	/usr/bin/cmake-gui -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
 .PHONY : edit_cache
 
 # Special rule for the target edit_cache
@@ -132,9 +132,9 @@ install/strip/fast: preinstall/fast
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jimin1203/misys/f1tenth_planner/CMakeFiles /home/jimin1203/misys/f1tenth_planner//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/seop/misys/f1tenth_planner/CMakeFiles /home/seop/misys/f1tenth_planner//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/jimin1203/misys/f1tenth_planner/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/seop/misys/f1tenth_planner/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -259,6 +259,30 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
+src/plotting.o: src/plotting.cpp.o
+.PHONY : src/plotting.o
+
+# target to build an object file
+src/plotting.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.o
+.PHONY : src/plotting.cpp.o
+
+src/plotting.i: src/plotting.cpp.i
+.PHONY : src/plotting.i
+
+# target to preprocess a source file
+src/plotting.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.i
+.PHONY : src/plotting.cpp.i
+
+src/plotting.s: src/plotting.cpp.s
+.PHONY : src/plotting.s
+
+# target to generate assembly for a file
+src/plotting.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.s
+.PHONY : src/plotting.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -282,6 +306,9 @@ help:
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/plotting.o"
+	@echo "... src/plotting.i"
+	@echo "... src/plotting.s"
 .PHONY : help
 
 
