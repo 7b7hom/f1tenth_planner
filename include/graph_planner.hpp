@@ -83,3 +83,22 @@ extern DMap sampling_map;
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
 void visual(const NodeMap& nodesPerLayer);
+
+void readDMapFromCSV(const string& pathname, DMap& map);
+void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
+
+void map_size(DMap& map);
+void addDVectorToMap(DMap &map,string attr, const IVector *idx_array);
+void samplePointsFromRaceline(const DVector& kappa,
+                              const DVector& dist,
+                              double d_curve,
+                              double d_straight,
+                              double curve_th,
+                              IVector& idx_array);
+double normalizeAngle(double angle);
+void calcHeading(DVector &x_raceline,
+                 DVector &y_raceline,
+                 DVector &psi);
+void genNode(NodeMap& nodesPerLayer,
+            const double veh_width,
+            float lat_resolution);

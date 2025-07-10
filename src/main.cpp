@@ -4,51 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-// CSV를 읽어서 DMap으로 변경 
-void readDMapFromCSV(const string& pathname, DMap& map) {
-    Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
-    vector<string> labels = csv.GetColumnNames();
-
-    for (const auto& label : labels)
-        map[label] = csv.GetColumn<double>(label);
-}
-
-// DMap을 CSV에 작성 
-void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',') {
-    ofstream file(pathname);
-    if (!file.is_open()) throw runtime_error("Can't open file.");
-
-    size_t num_cols = map.size();
-    size_t num_rows = map.begin()->second.size();
-
-    // Header
-    size_t i = 0;
-    for (const auto& [key, _] : map) {
-        file << key;
-        if (++i != num_cols) file << delimiter;
-    }
-    file << '\n';
-
-    // Row map
-    for (size_t row = 0; row < num_rows; ++row) {
-        size_t j = 0;
-        for (const auto& [_, col] : map) {
-            file << col[row];
-            if (++j != num_cols) file << delimiter;
-        }
-        file << '\n';
-    }
-
-    file.close();
-}
-
-// Debug용 함수: map의 columns, rows 개수 print  
-void map_size(DMap& map) {
-    size_t num_cols = map.size();
-    size_t num_rows = map.begin()->second.size();
-    cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
-}
-
 // Dvector를 Map 구조로 추가(연산)
 void addDVectorToMap(DMap &map,
                      string attr,
@@ -196,7 +151,7 @@ void genNode(NodeMap& nodesPerLayer,
     const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
     Vector2d node_pos;
-    
+    nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
@@ -209,14 +164,14 @@ void genNode(NodeMap& nodesPerLayer,
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
         // cout << "-----" << endl;
 
-        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
-        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 기준선에서의 위치
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
         
-        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
-        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
-        nodesPerLayer[i].resize(num_nodes);
-        
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;  // num_nodes : 좌우 총 가능한 노드 수
+        nodesPerLayer[i].resize(num_nodes); 
+
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
         // node별 loop 
         for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
@@ -454,14 +409,9 @@ void genEdges(const vector<vector<Node>> &nodesPerLayer,
         }
     }
 }
-
 #endif
 
-
-
-
 int main() {
-    #if 1
     IVector idx_sampling;
     Offline_Params params;
 
@@ -477,7 +427,7 @@ int main() {
     addDVectorToMap(gtpl_map, "delta_s");
 
     writeDMapToCSV(map_file_out, gtpl_map);
-
+    
     // layer 간격을 위한 raceline points sampling 
     samplePointsFromRaceline(gtpl_map[__kappa],
                              gtpl_map[__delta_s],
@@ -527,12 +477,9 @@ int main() {
 
     // sampling points' info 
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
-    
     // visual process 
     visual(nodesPerLayer);
-    #endif
 
-    #if 0
     // Graph sample code 
     Graph directedGraph;
     IPair t1 = make_pair(0, 0);
@@ -579,6 +526,6 @@ int main() {
     cout << "---위의 엣지를 제거한 후 graph 상태---" << endl;
     // 결과 확인용 
     directedGraph.printGraph();
-    #endif
+
     return 0;
 }

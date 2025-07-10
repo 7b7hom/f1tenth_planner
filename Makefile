@@ -283,6 +283,30 @@ src/plotting.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.s
 .PHONY : src/plotting.cpp.s
 
+src/toCSV.o: src/toCSV.cpp.o
+.PHONY : src/toCSV.o
+
+# target to build an object file
+src/toCSV.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/toCSV.cpp.o
+.PHONY : src/toCSV.cpp.o
+
+src/toCSV.i: src/toCSV.cpp.i
+.PHONY : src/toCSV.i
+
+# target to preprocess a source file
+src/toCSV.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/toCSV.cpp.i
+.PHONY : src/toCSV.cpp.i
+
+src/toCSV.s: src/toCSV.cpp.s
+.PHONY : src/toCSV.s
+
+# target to generate assembly for a file
+src/toCSV.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/toCSV.cpp.s
+.PHONY : src/toCSV.cpp.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
@@ -309,6 +333,9 @@ help:
 	@echo "... src/plotting.o"
 	@echo "... src/plotting.i"
 	@echo "... src/plotting.s"
+	@echo "... src/toCSV.o"
+	@echo "... src/toCSV.i"
+	@echo "... src/toCSV.s"
 .PHONY : help
 
 
