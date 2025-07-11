@@ -6,8 +6,8 @@ void runPlanningPipeline(const Offline_Params& params, const std::string& map_fi
 
 int main() {
     Offline_Params params;
-    std::string map_file_in = "inputs/gtpl_levine.csv";
-    std::string map_file_out = "inputs/gtpl_levine_out.csv";
+    std::string map_file_in = "/home/uiiiqns/f1tenth_planner/inputs/gtpl_levine.csv";
+    std::string map_file_out = "/home/uiiiqns/f1tenth_planner/inputs/gtpl_levine_out.csv";
 
     runPlanningPipeline(params, map_file_in, map_file_out);
 

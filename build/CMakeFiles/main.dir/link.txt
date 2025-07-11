@@ -1,1 +1,1 @@
-/usr/bin/g++ -g CMakeFiles/main.dir/src/main.cpp.o -o bin/main  /usr/lib/x86_64-linux-gnu/libpython3.10.so 
+/usr/bin/c++ CMakeFiles/main.dir/src/main.cpp.o CMakeFiles/main.dir/include/graph.cpp.o CMakeFiles/main.dir/src/gen_spline.cpp.o -o bin/main  /usr/lib/x86_64-linux-gnu/libpython3.12.so 

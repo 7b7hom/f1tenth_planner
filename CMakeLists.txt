@@ -56,14 +56,14 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # main
-add_executable(main src/main.cpp include/graph.cpp)
+add_executable(main src/main.cpp include/graph.cpp src/gen_spline.cpp)
 target_link_libraries(main PRIVATE matplotlib_cpp Eigen3::Eigen)
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # gen_spline
-add_executable(gen_spline src/gen_spline.cpp)
-target_link_libraries(gen_spline PRIVATE Eigen3::Eigen ${Python_LIBRARIES})
-set_target_properties(gen_spline PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
+# add_executable(gen_spline src/gen_spline.cpp)
+# target_link_libraries(gen_spline PRIVATE Eigen3::Eigen ${Python_LIBRARIES})
+# set_target_properties(gen_spline PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Install headers
 install(FILES

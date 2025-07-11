@@ -161,12 +161,12 @@ void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolutio
             node.x = node_pos.x();
             node.y = node_pos.y();
             node.psi = 0.0;
-            node.kappa = 0.0;        
+            node.kappa = 0.0;
             node.raceline = (node_idx == raceline_index);
 
             double psi_interp;
             if (node_idx < raceline_index) {
-                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) {  
+                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) {
                     double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
                     double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
                     psi_interp = bl + (p - bl) * node_idx / raceline_index;
@@ -282,7 +282,7 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
             ds = temp_ds;
         }
         // ds(i) / dis(i+1) -> 현재 구간 길이 / 다음 구간 길이
-        scaling = ds.head(no_splines) / ds.tail(no_splines);
+        scaling = ds.head(no_splines).cwiseQuotient(ds.tail(no_splines));
     }else{ // 거리 기반 스케일링 사용 x
         scaling = VectorXd::Ones(no_splines - 1); // scaling 벡터를 모든 요소가 1인 벡터로 설정
     }
@@ -335,8 +335,8 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
         double el_lengths_s = (el_lengths_ptr == nullptr) ? 1.0 : ds(0); // 길이 정보가 없으면 기본값으로 1.0
         
         // b_x, b_y 우변 벡터에 [시작점 헤딩(psi_s) = cos/sin 변환 값 * el_length_s] 설정
-        b_x(no_splines * 4 - 2) = cos(psi_s + M_PI / 2) * el_length_s;
-        b_y(no_splines * 4 - 2) = sin(psi_s + M_PI / 2) * el_length_s;
+        b_x(no_splines * 4 - 2) = cos(psi_s + M_PI / 2) * el_lengths_s;
+        b_y(no_splines * 4 - 2) = sin(psi_s + M_PI / 2) * el_lengths_s;
 
 
         // ---Heading end point---
@@ -347,11 +347,11 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
         M(no_splines * 4 - 1, last_spline_idx_start + 2) = 2; // a_2
         M(no_splines * 4 - 1, last_spline_idx_start + 3) = 3; // a_3
 
-        double el_lengths_e = (el_lenghts_ptr == nullptr) ? 1.0 : ds(no_splines - 1);
+        double el_lengths_e = (el_lengths_ptr == nullptr) ? 1.0 : ds(no_splines - 1);
 
         // b_x, b_y 우변 벡터에 [끝점 헤딩(psi_e) = cos/sin 변환 값 * el_length_e] 설정        
-        b_x(no_splines * 4 - 1) = cos(psi_e + M_PI / 2) * el_length_e;
-        b_y(no_splines * 4 - 1) = sin(psi_e + M_PI / 2) * el_length_e;
+        b_x(no_splines * 4 - 1) = cos(psi_e + M_PI / 2) * el_lengths_e;
+        b_y(no_splines * 4 - 1) = sin(psi_e + M_PI / 2) * el_lengths_e;
     }else{ // 닫힌 경로인 경우: heading/curvature 주기 조건(첫 spline 시작 = 마지막 spline끝)
         // Heading 경계 조건
         // p_0'(0) - p_{last}'(1) = 0
@@ -553,7 +553,7 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
                 }
 
                 // spline 유효성 검사
-                if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params, MatrixXd())){
+                if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params)){
                     ITuple src_key(current_node.layer_idx, current_node.node_idx);
                     graph.addEdge(src_key, next_node.node_idx); // 검사 통과 시 그래프에 edge 추가(src_key: 특정 node를 고유하게 식별하는 key 역할, tuple)
                 }
@@ -562,81 +562,92 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
     }
 }
 
-
 // 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
-void visual(const NodeMap& nodesPerLayer, const Graph& graph) {
-    plt::clf();
+// params를 인자로 받도록 수정했습니다.
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) { // params 인자 추가
+    plt::clf(); // plt:: 앞에 있던 불필요한 공백 제거
 
-    // 트랙 경계선
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+    // 트랙 경계선 (plt:: 앞에 있던 불필요한 공백 제거)
+    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
-    // 레이싱 라인 및 샘플링된 포인트
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
-    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+    // 레이싱 라인 및 샘플링된 포인트 (plt:: 앞에 있던 불필요한 공백 제거)
+    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
+    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
+    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
-    // 노드들
-    plotHeading(nodesPerLayer);
+    // 노드들 (plt:: 앞에 있던 불필요한 공백 제거)
+    plotHeading(nodesPerLayer);
 
-    // --- Graph 엣지 (스플라인) 시각화 ---
-    Offline_Params params; // params는 visual 함수 내부에서 직접 접근하거나 인자로 받아야 합니다.
-    for (const auto& layer_nodes : nodesPerLayer) {
-        for (const auto& current_node : layer_nodes) {
-            ITuple src_key(current_node.layer_idx, current_node.node_idx);
-            IVector child_nodes_idx;
+    // --- Graph 엣지 (스플라인) 시각화 ---
+    // Offline_Params params; // <--- 이 라인은 삭제해야 합니다. 이미 인자로 받았으니까요.
+    
+    // spline_x_pts, spline_y_pts는 루프 바깥에서 선언하여 효율성을 높입니다.
+    DVector spline_x_pts; 
+    DVector spline_y_pts;
 
-            try {
-                graph.getChildIdx(src_key, child_nodes_idx);
-            } catch (const std::runtime_error& e) {
-                continue;
-            }
-            
-            for (int dest_node_idx : child_nodes_idx) {
-                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
-                // next_node_idx 유효성 검사 추가 (인덱스 범위 체크)
-                if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
-                     cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl;
-                    continue;
-                }
-                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
+    for (const auto& layer_nodes : nodesPerLayer) {
+        for (const auto& current_node : layer_nodes) {
+            ITuple src_key(current_node.layer_idx, current_node.node_idx);
+            IVector child_nodes_idx;
 
-                MatrixXd spline_path(2, 2);
-                spline_path << current_node.x, current_node.y,
-                               next_node.x, next_node.y;
-                
-                double psi_s = current_node.psi;
-                double psi_e = next_node.psi;
+            try {
+                graph.getChildIdx(src_key, child_nodes_idx);
+            } catch (const std::runtime_error& e) {
+                continue;
+            }
+            
+            for (int dest_node_idx : child_nodes_idx) {
+                // 각 스플라인 그리기 전에 벡터를 비워줍니다. (이전 스플라인 점 데이터 초기화)
+                spline_x_pts.clear(); 
+                spline_y_pts.clear(); 
+                
+                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
+                // next_node_idx 유효성 검사 추가 (인덱스 범위 체크)
+                if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
+                    // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
+                    continue;
+                }
+                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
 
-                VectorXd el_lengths(1);
-                el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
+                MatrixXd spline_path(2, 2);
+                spline_path << current_node.x, current_node.y,
+                               next_node.x, next_node.y;
+                
+                double psi_s = current_node.psi;
+                double psi_e = next_node.psi;
 
-                SplineResult res;
-                try {
-                    res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
-                } catch (const std::exception& e) {
-                    continue;
-                }
+                VectorXd el_lengths(1);
+                el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
 
-                // 계산된 스플라인 계수를 사용하여 곡선 그리기
-                DVector spline_x_pts, spline_y_pts;
-                const int num_spline_segments = 10; 
-                for (int k = 0; k <= num_spline_segments; ++k) {
-                    double t_eval = static_cast<double>(k) / num_spline_segments;
-                    SplinePoint sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval, res.ds(0), true);
-                    spline_x_pts.push_back(sp.x);
-                    spline_y_pts.push_back(sp.y);
-                }
-                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}, {"label", "Valid Splines"}});
-            }
-        }
-    }
+                SplineResult res;
+                try {
+                    // calcSplines의 마지막 인자인 use_dist_scaling은 true로 가정
+                    res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
+                } catch (const std::exception& e) {
+                    continue;
+                }
 
-    plt::title("Track and Planned Graph");
-    plt::grid(true);
-    plt::axis("equal");
-    plt::legend();
-    plt::show();
+                // 계산된 스플라인 계수를 사용하여 곡선 그리기
+                const int num_spline_segments = 10; 
+                for (int k = 0; k <= num_spline_segments; ++k) {
+                    double t_eval = static_cast<double>(k) / num_spline_segments;
+                    SplinePoint sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval, res.ds(0), true);
+                    spline_x_pts.push_back(sp.x);
+                    spline_y_pts.push_back(sp.y);
+                }
+                // plt::plot 앞에 있던 불필요한 공백 제거
+                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}, {"label", "Valid Splines"}});
+            }
+        }
+    }
+
+    // plt::title 등 마지막 plt:: 호출들 앞에 있던 불필요한 공백 제거
+    plt::title("Track and Planned Graph");
+    plt::grid(true);
+    plt::axis("equal");
+    plt::legend();
+    plt::show();
 }
 
 // 전체 경로 계획 파이프라인을 실행하는 함수
@@ -686,18 +697,3 @@ void runPlanningPipeline(const Offline_Params& params, const std::string& map_fi
     visual(nodesPerLayer, directedGraph, params); 
 }
 
-
-// --- main 함수 ---
-int main() {
-    // 1. 경로 계획 파라미터 로드
-    Offline_Params params; 
-
-    // 2. 입력 및 출력 파일 경로 설정
-    std::string map_file_in = "inputs/gtpl_levine.csv"; 
-    std::string map_file_out = "inputs/gtpl_levine_out.csv"; 
-
-    // 3. 전체 경로 계획 파이프라인 실행
-    runPlanningPipeline(params, map_file_in, map_file_out);
-
-    return 0;
-}
