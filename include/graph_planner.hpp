@@ -77,11 +77,21 @@ public:
     void removeEdge(IPair& srcNodeIdx, IPairVector& parent);
 };
 
+// 스플라인 결과
+struct SplineResult {
+    MatrixXd coeffs_x;          // x 게수
+    MatrixXd coeffs_y; 
+    VectorXd ds;         // y 계수
+    MatrixXd M;                 // 계산용 행렬 
+    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
+};
+
 extern DMap gtpl_map;
 extern DMap sampling_map;
 
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
+void plotSplineFromCoeffs(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, const VectorXd& ds, int samples_per_segment);
 void visual(const NodeMap& nodesPerLayer);
 
 void readDMapFromCSV(const string& pathname, DMap& map);

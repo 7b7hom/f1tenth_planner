@@ -181,11 +181,10 @@ void genNode(NodeMap& nodesPerLayer,
             // node의 layer내의 인덱스 계산.
             node.node_idx = node_idx;
             node.x = node_pos.x();
-            node.y = node_pos.y();
-            node.psi = 0.0;
-            node.kappa = 0.0;        
+            node.y = node_pos.y();      
             node.raceline = (node_idx == raceline_index);
-
+            
+            // psi 재계산
             double psi_interp;
             if (node_idx < raceline_index) {
                 
@@ -212,23 +211,35 @@ void genNode(NodeMap& nodesPerLayer,
                 node.psi = normalizeAngle(psi_interp);
             }
             // cout << i << "번째 레이어의" <<node_idx << "번째 노드의 psi는" << node.psi << endl;
-            
+
             nodesPerLayer[i][node_idx] = node;
             ++node_idx;
         }
+        // 곡률 계산 (헤딩 변화량 / 거리)
+        for (int j = 1; j < num_nodes - 1; ++j) {
+            const Node& prev = nodesPerLayer[i][j - 1];
+            const Node& next = nodesPerLayer[i][j + 1];
+
+            double dpsi = normalizeAngle(next.psi - prev.psi);
+            double ds = std::hypot(next.x - prev.x, next.y - prev.y);
+            double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
+            nodesPerLayer[i][j].kappa = kappa;
+        }
+
+        // 양 끝은 0으로 처리
+        nodesPerLayer[i][0].kappa = 0.0;
+        nodesPerLayer[i][num_nodes - 1].kappa = 0.0;
 
         // cout << i << "번째 Layer의" << endl;
         // for (size_t i =0; i < node_pos.size(); ++i) {        
         //     cout << i << "번째 Node" << endl;
         //     cout << node_pos[i] << endl;
         // }
-                // 각 node의 psi, kappa 계산하는 로직 추가
 
     }
 }
-#if 1
 
-VectorXd computeEuclideanDistances(const vector<Vector2d>& path) {
+VectorXd computeDist(const vector<Vector2d>& path) {
     int N = static_cast<int>(path.size()) - 1;
     VectorXd dists(N);
     for (int i = 0; i < N; ++i) {
@@ -238,21 +249,18 @@ VectorXd computeEuclideanDistances(const vector<Vector2d>& path) {
 }
 
 unique_ptr<SplineResult> calcSplines(
-    const vector<Vector2d>& path,
+    const vector<Vector2d> &path,
     const VectorXd *el_lengths = nullptr,
     double psi_s = NAN,
-    double psi_e = NAN,
-    bool use_dist_scaling = true)
-{
-    vector<Vector2d> updated_path = path;
+    double psi_e = NAN) {
+
+    vector<Vector2d> closed_path = path;
     bool closed = (path.front() - path.back()).norm() < 1e-6;
 
-    if (closed) {
-        updated_path.push_back(path[1]);  // path[1] 복사해서 끝에 추가
-    }
+    // if (closed) closed_path.push_back(path[0]);
 
-    int no_splines = static_cast<int>(updated_path.size()) - 1;
-    VectorXd ds = (el_lengths == nullptr) ? computeEuclideanDistances(updated_path) : *el_lengths;
+    int no_splines = closed_path.size() - 1;
+    VectorXd ds = (el_lengths == nullptr) ? computeDist(closed_path) : *el_lengths;
 
     MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
     VectorXd b_x = VectorXd::Zero(no_splines * 4);
@@ -261,8 +269,8 @@ unique_ptr<SplineResult> calcSplines(
     for (int j = 0; j < no_splines; ++j) {
         int row0 = j * 4;
         M(row0, row0) = 1;
-        b_x(row0) = updated_path[j].x();
-        b_y(row0) = updated_path[j].y();
+        b_x(row0) = closed_path[j].x();
+        b_y(row0) = closed_path[j].y();
 
         RowVector4d T;
         double d = ds(j);
@@ -271,8 +279,8 @@ unique_ptr<SplineResult> calcSplines(
         for (int k = 0; k < 4; ++k)
             M(row0 + 1, row0 + k) = T(k);
 
-        b_x(row0 + 1) = updated_path[j + 1].x();
-        b_y(row0 + 1) = updated_path[j + 1].y();
+        b_x(row0 + 1) = closed_path[j + 1].x();
+        b_y(row0 + 1) = closed_path[j + 1].y();
     }
 
     for (int j = 0; j < no_splines - 1; ++j) {
@@ -336,11 +344,12 @@ unique_ptr<SplineResult> calcSplines(
     return make_unique<SplineResult>(SplineResult{coeffs_x, coeffs_y, M, normvec_normalized});
 }
 
-
-void genEdges(const vector<vector<Node>> &nodesPerLayer,
-              Vector2d &node_pos,
+void genEdges(NodeMap &nodesPerLayer, 
+              IVector &raceline_index_array,
+              Graph &edgeList,
               const double lat_offset,
-              const double stepsize_approx,
+              const double lat_resolution,
+              const double curve_thr,
               const double min_vel = 0.0,
               bool closed = true) {
 
@@ -349,67 +358,82 @@ void genEdges(const vector<vector<Node>> &nodesPerLayer,
     }
 
     vector<Vector2d> raceline_cl;
-    Vector2d start_point();
+    Vector2d start_point;
 
-    if (closed) {
-        raceline_cl.push_back(node_pos.x(), node_pos.y());  // node_pos가 vector<Vector2d>라 가정
-    }   
-    // node_pos 스플라인 계수 계산
+    const auto& x_vals = sampling_map[__x_raceline];
+    const auto& y_vals = sampling_map[__y_raceline];
+
+    size_t N = x_vals.size();  // 또는 y_vals.size(), 두 벡터는 같은 길이여야 함
+
+    for (size_t i = 0; i < N; ++i) {
+        raceline_cl.emplace_back(x_vals[i], y_vals[i]);
+    }
+
+    // raceline spline 먼저 계산
     auto raceline_result = calcSplines(raceline_cl);
 
-    const MatrixXd& x_coeff_r = raceline_result->coeffs_x;
-    const MatrixXd& y_coeff_r = raceline_result->coeffs_y;
+    const MatrixXd& x_coeff_r = raceline_result -> coeffs_x;
+    const MatrixXd& y_coeff_r = raceline_result -> coeffs_y;
 
-    for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
-        size_t start_layer = i;
-        size_t end_layer = i + 1;
+    // 레이어 별 loop
+    for (size_t layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
+        
+        int start_layer = layerIdx;
+        int end_layer = layerIdx + 1;
 
-        if (end_layer >= nodesPerLayer.size()) {
-            if (closed)
-                end_layer -= nodesPerLayer.size();
-            else
-                break;
-        }
+        // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 end_layer 조정 
+        if (end_layer >= nodesPerLayer.size())
+            end_layer -= nodesPerLayer.size();
+        else 
+            break;
 
-        for (size_t start_n = 0; start_n < nodesPerLayer[start_layer].size(); ++start_n) {
-            const Node& start_node = nodesPerLayer[start_layer][start_n];
+        int start_raceline_Idx = raceline_index_array[start_layer];
+        int end_raceline_Idx = raceline_index_array[end_layer];
+        
+        // start layer 내 노드별 loop
+        for (size_t startIdx = 0; startIdx <= nodesPerLayer[start_layer].size(); ++startIdx) {
+            // 기준 노드
+            Node &startNode = nodesPerLayer[start_layer][startIdx];
 
-            // raceline index 비교를 위해 기준 index 필요
-            int ref_start_idx = /* 예: raceline에서의 index 저장 벡터가 필요 */;
-            int ref_end_idx = /* 마찬가지로 end_layer에서의 raceline index */;
+            int refDestIdx = end_raceline_Idx + startIdx - start_raceline_Idx; // 기준 end노드 
+            
+            refDestIdx = clamp(refDestIdx, 0, static_cast<int>(nodesPerLayer[end_layer].size() - 1));
+            Node &srcEndNode = nodesPerLayer[end_layer][refDestIdx];
+            Vector2d d_start(startNode.x, startNode.y);
+            Vector2d d_end(srcEndNode.x, srcEndNode.y);
 
-            int end_n_ref = ref_end_idx + start_n - ref_start_idx;
-
-            // 거리 계산
-            Vector2d d_start(start_node.x, start_node.y);
-            const auto& end_layer_nodes = nodesPerLayer[end_layer];
-            int clipped_idx = clamp(end_n_ref, 0, (int)end_layer_nodes.size() - 1);
-            Vector2d d_end(end_layer_nodes[clipped_idx].x, end_layer_nodes[clipped_idx].y);
-
+            // spline 연결할 노드 선정 기준 : lat_steps
             double dist = (d_end - d_start).norm();
-            int lat_steps = static_cast<int>(round(dist * lat_offset / start_node.lat_resolution));
+            // genNode에서 kappa 계산한거 토대로(+기능 추가 완료)
+            double factor = (startNode.kappa > curve_thr) ? 2.0 : 1.0;  // 커브에서 더 많이 연결(추월 경로를 위하여)
+            int lat_steps = round(factor * dist * lat_offset / lat_resolution); // srcEndNode 기준 2*lat_steps + 1개의 노드와 연결한다.
 
-            for (int end_n = max(0, end_n_ref - lat_steps); end_n <= min((int)end_layer_nodes.size() - 1, end_n_ref + lat_steps); ++end_n) {
-                const Node& end_node = end_layer_nodes[end_n];
+            // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
+            for (int destIdx = max(0, refDestIdx - lat_steps); 
+                destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() -1), refDestIdx + lat_steps); ++destIdx) {
+                    Node &endNode = nodesPerLayer[end_layer][destIdx];
 
-                MatrixXd x_coeff, y_coeff;
+                    MatrixXd x_coeffs, y_coeffs;
 
-                if (start_node.raceline && end_node.raceline) {
-                    x_coeff = x_coeff_r.row(start_layer);
-                    y_coeff = y_coeff_r.row(start_layer);
-                } else {
-                    vector<Vector2d> path = { Vector2d(start_node.x, start_node.y), Vector2d(end_node.x, end_node.y) };
-                    auto result = calcSplines(path, nullptr, start_node.psi, end_node.psi);
-                    x_coeff = result->coeffs_x;
-                    y_coeff = result->coeffs_y;
+                    if (startNode.raceline && endNode.raceline ) {
+                        x_coeffs = x_coeff_r.row(start_layer);
+                        y_coeffs = y_coeff_r.row(start_layer);
+                    }
+                    else {
+                    vector<Vector2d> path = { Vector2d(startNode.x, startNode.y), Vector2d(endNode.x, endNode.y) };
+                    auto result = calcSplines(path, nullptr, startNode.psi, endNode.psi);
+                    x_coeffs = result->coeffs_x;
+                    y_coeffs = result->coeffs_y;
+                    }
+                    // graph에 넣는 과정 
+                    IPair n1 = make_pair(start_layer, startIdx);
+                    IPair n2 = make_pair(end_layer, destIdx);
+                    edgeList.addEdge(n1, n2);
+                    
                 }
-
-                // addEdge(start_layer, start_n, end_layer, end_n, x_coeff, y_coeff);
-            }
         }
     }
 }
-#endif
 
 int main() {
     IVector idx_sampling;
@@ -471,6 +495,7 @@ int main() {
 
     NodeMap nodesPerLayer;
     IVector raceline_index_array;
+    Vector2d node_pos;
 
     genNode(nodesPerLayer,
             raceline_index_array,
@@ -479,55 +504,17 @@ int main() {
 
     // sampling points' info 
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
+
+    Graph edgeList;
+
+    genEdges(nodesPerLayer,
+             raceline_index_array,
+             edgeList,
+             params.LAT_OFFSET,
+             params.LAT_RESOLUTION,
+             params.CURVE_THR);
     // visual process 
     visual(nodesPerLayer);
-
-    // Graph sample code 
-    Graph directedGraph;
-    IPair t1 = make_pair(0, 0);
-    IPair t2 = make_pair(0, 1);
-    IPair t3 = make_pair(1, 0);
-    IPair t4 = make_pair(0, 2);
-    IPair t5 = make_pair(1, 2);
-    IPair t6 = make_pair(1, 5);
-    IPair t7 = make_pair(1, 6);
-    // spline 생성 후 edge로 집어넣음.
-    directedGraph.addEdge(t1, t3);// push_back이라서 sorting은 되지 않음. 
-    directedGraph.addEdge(t1, t5);
-    directedGraph.addEdge(t1, t6);
-    directedGraph.addEdge(t2, t5);
-    directedGraph.addEdge(t4, t7);
-    // 실제 로직은 node idx가 작은 순서대로 그래프가 그러질 예정이라 괜찮을 듯.
-    // grpah 전체 print 
-    cout << "---처음 Graph---" << endl;
-    directedGraph.printGraph();
-
-    IPairVector child1;
-    // t1 노드의 뒤로 연결된(child) node들을 뽑아온다.
-    // directedGraph.getChildIdx(t1, child1);
-
-    // for (size_t i =0; i < child1.size(); ++i) {
-    //     cout << child1[i].first << ", " << child1[i].second << "/ ";
-    // }
-    
-    // Error Index(child가 없는 경우 runtime_error)
-    // directedGraph.getChildIdx(t5, child1);
-    
-    // (0, n)이라는 임의의 노드 n이 t5(1, 2)을 들고 있는 경우 해당 list에서 t5 삭제
-    // 이후 child 노드가 그 뒤로 연결된 spline이 없는 경우 parent의 adjList에서 child 노드를 삭제하기 위하여 필요함.
-    IPairVector parent; 
-    // t5 노드를 들고 있는 노드가 있는지 1. 찾고 2. parent로 반환함.
-    directedGraph.getParentNode(t5, parent); 
-    
-    cout << "---0번째 Layer의 node 중에서 1번째 Layer의 3번째 노드와 엣지로 연결되어 있는 노드의 idx---" << endl;
-    for (size_t i = 0; i < parent.size(); ++i) {
-        cout << parent[i].first << ", " << parent[i].second << endl;
- 
-    }
-    directedGraph.removeEdge(t5, parent);
-    cout << "---위의 엣지를 제거한 후 graph 상태---" << endl;
-    // 결과 확인용 
-    directedGraph.printGraph();
 
     return 0;
 }

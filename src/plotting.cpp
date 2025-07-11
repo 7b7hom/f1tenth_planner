@@ -87,6 +87,32 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
+void plotSplineFromCoeffs(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, const VectorXd& ds, int samples_per_segment = 20) {
+    vector<double> X, Y;
+
+    int n_segments = coeffs_x.rows();
+    for (int i = 0; i < n_segments; ++i) {
+        RowVector4d cx = coeffs_x.row(i);
+        RowVector4d cy = coeffs_y.row(i);
+
+        double d = ds(i);  // 해당 구간의 길이 (0 ~ d까지 t)
+
+        for (int s = 0; s <= samples_per_segment; ++s) {
+            double t = d * (double(s) / samples_per_segment);
+            double x = cx[0] + cx[1]*t + cx[2]*t*t + cx[3]*t*t*t;
+            double y = cy[0] + cy[1]*t + cy[2]*t*t + cy[3]*t*t*t;
+
+            X.push_back(x);
+            Y.push_back(y);
+        }
+    }
+
+    plt::plot(X, Y, "r-");  // 빨간 곡선으로 출력
+    plt::axis("equal");
+    plt::title("Spline Visualization");
+    plt::show();
+}
+
 void visual(const NodeMap& nodesPerLayer) {
     plt::clf();
 
