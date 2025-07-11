@@ -100,5 +100,6 @@ void calcHeading(DVector &x_raceline,
                  DVector &y_raceline,
                  DVector &psi);
 void genNode(NodeMap& nodesPerLayer,
+            IVector &raceline_index_array,
             const double veh_width,
             float lat_resolution);

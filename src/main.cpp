@@ -145,11 +145,11 @@ void calcHeading(DVector &x_raceline,
 }
 
 void genNode(NodeMap& nodesPerLayer,
+            IVector &raceline_index_array,
             const double veh_width,
             float lat_resolution) {
     
     const size_t N = sampling_map[__alpha].size();
-    IVector raceline_index_array;
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
@@ -226,7 +226,7 @@ void genNode(NodeMap& nodesPerLayer,
 
     }
 }
-#if 0
+#if 1
 
 VectorXd computeEuclideanDistances(const vector<Vector2d>& path) {
     int N = static_cast<int>(path.size()) - 1;
@@ -470,8 +470,10 @@ int main() {
     // sampling_map[__psi_bound_r] = psi_bound_r;
 
     NodeMap nodesPerLayer;
+    IVector raceline_index_array;
 
     genNode(nodesPerLayer,
+            raceline_index_array,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
