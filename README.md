@@ -16,6 +16,7 @@ Local Planner
 
 2025.07.11
 - debuging 완료
+    -> 실행 잘 됨!
 - gui 안 뜨는 문제 해결
   1. VcXcrv Windows X Server install
   2. 방화벽 설정에서 X Server 허용
