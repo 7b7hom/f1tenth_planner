@@ -60,6 +60,12 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
             }
         }
 
+        // 유클리드 거리 출력
+        std::cout << "[DEBUG] ds (거리 벡터):\n" << ds.transpose() << "\n";
+
+        // 스케일링 비율 출력
+        std::cout << "[DEBUG] scaling (비율):\n" << scaling.transpose() << "\n";
+
         // 3. 행렬 M 구성
         // 각 스플라인은 x, y 각각에 대해 4개의 계수(a0 ~ a3) 가짐
         // 따라서 N개의 점이면, N-1개의 스플라인 구간 * 4개의 계수 = 총 4(N-1)개의 계수 발생
@@ -68,7 +74,19 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
         // 1차 도함수 연속(기울기 연속) : 식 (N-2)개
         // 2차 도함수 연속(곡률 연속) : 식 (N-2)개
         // 양 끝 점(경계 조건) : 식 2개
-    
+        
+        MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
+        VectorXd b_x = VectorXd::Zero(no_splines * 4);
+        VectorXd b_y = VectorXd::Zero(no_splines * 4);
+
+        for (int i = 0; i < no_splines; i++) {
+            int row = i * 4;
+            int col = i * 4;
+
+            M(row, col) = 1.0;
+            b_x(row) = updated_path(i,0);
+        }
+        
 
         SplineResult result;
         result.coeffs_x = MatrixXd::Zero(no_splines, 4);
@@ -85,10 +103,13 @@ int main() {
     using namespace Eigen;
 
     // 간단한 테스트 경로: 삼각형 형태
-    MatrixXd path(3, 2);
+    MatrixXd path(5, 2);
     path << 0, 0,
-            1, 1,
-            0, 2;
+            1, 2,
+            3, 3,
+            6, 2,
+            10, 0;
+    
 
     // 시작, 끝 방향 (라디안) – 테스트용 값
     double psi_s = M_PI / 2.0;
