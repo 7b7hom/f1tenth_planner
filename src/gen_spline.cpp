@@ -48,53 +48,67 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
             ds = *el_lengths;  // 외부에서 받은 길이 벡터 사용
         }
 
-        // 2. 스케일링
-        // ds라는 거리 벡터가 계산된 상태에서, 각 구간 간의 길이 비율(scaling)을 계산 해 VectorXd scaling에 저장
-        // scaling 벡터 크기 : no_splines - 1 (두 스플라인 사이의 연결점 개수 == 스플라인 개수 - 1)
-
-        // 이후 스플라인 연립방정식 구성 시 사용 (연속성 조건에 반영)
-        VectorXd scaling = VectorXd::Ones(no_splines - 1);  // 기본값: 모두 1.0
-        if (use_dist_scaling) {
-            for (int i = 0; i < no_splines - 1; ++i) {
-                scaling(i) = ds(i) / ds(i + 1);  // 인접 구간 간의 거리 비율 계산
-            }
-        }
-
         // 유클리드 거리 출력
-        std::cout << "[DEBUG] ds (거리 벡터):\n" << ds.transpose() << "\n";
+        cout << "ds(거리벡터):\n" << ds.transpose() << "\n";
 
-        // 스케일링 비율 출력
-        std::cout << "[DEBUG] scaling (비율):\n" << scaling.transpose() << "\n";
-
-        // 3. 행렬 M 구성
+        // 2. 행렬 M 구성
         // 각 스플라인은 x, y 각각에 대해 4개의 계수(a0 ~ a3) 가짐
-        // 따라서 N개의 점이면, N-1개의 스플라인 구간 * 4개의 계수 = 총 4(N-1)개의 계수 발생
+        // 스플라인 0 -> 행 0 ~ 3, 스플라인 1 -> 행 4 ~ 7
 
         // 위치 조건(각 스플라인은 시작점과 끝점에서 위치가 정확히 맞아야 함) : 식 2*(N-1)개
         // 1차 도함수 연속(기울기 연속) : 식 (N-2)개
         // 2차 도함수 연속(곡률 연속) : 식 (N-2)개
         // 양 끝 점(경계 조건) : 식 2개
+
+        // 스케일링 없이 진행. 1, 2차 도합수 조건에 직접 거리 d 사용하면 됨
         
         MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
         VectorXd b_x = VectorXd::Zero(no_splines * 4);
         VectorXd b_y = VectorXd::Zero(no_splines * 4);
 
+        // 위치 조건
         for (int i = 0; i < no_splines; i++) {
-            int row = i * 4;
-            int col = i * 4;
+            int row_s = i * 4;  // 스플라인 시작 행
+            double d = ds(i);
 
-            M(row, col) = 1.0;
-            b_x(row) = updated_path(i,0);
+            // 시작점 위치 조건
+            M(row_s, row_s) = 1.0;  // a_0 = p_i
+            b_x(row_s) = updated_path(i,0);
+            b_y(row_s) = updated_path(i,1);
+
+            // 끝점 위치 조건
+            RowVector4d T(1.0, d, d*d, d*d*d);
+            M.block(row_s + 1, row_s, 1, 4) = T; // 시작 행, 시작 열, 선택할 행, 선택할 열
+            b_x(row_s + 1) = updated_path(i+1, 0);
+            b_y(row_s + 1) = updated_path(i+1, 1);
         }
         
 
+        // [DEBUG] M, b_x, b_y 출력
+        cout << "[DEBUG] M 행렬:\n" << M << "\n";
+        cout << "[DEBUG] b_x 벡터:\n" << b_x.transpose() << "\n";
+        cout << "[DEBUG] b_y 벡터:\n" << b_y.transpose() << "\n";
+
+        // 연립방정식 풀기
+        VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
+        VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
+
+        // 결과 구조체 초기화
         SplineResult result;
         result.coeffs_x = MatrixXd::Zero(no_splines, 4);
         result.coeffs_y = MatrixXd::Zero(no_splines, 4);
-        result.M = MatrixXd::Zero(1, 1); // dummy
-        result.normvec_normalized = MatrixXd::Zero(no_splines, 2);
+        result.M = M;
+        result.normvec_normalized = MatrixXd::Zero(no_splines, 2); // 아직 법선 벡터 미구현
 
-    return result;
+        // 계수 복사
+        for (int i = 0; i < no_splines; i++) {
+            for (int j = 0; j < 4; j++) {
+                result.coeffs_x(i, j) = coeffs_x(i * 4 + j);
+                result.coeffs_y(i, j) = coeffs_y(i * 4 + j);
+            }
+        }
+
+        return result;
 
 }
 
