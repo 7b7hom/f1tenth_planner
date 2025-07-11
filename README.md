@@ -21,6 +21,9 @@ Local Planner
   1. VcXcrv Windows X Server install
   2. 방화벽 설정에서 X Server 허용
   3. echo DISPLAY=0.0 두고 실행
+ 
+<img width="640" height="480" alt="graph" src="https://github.com/user-attachments/assets/a0a209e5-5e37-4a7d-b205-5c66fc85abd1" />
+
 
 ## gen_spline 흐름
 - computeEuclideanDistances
