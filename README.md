@@ -11,6 +11,20 @@ Local Planner
 2025.07.08
 - visual, runPlanningPipeline ai 돌려서 대충 채워놓고, gen_spline.cpp에서 모든 로직 실행하도록 정리함.(실행 목적..)
 
+2025.07.10
+- 빌드 및 실행 시도
+
+2025.07.11
+- debuging 완료
+    -> 실행 잘 됨!
+- gui 안 뜨는 문제 해결
+  1. VcXcrv Windows X Server install
+  2. 방화벽 설정에서 X Server 허용
+  3. echo DISPLAY=0.0 두고 실행
+ 
+<img width="640" height="480" alt="graph" src="https://github.com/user-attachments/assets/a0a209e5-5e37-4a7d-b205-5c66fc85abd1" />
+
+
 ## gen_spline 흐름
 - computeEuclideanDistances
   - 주어진 경로(path) 상의 연속된 점들 간의 유클리드 거리 계산
