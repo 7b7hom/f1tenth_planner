@@ -564,25 +564,23 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
 
 // 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
 // params를 인자로 받도록 수정했습니다.
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) { // params 인자 추가
-    plt::clf(); // plt:: 앞에 있던 불필요한 공백 제거
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
+    plt::clf();
 
-    // 트랙 경계선 (plt:: 앞에 있던 불필요한 공백 제거)
+    // 트랙 경계선
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
     plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
-    // 레이싱 라인 및 샘플링된 포인트 (plt:: 앞에 있던 불필요한 공백 제거)
+    // 레이싱 라인 및 샘플링된 포인트
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
     plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
-    // 노드들 (plt:: 앞에 있던 불필요한 공백 제거)
+    // 노드들
     plotHeading(nodesPerLayer);
 
     // --- Graph 엣지 (스플라인) 시각화 ---
-    // Offline_Params params; // <--- 이 라인은 삭제해야 합니다. 이미 인자로 받았으니까요.
     
-    // spline_x_pts, spline_y_pts는 루프 바깥에서 선언하여 효율성을 높입니다.
     DVector spline_x_pts; 
     DVector spline_y_pts;
 
