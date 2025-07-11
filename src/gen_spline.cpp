@@ -636,13 +636,11 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                     spline_x_pts.push_back(sp.x);
                     spline_y_pts.push_back(sp.y);
                 }
-                // plt::plot 앞에 있던 불필요한 공백 제거
-                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}, {"label", "Valid Splines"}});
+                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
             }
         }
     }
 
-    // plt::title 등 마지막 plt:: 호출들 앞에 있던 불필요한 공백 제거
     plt::title("Track and Planned Graph");
     plt::grid(true);
     plt::axis("equal");
