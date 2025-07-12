@@ -82,34 +82,99 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
             b_x(row_s + 1) = updated_path(i+1, 0);
             b_y(row_s + 1) = updated_path(i+1, 1);
         }
-        
+
+        // 기울기 조건
+        // i = 0 ~ no_splines - 2까지만 적용 (마지막 스플라인 뒤에는 비교할 스플라인이 없기 때문)
+        for (int i = 0; i < no_splines - 1; ++i) {
+            int row = 2 * no_splines + i;
+            double d = ds(i);
+
+            M(row, 4 * i + 1) = 1.0;              // a_1^i
+            M(row, 4 * i + 2) = 2.0 * d;          // 2a_2^i * d
+            M(row, 4 * i + 3) = 3.0 * d * d;      // 3a_3^i * d^2
+            M(row, 4 * (i + 1) + 1) = -1.0;       // -a_1^{i+1}
+
+            b_x(row) = 0.0;
+            b_y(row) = 0.0;
+        }
+
+        // 곡률 조건
+        for (int i = 0; i < no_splines - 1; ++i) {
+            int row = 3 * no_splines - 1 + i;
+            double d = ds(i);
+
+            M(row, 4 * i + 2) = 2.0;                // 2a_2^i
+            M(row, 4 * i + 3) = 6.0 * d;            // 6a_3^i * d
+            M(row, 4 * (i + 1) + 2) = -2.0;         // -2a_2^{i+1}
+
+            b_x(row) = 0.0;
+            b_y(row) = 0.0;
+        }
+
+        // 닫히지 않은 경로에서 시작점과 끝점 방향 조건
+        if (!closed) {
+            // 시작점 도함수 조건 (t=0)
+            int start_row = 4 * no_splines - 2; // 마지막에서 두 번째 줄이 시작점 도함수 조건
+            M.row(start_row).setZero();
+            M(start_row, 1) = 1.0;  // a_1항에 1 설정 (S'(0) = a_1)
+
+            double d_s = ds(0); // 첫 번째 구간 길이
+            b_x(start_row) = cos(psi_s) * d_s;  // x방향 단위벡터 * d_s
+            b_y(start_row) = sin(psi_s) * d_s;  // y방향 단위벡터 * d_s
+
+            // 끝점 도함수 조건 (t=d)
+            int end_row = 4 * no_splines - 1;
+            M.row(end_row).setZero();
+            
+            double d_e = ds(no_splines - 1);    // 마지막 구간 길이
+            int offset = 4 * (no_splines - 1);  // 마지막 스플라인 계수들의 시작 인덱스
+            M(end_row, offset + 1) = 1.0;
+            M(end_row, offset + 2) = 2.0 * d_e;
+            M(end_row, offset + 3) = 3.0 * d_e * d_e;
+
+            b_x(end_row) = cos(psi_e) * d_e;
+            b_y(end_row) = sin(psi_e) * d_e;
+        }
 
         // [DEBUG] M, b_x, b_y 출력
         cout << "[DEBUG] M 행렬:\n" << M << "\n";
         cout << "[DEBUG] b_x 벡터:\n" << b_x.transpose() << "\n";
         cout << "[DEBUG] b_y 벡터:\n" << b_y.transpose() << "\n";
 
-        // 연립방정식 풀기
-        VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
-        VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
+        // 1. 연립방정식 풀기 (QR 분해로 안정적)
+        VectorXd x_flat = M.colPivHouseholderQr().solve(b_x);  // (4 * N x 1)
+        VectorXd y_flat = M.colPivHouseholderQr().solve(b_y);  // (4 * N x 1)
 
-        // 결과 구조체 초기화
-        SplineResult result;
-        result.coeffs_x = MatrixXd::Zero(no_splines, 4);
-        result.coeffs_y = MatrixXd::Zero(no_splines, 4);
-        result.M = M;
-        result.normvec_normalized = MatrixXd::Zero(no_splines, 2); // 아직 법선 벡터 미구현
+        // 2. 계수 벡터를 (N x 4) 행렬로 reshape
+        MatrixXd coeffs_x = Map<Matrix<double, 4, Dynamic>>(x_flat.data(), 4, no_splines).transpose();
+        MatrixXd coeffs_y = Map<Matrix<double, 4, Dynamic>>(y_flat.data(), 4, no_splines).transpose();
 
-        // 계수 복사
-        for (int i = 0; i < no_splines; i++) {
-            for (int j = 0; j < 4; j++) {
-                result.coeffs_x(i, j) = coeffs_x(i * 4 + j);
-                result.coeffs_y(i, j) = coeffs_y(i * 4 + j);
-            }
+        // 3. 법선 벡터 계산 (노멀 벡터)
+        MatrixXd normvec(no_splines, 2);
+        for (int i = 0; i < no_splines; ++i) {
+            double dx = coeffs_x(i, 1);  // a₁: x방향 도함수 시작점
+            double dy = coeffs_y(i, 1);  // a₁: y방향 도함수 시작점
+            normvec(i, 0) = -dy;
+            normvec(i, 1) = dx;
         }
+
+        VectorXd norms = normvec.rowwise().norm();
+        MatrixXd normvec_normalized = normvec.array().colwise() / norms.array();
+
+        // 4. 결과 구조체에 저장
+        SplineResult result;
+        result.coeffs_x = coeffs_x;
+        result.coeffs_y = coeffs_y;
+        result.M = M;
+        result.normvec_normalized = normvec_normalized;
+
 
         return result;
 
+}
+
+void genEdges() {
+    
 }
 
 
