@@ -4,7 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
@@ -277,15 +276,6 @@ void genNode(NodeMap& nodesPerLayer,
 // gen_spline --------------------------------
 // -------------------------------------------
 
-
-// 스플라인 결과를 담기 위한 구조체: x, y 방향 계수, 행렬 M, 정규화된 노멀 벡터
-struct SplineResult {
-    MatrixXd coeffs_x;          // 각 구간의 x 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
-    MatrixXd coeffs_y;          // 각 구간의 y 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
-    MatrixXd M;                 // 스플라인 계수 계산에 사용된 시스템 행렬
-    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
-};
-
 // 경로 행렬의 각 점 사이의 유클리드 거리 계산 함수
 VectorXd computeEuclideanDistances(const MatrixXd& path) {
     int N = path.rows() - 1;    // 구간 개수는 점 개수 - 1
@@ -457,51 +447,189 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
 
 }
 
-Vector2d evaluateSpline(const RowVector4d& coeffs_x, const RowVector4d& coeffs_y, double t) {
+// ------------------evaluate spline------------------
+
+SplineEval evaluateSpline(const RowVector4d& coeffs_x,
+                          const RowVector4d& coeffs_y,
+                          double t) {
+    // 위치
     double x = coeffs_x(0) + coeffs_x(1) * t + coeffs_x(2) * t * t + coeffs_x(3) * t * t * t;
     double y = coeffs_y(0) + coeffs_y(1) * t + coeffs_y(2) * t * t + coeffs_y(3) * t * t * t;
-    return Vector2d(x, y);
+
+    // 1차 미분 (속도 벡터)
+    double dx = coeffs_x(1) + 2 * coeffs_x(2) * t + 3 * coeffs_x(3) * t * t;
+    double dy = coeffs_y(1) + 2 * coeffs_y(2) * t + 3 * coeffs_y(3) * t * t;
+
+    // 2차 미분 (가속도 벡터)
+    double ddx = 2 * coeffs_x(2) + 6 * coeffs_x(3) * t;
+    double ddy = 2 * coeffs_y(2) + 6 * coeffs_y(3) * t;
+
+    // 헤딩 ψ = atan2(dy, dx)
+    double heading = std::atan2(dy, dx);
+
+    // 곡률 κ = (dx * ddy - dy * ddx) / (dx² + dy²)^(3/2)
+    double denom = std::pow(dx * dx + dy * dy, 1.5);
+    double curvature = 0.0;
+    if (denom > 1e-6) {
+        curvature = (dx * ddy - dy * ddx) / denom;
+    } else {
+        curvature = 0.0;  // 속도가 너무 작으면 곡률 계산이 불안정
+    }
+
+    return SplineEval{Vector2d(x, y), heading, curvature};
 }
 
-void visualizeSplines(const SplineResult& result, const MatrixXd& path) {
-    using namespace matplotlibcpp;
+bool isInsideTrack(double x, double y, const DMap& sampling_map) {
 
-    vector<double> xs, ys;
-    int samples_per_segment = 20;
+    if (sampling_map.empty() || sampling_map.begin()->second.empty()) {
+        return false;
+    }
 
-    for (int i = 0; i < result.coeffs_x.rows(); ++i) {
-        double d = (path.row(i + 1) - path.row(i)).norm();
+    const auto& x_ref = sampling_map.at(__x_ref);            // 중심선 x
+    const auto& y_ref = sampling_map.at(__y_ref);            // 중심선 y
+    const auto& x_normvec = sampling_map.at(__x_normvec);    // 중심선에서의 노멀 x
+    const auto& y_normvec = sampling_map.at(__y_normvec);    // 중심선에서의 노멀 y
+    const auto& width_left = sampling_map.at(__width_left);  // 왼쪽 경계 폭
+    const auto& width_right = sampling_map.at(__width_right);// 오른쪽 경계 폭
 
-        for (int j = 0; j <= samples_per_segment; ++j) {
-            double t = d * j / static_cast<double>(samples_per_segment);
-            Vector2d pt = evaluateSpline(result.coeffs_x.row(i), result.coeffs_y.row(i), t);
-            xs.push_back(pt.x());
-            ys.push_back(pt.y());
+    double min_dist_sq = std::numeric_limits<double>::max();
+    int closest_idx = -1;
+
+     // 가장 가까운 기준선 인덱스 찾기
+    for (size_t i = 0; i < x_refs.size(); ++i) {
+        double dx = x - x_refs[i];
+        double dy = y - y_refs[i];
+        double dist_sq = dx * dx + dy * dy;
+        if (dist_sq < min_dist_sq) {
+            min_dist_sq = dist_sq;
+            closest_idx = i;
         }
     }
 
-    // 원래 입력 경로 점
-    vector<double> x_orig, y_orig;
-    for (int i = 0; i < path.rows(); ++i) {
-        x_orig.push_back(path(i, 0));
-        y_orig.push_back(path(i, 1));
+    if (closest_idx == -1) return false;
+
+    // 기준선 정보
+    double ref_x = x_refs[closest_idx];
+    double ref_y = y_refs[closest_idx];
+    double norm_x = norm_xs[closest_idx];
+    double norm_y = norm_ys[closest_idx];
+    double width_left = widths_left[closest_idx];
+    double width_right = widths_right[closest_idx];
+
+    // 횡방향 거리 계산 (노멀 벡터 방향)
+    double lateral_offset = (x - ref_x) * norm_x + (y - ref_y) * norm_y;
+
+    // 경계 안에 있는지 판별
+    return (lateral_offset >= -width_left && lateral_offset <= width_right);
+}
+
+bool isValidSpline(const RowVector4d& coeffs_x,
+                    const RowVector4d& coeffs_y,
+                    double stepsize,            // 샘플 간 거리 기준
+                    double kappa_max = 0.2) {   // 최대 허용 곡률 (예시값)
+
+    const int num_samples = 20;
+
+    for (int i = 0; i <= num_samples; ++i) {
+        double t = stepsize * i / static_cast<double>(num_samples);
+        SplineEval eval = evaluateSpline(coeffs_x, coeffs_y, t);
+
+        // 트랙 안에 있는가?
+        if (!isInsideTrack(eval.pos.x(), eval.pos.y())) {
+            return false;
+        }
+
+        // 곡률이 너무 큰가?
+        if (std::abs(eval.curvature) > kappa_max) {
+            return false;
+        }
     }
 
-    figure();
-    plot(xs, ys, "r-");           // 스타일만 사용
-    plot(x_orig, y_orig, "bo--"); // 스타일만 사용
-    legend();                     // 레전드 호출 시 자동 생성
-    title("Spline Visualization");
-    axis("equal");
-    grid(true);
-    show();
+    return true;  // 모든 샘플이 유효하면 true
 }
 
+void genEdge(Graph& graph, 
+    const NodeMap& nodesPerLayer, 
+    const Offline_Params& params,
+    const IVector& raceline_index_array,
+    bool closed = true) {
+
+        if (params.LAT_OFFSET <= 0.0) {
+            cout << "Too small lateral offset" << endl;
+        }
+
+        const auto& xs = sampling_map[__x_raceline];
+        const auto& ys = sampling_map[__y_raceline];
+
+        raceline_cl.reserve(xs.size());
+        for (size_t i = 0; i < xs.size(); ++i) {
+            raceline_cl.emplace_back(xs[i], ys[i]);
+        }
+
+        // raceline 전체를 스플라인으로 만들고 계수 가져오기
+        auto raceline_result = calcSplines(raceline_cl);
+        const MatrixXd& x_coeff_r = raceline_result->coeffs_x;
+        const MatrixXd& y_coeff_r = raceline_result->coeffs_y;
+
+        // closed -> 마지막과 0번 레이어 연결, open -> break
+        size_t end_layer = (layer + 1) % nodesPerLayer.size();
+        if (!params.CLOSURE_DETECTION_DIST && end_layer == 0)
+            break;
+
+        // 1. 각 레이어의 레이스라인 기준 인덱스
+        const int start_race_idx = raceline_index_array[start_layer];
+        const int end_race_idx   = raceline_index_array[end_layer];
+
+        // 2. 시작 레이어의 각 노드에 대해 반복
+        const auto& start_layer_nodes = nodesPerLayer[start_layer];
+        const auto& end_layer_nodes   = nodesPerLayer[end_layer];
+
+        for (size_t start_idx = 0; start_idx < start_layer_nodes.size(); ++start_idx) {
+            Node& start_node = start_layer_nodes[start_idx];
+
+            // 3. 레이스라인에서 같은 위치에 있는 end 레이어의 참조 노드 인덱스 계산
+            int rel_race_offset = static_cast<int>(start_idx) - start_race_idx;
+            int ref_end_idx = end_race_idx + rel_race_offset;
+
+            // 4. 범위 클램프
+            ref_end_idx = std::clamp(ref_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
+
+            // 5. 거리 계산
+            MatrixXd spline_path(2, 2);
+            spline_path << start_node.x, start_node.y,
+                        ref_end_node.x, ref_end_node.y;
+
+            VectorXd el_lengths = computeEuclideanDistances(spline_path);
+            double dist = el_lengths(0);
+
+            // 커브면 더 많이 연결
+            double factor = (startNode.kappa > params.CURVE_THR) ? 2.0 : 1.0;
+            int lat_steps = round(factor * dist * params.LAT_OFFSET / params.LAT_RESOLUTION);
+
+            for (int destIdx = std::max(0, refDestIdx - lat_steps);
+                destIdx <= std::min(static_cast<int>(nodesPerLayer[end_layer].size() - 1), refDestIdx + lat_steps);
+                ++destIdx) {
+
+                Node& endNode = nodesPerLayer[end_layer][destIdx];
+                MatrixXd x_coeffs, y_coeffs;
+
+                if (startNode.raceline && endNode.raceline) {
+                    x_coeffs = x_coeff_r.row(start_layer);
+                    y_coeffs = y_coeff_r.row(start_layer);
+                } else {
+                    vector<Vector2d> path = { Vector2d(startNode.x, startNode.y), Vector2d(endNode.x, endNode.y) };
+                    auto result = calcSplines(path, nullptr, startNode.psi, endNode.psi);
+                    x_coeffs = result->coeffs_x;
+                    y_coeffs = result->coeffs_y;
+                }
+
+                // 그래프에 엣지 추가
+                graph.addEdge({start_layer, startIdx}, {end_layer, destIdx});
+            }
+        }
+    }
 
 
-void genEdges() {
-    
-}
 
 int main() {
     IVector idx_sampling;
@@ -537,24 +665,20 @@ int main() {
             }
         }
     }
-
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
 
-
-    // 추후 저장될 예정 
     calcHeading(sampling_map[__x_raceline],
                 sampling_map[__y_raceline],
                 sampling_map[__psi]);
-    
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
     calcHeading(sampling_map[__x_bound_l],
                 sampling_map[__y_bound_l],
                 sampling_map[__psi_bound_l]);
-
     calcHeading(sampling_map[__x_bound_r],
                 sampling_map[__y_bound_r],
                 sampling_map[__psi_bound_r]);  
 
+    // 노드 그리드 생성
     NodeMap nodesPerLayer;
     IVector raceline_index_array;
     Vector2d node_pos;
@@ -577,13 +701,18 @@ int main() {
 
     SplineResult result = calcSplines(path_xy, nullptr, psi_s, psi_e);
 
+    // 최종 그래프 생성
+    Graph myGraph;
+    genEdge(myGraph,
+            nodesPerLayer,
+            params,
+            raceline_index_array);
+
+
+    // 최종 그래프 풀력
+    
     // 시각화
-    visualizeSplines(result, path_xy);
-
-
-    //genEdges();
-    // visual process 
-    //visual();
+    visual(nodesPerLayer);
 
     return 0;
 }

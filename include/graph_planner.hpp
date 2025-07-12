@@ -37,6 +37,14 @@ using namespace rapidcsv;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
+// 스플라인 결과를 담기 위한 구조체: x, y 방향 계수, 행렬 M, 정규화된 노멀 벡터
+struct SplineResult {
+    MatrixXd coeffs_x;          // 각 구간의 x 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
+    MatrixXd coeffs_y;          // 각 구간의 y 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
+    MatrixXd M;                 // 스플라인 계수 계산에 사용된 시스템 행렬
+    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
+};
+
 struct Node {
     int layer_idx;
     int node_idx;
