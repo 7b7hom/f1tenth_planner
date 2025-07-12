@@ -191,11 +191,11 @@ void calcHeading(DVector &x_raceline,
 }
 
 void genNode(NodeMap& nodesPerLayer,
+            IVector& raceline_index_array,
             const double veh_width,
             float lat_resolution) {
     
     const size_t N = sampling_map[__alpha].size();
-    IVector raceline_index_array;
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
@@ -488,14 +488,15 @@ void visualizeSplines(const SplineResult& result, const MatrixXd& path) {
     }
 
     figure();
-    plot(xs, ys, "r-", {{"label", "Spline"}});
-    plot(x_orig, y_orig, "bo--", {{"label", "Sampled Points"}});
-    legend();
+    plot(xs, ys, "r-");           // 스타일만 사용
+    plot(x_orig, y_orig, "bo--"); // 스타일만 사용
+    legend();                     // 레전드 호출 시 자동 생성
     title("Spline Visualization");
     axis("equal");
     grid(true);
     show();
 }
+
 
 
 void genEdges() {
@@ -563,7 +564,7 @@ int main() {
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
-    Graph edgeList;
+    //Graph edgeList;
 
     MatrixXd path_xy(sampling_map[__x_raceline].size(), 2);
     for (size_t i = 0; i < sampling_map[__x_raceline].size(); ++i) {
