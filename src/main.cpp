@@ -347,49 +347,35 @@ unique_ptr<SplineResult> calcSplines(
 void genEdges(NodeMap &nodesPerLayer, 
               IVector &raceline_index_array,
               Graph &edgeList,
+              SplineMap &splineMap,
               const double lat_offset,
               const double lat_resolution,
               const double curve_thr,
               const double min_vel = 0.0,
               bool closed = true) {
-
+    
     if (lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
     }
 
-    vector<Vector2d> raceline_cl;
-    Vector2d start_point;
-
-    const auto& x_vals = sampling_map[__x_raceline];
-    const auto& y_vals = sampling_map[__y_raceline];
-
-    size_t N = x_vals.size();  // 또는 y_vals.size(), 두 벡터는 같은 길이여야 함
-
-    for (size_t i = 0; i < N; ++i) {
-        raceline_cl.emplace_back(x_vals[i], y_vals[i]);
-    }
-
-    // raceline spline 먼저 계산
-    auto raceline_result = calcSplines(raceline_cl);
-
-    const MatrixXd& x_coeff_r = raceline_result -> coeffs_x;
-    const MatrixXd& y_coeff_r = raceline_result -> coeffs_y;
-
+    // cout << nodesPerLayer.size() << endl; 출력: 51
     // 레이어 별 loop
-    for (size_t layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
+    for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
         
         int start_layer = layerIdx;
         int end_layer = layerIdx + 1;
 
+        // cout << "end_layer:" << end_layer << endl;
+        // cout << "nodesPerLayer.size()" << nodesPerLayer.size() << endl;
+
         // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 end_layer 조정 
-        if (end_layer >= nodesPerLayer.size())
+        if (end_layer >= nodesPerLayer.size()) {
             end_layer -= nodesPerLayer.size();
-        else 
-            break;
+        }
 
         int start_raceline_Idx = raceline_index_array[start_layer];
         int end_raceline_Idx = raceline_index_array[end_layer];
-        
+
         // start layer 내 노드별 loop
         for (size_t startIdx = 0; startIdx <= nodesPerLayer[start_layer].size(); ++startIdx) {
             // 기준 노드
@@ -398,6 +384,7 @@ void genEdges(NodeMap &nodesPerLayer,
             int refDestIdx = end_raceline_Idx + startIdx - start_raceline_Idx; // 기준 end노드 
             
             refDestIdx = clamp(refDestIdx, 0, static_cast<int>(nodesPerLayer[end_layer].size() - 1));
+
             Node &srcEndNode = nodesPerLayer[end_layer][refDestIdx];
             Vector2d d_start(startNode.x, startNode.y);
             Vector2d d_end(srcEndNode.x, srcEndNode.y);
@@ -413,22 +400,19 @@ void genEdges(NodeMap &nodesPerLayer,
                 destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() -1), refDestIdx + lat_steps); ++destIdx) {
                     Node &endNode = nodesPerLayer[end_layer][destIdx];
 
-                    MatrixXd x_coeffs, y_coeffs;
-
-                    if (startNode.raceline && endNode.raceline ) {
-                        x_coeffs = x_coeff_r.row(start_layer);
-                        y_coeffs = y_coeff_r.row(start_layer);
-                    }
-                    else {
                     vector<Vector2d> path = { Vector2d(startNode.x, startNode.y), Vector2d(endNode.x, endNode.y) };
                     auto result = calcSplines(path, nullptr, startNode.psi, endNode.psi);
-                    x_coeffs = result->coeffs_x;
-                    y_coeffs = result->coeffs_y;
-                    }
+
+                    IPair startKey = make_pair(start_layer, startIdx);
+                    IPair endKey = make_pair(end_layer, destIdx);
+                    EdgeKey srcKey= make_pair(startKey, endKey);
+                    splineMap[srcKey] = *result;
+
                     // graph에 넣는 과정 
-                    IPair n1 = make_pair(start_layer, startIdx);
-                    IPair n2 = make_pair(end_layer, destIdx);
-                    edgeList.addEdge(n1, n2);
+                    edgeList.addEdge(startKey, endKey);
+
+                    // cout << "startKey:" << startKey.first << ", " << startKey.second << " -> ";
+                    // cout << "endKey:" << endKey.first << ", " << endKey.second << endl;
                     
                 }
         }
@@ -506,15 +490,20 @@ int main() {
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
 
     Graph edgeList;
+    SplineMap splineMap;
 
     genEdges(nodesPerLayer,
              raceline_index_array,
              edgeList,
+             splineMap,
              params.LAT_OFFSET,
              params.LAT_RESOLUTION,
              params.CURVE_THR);
+
+    // edgeList.printGraph();
+    
     // visual process 
-    visual(nodesPerLayer);
+    // visual(nodesPerLayer);
 
     return 0;
 }

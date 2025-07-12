@@ -10,12 +10,15 @@ void Graph::addEdge(IPair srcNodeIdx, IPair childNodeIdx) {
 }
 
 void Graph::printGraph() {
+    int size =0;
     for (const auto& [srcNode, childNode] : adjLists) {
         cout << "(" << srcNode.first << "," << srcNode.second << ")" << ": ";
         for (size_t i = 0; i < childNode.size(); ++i) {
             cout << "(" << childNode[i].first << ", " << childNode[i].second << ")" << " -> "; 
+            size ++;
         }
         cout << "NULL\n";
+        
     }
     // for (const auto& [key, neighbors] : adjLists) {
     //     cout << "(" << get<0>(key) << "," << get<1>(key) << ")" << ": ";
@@ -24,6 +27,7 @@ void Graph::printGraph() {
     //     }
     //     cout << "NULL\n";
     // }
+    cout << "spline 개수" << size << endl;
 }
 
 void Graph::getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx) {

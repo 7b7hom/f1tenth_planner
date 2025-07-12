@@ -113,6 +113,32 @@ void plotSplineFromCoeffs(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, co
     plt::show();
 }
 
+void plotSplineNormalized(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, int samples_per_segment = 20) {
+    vector<double> X, Y;
+    cout << "hi" << endl;
+    int n_segments = coeffs_x.rows();
+    for (int i = 0; i < n_segments; ++i) {
+        RowVector4d cx = coeffs_x.row(i);
+        RowVector4d cy = coeffs_y.row(i);
+        
+        for (int s = 0; s <= samples_per_segment; ++s) {
+            double t = double(s) / samples_per_segment;
+            double x = cx(0) + cx(1)*t + cx(2)*t*t + cx(3)*t*t*t;
+            double y = cy(0) + cy(1)*t + cy(2)*t*t + cy(3)*t*t*t;
+
+
+            X.push_back(x);
+            Y.push_back(y);
+        }
+    }
+
+    plt::plot(X, Y, "g-");
+    plt::axis("equal");
+    plt::title("Spline Visualization (t ∈ [0, 1])");
+    plt::show();
+}
+
+
 void visual(const NodeMap& nodesPerLayer) {
     plt::clf();
 

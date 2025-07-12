@@ -48,6 +48,14 @@ struct Node {
     bool raceline;
 };
 
+// 스플라인 결과
+struct SplineResult {
+    MatrixXd coeffs_x;          // x 계수
+    MatrixXd coeffs_y;             // y 계수     
+    MatrixXd M;                 // 계산용 행렬 
+    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
+};
+
 typedef vector<double> DVector;
 typedef vector<int>    IVector;
 typedef map<string, DVector> DMap;
@@ -60,6 +68,9 @@ typedef vector<vector<Node>> NodeMap;
 typedef pair<int, int> IPair; // <layerIdx, nodeIdx>
 typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vector
 typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
+typedef pair<IPair, IPair> EdgeKey;
+typedef map<EdgeKey, SplineResult> SplineMap;
+
 #define LayerIdx(pair) (pair.first)
 #define NodeIdx(pair) (pair.second)
 
@@ -77,27 +88,21 @@ public:
     void removeEdge(IPair& srcNodeIdx, IPairVector& parent);
 };
 
-// 스플라인 결과
-struct SplineResult {
-    MatrixXd coeffs_x;          // x 게수
-    MatrixXd coeffs_y; 
-    VectorXd ds;         // y 계수
-    MatrixXd M;                 // 계산용 행렬 
-    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
-};
-
 extern DMap gtpl_map;
 extern DMap sampling_map;
 
+// plotting
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
-void plotSplineFromCoeffs(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, const VectorXd& ds, int samples_per_segment);
+void plotSplineNormalized(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, int samples_per_segment);
 void visual(const NodeMap& nodesPerLayer);
 
+// toCSV
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
-
 void map_size(DMap& map);
+
+// main
 void addDVectorToMap(DMap &map,string attr, const IVector *idx_array);
 void samplePointsFromRaceline(const DVector& kappa,
                               const DVector& dist,

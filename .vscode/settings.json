@@ -13,6 +13,7 @@
         "deque": "cpp",
         "string": "cpp",
         "*.orig": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "functional": "cpp"
     }
 }
