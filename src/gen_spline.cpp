@@ -707,12 +707,9 @@ int main() {
             nodesPerLayer,
             params,
             raceline_index_array);
-
-
-    // 최종 그래프 풀력
     
     // 시각화
-    visual(nodesPerLayer);
+    // visual(nodesPerLayer);
 
     return 0;
 }
