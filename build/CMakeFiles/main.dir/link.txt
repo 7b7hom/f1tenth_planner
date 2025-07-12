@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/main.dir/src/main.cpp.o -o bin/main  /usr/lib/aarch64-linux-gnu/libpython3.10.so 

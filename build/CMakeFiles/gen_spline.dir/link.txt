@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/gen_spline.dir/src/gen_spline.cpp.o -o bin/gen_spline  /usr/lib/aarch64-linux-gnu/libpython3.10.so 
