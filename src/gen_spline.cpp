@@ -449,9 +449,9 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
         }
 
         // [DEBUG] M, b_x, b_y 출력
-        cout << "[DEBUG] M 행렬:\n" << M << "\n";
-        cout << "[DEBUG] b_x 벡터:\n" << b_x.transpose() << "\n";
-        cout << "[DEBUG] b_y 벡터:\n" << b_y.transpose() << "\n";
+        // cout << "[DEBUG] M 행렬:\n" << M << "\n";
+        // cout << "[DEBUG] b_x 벡터:\n" << b_x.transpose() << "\n";
+        // cout << "[DEBUG] b_y 벡터:\n" << b_y.transpose() << "\n";
 
         // 연립방정식 풀기
         VectorXd x_les = M.colPivHouseholderQr().solve(b_x);
@@ -709,10 +709,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
     plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
-    // 노드들
     plotHeading(nodesPerLayer);
-
-    // --- Graph 엣지 (스플라인) 시각화 ---
     
     DVector spline_x_pts; 
     DVector spline_y_pts;
@@ -729,12 +726,12 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
             }
             
             for (int dest_node_idx : child_nodes_idx) {
-                // 각 스플라인 그리기 전에 벡터를 비워줍니다. (이전 스플라인 점 데이터 초기화)
+
                 spline_x_pts.clear(); 
                 spline_y_pts.clear(); 
                 
                 size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
-                // next_node_idx 유효성 검사 추가 (인덱스 범위 체크)
+
                 if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
                     // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
                     continue;
@@ -753,13 +750,11 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
 
                 SplineResult res;
                 try {
-                    // calcSplines의 마지막 인자인 use_dist_scaling은 true로 가정
                     res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
                 } catch (const std::exception& e) {
                     continue;
                 }
 
-                // 계산된 스플라인 계수를 사용하여 곡선 그리기
                 const int num_spline_segments = 10; 
                 for (int k = 0; k <= num_spline_segments; ++k) {
                     double t_eval = static_cast<double>(k) / num_spline_segments;
@@ -786,11 +781,12 @@ int main() {
     IVector idx_sampling;
     Offline_Params params;
 
-    string map_file_in = "inputs/gtpl_levine.csv";
-    string map_file_out = "inputs/gtpl_levine_out.csv";
+    string map_file_in = "../inputs/gtpl_levine.csv";
+    string map_file_out = "../inputs/gtpl_levine_out.csv";
 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     readDMapFromCSV(map_file_in, gtpl_map);
+    std::cout << "CSV loaded, columns: " << gtpl_map.size() << std::endl;
 
     addDVectorToMap(gtpl_map, "bound_r");
     addDVectorToMap(gtpl_map, "bound_l");
@@ -860,7 +856,7 @@ int main() {
             raceline_index_array);
     
     // 시각화
-    // visual(nodesPerLayer, myGraph, params);
+    visual(nodesPerLayer, myGraph, params);
 
     return 0;
 }
