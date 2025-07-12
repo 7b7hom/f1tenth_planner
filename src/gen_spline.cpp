@@ -763,9 +763,10 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                 const int num_spline_segments = 10; 
                 for (int k = 0; k <= num_spline_segments; ++k) {
                     double t_eval = static_cast<double>(k) / num_spline_segments;
-                    SplinePoint sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval, res.ds(0), true);
-                    spline_x_pts.push_back(sp.x);
-                    spline_y_pts.push_back(sp.y);
+                    SplineEval sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
+                    spline_x_pts.push_back(sp.pos.x());
+                    spline_y_pts.push_back(sp.pos.y());
+
                 }
                 plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
             }
