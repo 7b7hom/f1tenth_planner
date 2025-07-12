@@ -141,15 +141,15 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
         cout << "[DEBUG] b_x 벡터:\n" << b_x.transpose() << "\n";
         cout << "[DEBUG] b_y 벡터:\n" << b_y.transpose() << "\n";
 
-        // 1. 연립방정식 풀기 (QR 분해로 안정적)
-        VectorXd x_flat = M.colPivHouseholderQr().solve(b_x);  // (4 * N x 1)
-        VectorXd y_flat = M.colPivHouseholderQr().solve(b_y);  // (4 * N x 1)
+        // 연립방정식 풀기
+        VectorXd x_les = M.colPivHouseholderQr().solve(b_x);
+        VectorXd y_les = M.colPivHouseholderQr().solve(b_y);
 
-        // 2. 계수 벡터를 (N x 4) 행렬로 reshape
-        MatrixXd coeffs_x = Map<Matrix<double, 4, Dynamic>>(x_flat.data(), 4, no_splines).transpose();
-        MatrixXd coeffs_y = Map<Matrix<double, 4, Dynamic>>(y_flat.data(), 4, no_splines).transpose();
+        MatrixXd coeffs_x = Map<MatrixXd>(x_les.data(), 4, no_splines).transpose();
+        MatrixXd coeffs_y = Map<MatrixXd>(y_les.data(), 4, no_splines).transpose();
 
-        // 3. 법선 벡터 계산 (노멀 벡터)
+
+        // 법선 벡터 계산 (노멀 벡터)
         MatrixXd normvec(no_splines, 2);
         for (int i = 0; i < no_splines; ++i) {
             double dx = coeffs_x(i, 1);  // a₁: x방향 도함수 시작점
@@ -161,7 +161,7 @@ SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = null
         VectorXd norms = normvec.rowwise().norm();
         MatrixXd normvec_normalized = normvec.array().colwise() / norms.array();
 
-        // 4. 결과 구조체에 저장
+        // 결과 구조체에 저장
         SplineResult result;
         result.coeffs_x = coeffs_x;
         result.coeffs_y = coeffs_y;
@@ -177,31 +177,36 @@ void genEdges() {
     
 }
 
-
 int main() {
+    using namespace std;
     using namespace Eigen;
 
-    // 간단한 테스트 경로: 삼각형 형태
-    MatrixXd path(5, 2);
-    path << 0, 0,
-            1, 2,
-            3, 3,
-            6, 2,
-            10, 0;
-    
+    // std::vector<Eigen::Vector2d> 형태로 경로 생성
+    vector<Vector2d> path = {
+        {0, 0},
+        {2, 3},
+        {5, 5},
+        {8, 2}
+    };
 
-    // 시작, 끝 방향 (라디안) – 테스트용 값
-    double psi_s = M_PI / 2.0;
-    double psi_e = M_PI / 2.0;
+    // Eigen::MatrixXd로 변환
+    MatrixXd path_mat(path.size(), 2);
+    for (size_t i = 0; i < path.size(); ++i) {
+        path_mat(i, 0) = path[i].x();
+        path_mat(i, 1) = path[i].y();
+    }
 
-    // calcSplines 호출 (el_lengths 없이 테스트)
-    SplineResult result = calcSplines(path, nullptr, psi_s, psi_e, true);
+    // 시작, 끝 방향
+    double psi_s = M_PI / 4;
+    double psi_e = 0;
+
+    // 스플라인 계산 함수 호출
+    SplineResult result = calcSplines(path_mat, nullptr, psi_s, psi_e);
 
     // 결과 출력
-    std::cout << "X 계수:\n" << result.coeffs_x << "\n\n";
-    std::cout << "Y 계수:\n" << result.coeffs_y << "\n\n";
-    std::cout << "M 행렬 크기: " << result.M.rows() << "x" << result.M.cols() << "\n";
-    std::cout << "정규화된 노멀 벡터:\n" << result.normvec_normalized << "\n";
+    cout << "X 계수:\n" << result.coeffs_x << "\n\n";
+    cout << "Y 계수:\n" << result.coeffs_y << "\n\n";
+    cout << "정규화된 법선 벡터:\n" << result.normvec_normalized << "\n";
 
     return 0;
 }
