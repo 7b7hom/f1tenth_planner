@@ -239,14 +239,14 @@ void genNode(NodeMap& nodesPerLayer,
     }
 }
 
-VectorXd computeDist(const vector<Vector2d>& path) {
-    int N = static_cast<int>(path.size()) - 1;
-    VectorXd dists(N);
-    for (int i = 0; i < N; ++i) {
-        dists(i) = (path[i + 1] - path[i]).norm();
-    }
-    return dists;
-}
+// VectorXd computeDist(const vector<Vector2d>& path) {
+//     int N = static_cast<int>(path.size()) - 1;
+//     VectorXd dists(N);
+//     for (int i = 0; i < N; ++i) {
+//         dists(i) = (path[i + 1] - path[i]).norm();
+//     }
+//     return dists;
+// }
 
 unique_ptr<SplineResult> calcSplines(
     const vector<Vector2d> &path,
@@ -260,7 +260,7 @@ unique_ptr<SplineResult> calcSplines(
     // if (closed) closed_path.push_back(path[0]);
 
     int no_splines = closed_path.size() - 1;
-    VectorXd ds = (el_lengths == nullptr) ? computeDist(closed_path) : *el_lengths;
+    VectorXd ds = VectorXd::Ones(no_splines);
 
     MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
     VectorXd b_x = VectorXd::Zero(no_splines * 4);
@@ -381,10 +381,10 @@ void genEdges(NodeMap &nodesPerLayer,
             // 기준 노드
             Node &startNode = nodesPerLayer[start_layer][startIdx];
 
-            int refDestIdx = end_raceline_Idx + startIdx - start_raceline_Idx; // 기준 end노드 
+            // int refDestIdx = end_raceline_Idx + startIdx - start_raceline_Idx; // 기준 end노드 
             
-            refDestIdx = clamp(refDestIdx, 0, static_cast<int>(nodesPerLayer[end_layer].size() - 1));
-
+            // refDestIdx = clamp(refDestIdx, 0, static_cast<int>(nodesPerLayer[end_layer].size() - 1));
+            int refDestIdx = startIdx;
             Node &srcEndNode = nodesPerLayer[end_layer][refDestIdx];
             Vector2d d_start(startNode.x, startNode.y);
             Vector2d d_end(srcEndNode.x, srcEndNode.y);
@@ -418,6 +418,39 @@ void genEdges(NodeMap &nodesPerLayer,
         }
     }
 }
+
+void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
+    std::cout << "\n=== 📌 SplineMap: Coefficients with Start/End Node Info ===\n";
+
+    for (const auto& [edgeKey, spline] : splineMap) {
+        const IPair& startKey = edgeKey.first;
+        const IPair& endKey = edgeKey.second;
+
+        const Node& startNode = nodesPerLayer[startKey.first][startKey.second];
+        const Node& endNode = nodesPerLayer[endKey.first][endKey.second];
+
+        std::cout << "\n▶ (" << startKey.first << ", " << startKey.second << ") --> ("
+                  << endKey.first << ", " << endKey.second << ")\n";
+
+        std::cout << "  [Start Node] x: " << startNode.x
+                  << ", y: " << startNode.y
+                  << ", psi: " << startNode.psi << "\n";
+        std::cout << "  [End Node]   x: " << endNode.x
+                  << ", y: " << endNode.y
+                  << ", psi: " << endNode.psi << "\n";
+
+        std::cout << "  coeffs_x (" << spline.coeffs_x.rows() << "x" << spline.coeffs_x.cols() << "):\n";
+        std::cout << spline.coeffs_x << "\n";
+
+        std::cout << "  coeffs_y (" << spline.coeffs_y.rows() << "x" << spline.coeffs_y.cols() << "):\n";
+        std::cout << spline.coeffs_y << "\n";
+
+        std::cout << "----------------------------------------";
+    }
+
+    std::cout << "\n=== ✅ End of splineMap ===\n";
+}
+
 
 int main() {
     IVector idx_sampling;
@@ -500,10 +533,11 @@ int main() {
              params.LAT_RESOLUTION,
              params.CURVE_THR);
 
+    // printSplineMapVerbose(splineMap, nodesPerLayer);
     // edgeList.printGraph();
     
     // visual process 
-    // visual(nodesPerLayer);
+    visual(edgeList, nodesPerLayer, splineMap);
 
     return 0;
 }

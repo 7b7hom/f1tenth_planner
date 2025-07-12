@@ -76,10 +76,11 @@ typedef map<EdgeKey, SplineResult> SplineMap;
 
 class Graph {
 private:
-    IPairAdjList adjLists;
+    
     bool isDirected;
 
 public:
+IPairAdjList adjLists;
     Graph(bool directed = true);
     void addEdge(IPair srcNodeIdx, IPair destNodeIdx);
     void printGraph();
@@ -94,8 +95,8 @@ extern DMap sampling_map;
 // plotting
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
-void plotSplineNormalized(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, int samples_per_segment);
-void visual(const NodeMap& nodesPerLayer);
+void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap);
+void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap);
 
 // toCSV
 void readDMapFromCSV(const string& pathname, DMap& map);

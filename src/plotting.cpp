@@ -87,59 +87,57 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
-void plotSplineFromCoeffs(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, const VectorXd& ds, int samples_per_segment = 20) {
-    vector<double> X, Y;
+void plotSplinesFromMap(const SplineMap& splineMap, const NodeMap& nodesPerLayer, int num_samples = 20) {
+    std::vector<double> spline_x_pts;
+    std::vector<double> spline_y_pts;
 
-    int n_segments = coeffs_x.rows();
-    for (int i = 0; i < n_segments; ++i) {
-        RowVector4d cx = coeffs_x.row(i);
-        RowVector4d cy = coeffs_y.row(i);
+    for (const auto& [edgeKey, splineRes] : splineMap) {
+        spline_x_pts.clear();
+        spline_y_pts.clear();
 
-        double d = ds(i);  // 해당 구간의 길이 (0 ~ d까지 t)
+        const IPair& startKey = edgeKey.first;
+        const IPair& endKey = edgeKey.second;
 
-        for (int s = 0; s <= samples_per_segment; ++s) {
-            double t = d * (double(s) / samples_per_segment);
-            double x = cx[0] + cx[1]*t + cx[2]*t*t + cx[3]*t*t*t;
-            double y = cy[0] + cy[1]*t + cy[2]*t*t + cy[3]*t*t*t;
+        const int start_layer = startKey.first;
+        const int start_idx   = startKey.second;
+        const int end_layer   = endKey.first;
+        const int end_idx     = endKey.second;
 
-            X.push_back(x);
-            Y.push_back(y);
+        // 유효성 검사
+        if (start_layer >= nodesPerLayer.size() || end_layer >= nodesPerLayer.size()) continue;
+        if (start_idx >= nodesPerLayer[start_layer].size() || end_idx >= nodesPerLayer[end_layer].size()) continue;
+
+        const Node& startNode = nodesPerLayer[start_layer][start_idx];
+        const Node& endNode   = nodesPerLayer[end_layer][end_idx];
+
+        const auto& coeffs_x = splineRes.coeffs_x;
+        const auto& coeffs_y = splineRes.coeffs_y;
+
+        // 일반적으로 1개 구간만 있다고 가정 (row 0)
+        for (int i = 0; i <= num_samples; ++i) {
+            double t = static_cast<double>(i) / num_samples;
+
+            double x = coeffs_x(0, 0)
+                     + coeffs_x(0, 1) * t
+                     + coeffs_x(0, 2) * t * t
+                     + coeffs_x(0, 3) * t * t * t;
+
+            double y = coeffs_y(0, 0)
+                     + coeffs_y(0, 1) * t
+                     + coeffs_y(0, 2) * t * t
+                     + coeffs_y(0, 3) * t * t * t;
+
+            spline_x_pts.push_back(x);
+            spline_y_pts.push_back(y);
         }
-    }
 
-    plt::plot(X, Y, "r-");  // 빨간 곡선으로 출력
-    plt::axis("equal");
-    plt::title("Spline Visualization");
-    plt::show();
+        // 그리기
+        plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}});
+    }
 }
 
-void plotSplineNormalized(const MatrixXd& coeffs_x, const MatrixXd& coeffs_y, int samples_per_segment = 20) {
-    vector<double> X, Y;
-    cout << "hi" << endl;
-    int n_segments = coeffs_x.rows();
-    for (int i = 0; i < n_segments; ++i) {
-        RowVector4d cx = coeffs_x.row(i);
-        RowVector4d cy = coeffs_y.row(i);
-        
-        for (int s = 0; s <= samples_per_segment; ++s) {
-            double t = double(s) / samples_per_segment;
-            double x = cx(0) + cx(1)*t + cx(2)*t*t + cx(3)*t*t*t;
-            double y = cy(0) + cy(1)*t + cy(2)*t*t + cy(3)*t*t*t;
 
-
-            X.push_back(x);
-            Y.push_back(y);
-        }
-    }
-
-    plt::plot(X, Y, "g-");
-    plt::axis("equal");
-    plt::title("Spline Visualization (t ∈ [0, 1])");
-    plt::show();
-}
-
-
-void visual(const NodeMap& nodesPerLayer) {
+void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap) {
     plt::clf();
 
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
@@ -164,7 +162,8 @@ void visual(const NodeMap& nodesPerLayer) {
 
 
     // 노드마다 psi확인할 수 있는 용도 
-    plotHeading(nodesPerLayer);
+    // plotHeading(nodesPerLayer);
+    plotSplinesFromMap(splineMap, nodesPerLayer);   
 
     plt::title("Track");
     plt::grid(true);
