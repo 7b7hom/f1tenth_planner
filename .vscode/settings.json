@@ -14,6 +14,7 @@
         "string": "cpp",
         "*.orig": "cpp",
         "iostream": "cpp",
-        "functional": "cpp"
+        "functional": "cpp",
+        "cmath": "cpp"
     }
 }

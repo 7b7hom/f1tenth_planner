@@ -87,55 +87,40 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
-void plotSplinesFromMap(const SplineMap& splineMap, const NodeMap& nodesPerLayer, int num_samples = 20) {
-    std::vector<double> spline_x_pts;
-    std::vector<double> spline_y_pts;
+vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points = 50) {
+    vector<Vector2d> points;
+    points.reserve(num_points);
 
-    for (const auto& [edgeKey, splineRes] : splineMap) {
-        spline_x_pts.clear();
-        spline_y_pts.clear();
+    for (int i = 0; i <= num_points; ++i) {
+        double t = static_cast<double>(i) / num_points;
+        double t2 = t * t;
+        double t3 = t2 * t;
 
-        const IPair& startKey = edgeKey.first;
-        const IPair& endKey = edgeKey.second;
+        double x = spline.coeffs_x(0, 0) + spline.coeffs_x(0, 1) * t + spline.coeffs_x(0, 2) * t2 + spline.coeffs_x(0, 3) * t3;
+        double y = spline.coeffs_y(0, 0) + spline.coeffs_y(0, 1) * t + spline.coeffs_y(0, 2) * t2 + spline.coeffs_y(0, 3) * t3;
 
-        const int start_layer = startKey.first;
-        const int start_idx   = startKey.second;
-        const int end_layer   = endKey.first;
-        const int end_idx     = endKey.second;
-
-        // 유효성 검사
-        if (start_layer >= nodesPerLayer.size() || end_layer >= nodesPerLayer.size()) continue;
-        if (start_idx >= nodesPerLayer[start_layer].size() || end_idx >= nodesPerLayer[end_layer].size()) continue;
-
-        const Node& startNode = nodesPerLayer[start_layer][start_idx];
-        const Node& endNode   = nodesPerLayer[end_layer][end_idx];
-
-        const auto& coeffs_x = splineRes.coeffs_x;
-        const auto& coeffs_y = splineRes.coeffs_y;
-
-        // 일반적으로 1개 구간만 있다고 가정 (row 0)
-        for (int i = 0; i <= num_samples; ++i) {
-            double t = static_cast<double>(i) / num_samples;
-
-            double x = coeffs_x(0, 0)
-                     + coeffs_x(0, 1) * t
-                     + coeffs_x(0, 2) * t * t
-                     + coeffs_x(0, 3) * t * t * t;
-
-            double y = coeffs_y(0, 0)
-                     + coeffs_y(0, 1) * t
-                     + coeffs_y(0, 2) * t * t
-                     + coeffs_y(0, 3) * t * t * t;
-
-            spline_x_pts.push_back(x);
-            spline_y_pts.push_back(y);
-        }
-
-        // 그리기
-        plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}});
+        points.emplace_back(x, y);
     }
+    return points;
 }
 
+void plotAllSplines(const SplineMap& splineMap) {
+    for (const auto& [edge_key, spline] : splineMap) {
+        vector<Vector2d> spline_points = generateSplinePoints(spline);
+        DVector xs, ys;
+        for (const auto& pt : spline_points) {
+            xs.push_back(pt.x());
+            ys.push_back(pt.y());
+        }
+        plt::plot(xs, ys);
+    }
+
+    plt::title("All Spline Paths");
+    plt::xlabel("X");
+    plt::ylabel("Y");
+    plt::axis("equal");
+    plt::show();
+}
 
 void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap) {
     plt::clf();
@@ -163,10 +148,12 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 
     // 노드마다 psi확인할 수 있는 용도 
     // plotHeading(nodesPerLayer);
-    plotSplinesFromMap(splineMap, nodesPerLayer);   
+    // plotSplinesFromMap(splineMap, nodesPerLayer);   
 
-    plt::title("Track");
-    plt::grid(true);
-    plt::axis("equal");
-    plt::show();  
+    plotAllSplines(splineMap);
+
+    // plt::title("Track");
+    // plt::grid(true);
+    // plt::axis("equal");
+    // plt::show();  
 }

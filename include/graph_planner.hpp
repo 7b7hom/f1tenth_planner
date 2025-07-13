@@ -39,8 +39,6 @@ using namespace Eigen;
 namespace plt = matplotlibcpp;
 
 struct Node {
-    int layer_idx;
-    int node_idx;
     double x;
     double y;
     double psi;
@@ -52,8 +50,6 @@ struct Node {
 struct SplineResult {
     MatrixXd coeffs_x;          // x 계수
     MatrixXd coeffs_y;             // y 계수     
-    MatrixXd M;                 // 계산용 행렬 
-    MatrixXd normvec_normalized;// 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
 };
 
 typedef vector<double> DVector;
@@ -102,20 +98,3 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
-
-// main
-void addDVectorToMap(DMap &map,string attr, const IVector *idx_array);
-void samplePointsFromRaceline(const DVector& kappa,
-                              const DVector& dist,
-                              double d_curve,
-                              double d_straight,
-                              double curve_th,
-                              IVector& idx_array);
-double normalizeAngle(double angle);
-void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline,
-                 DVector &psi);
-void genNode(NodeMap& nodesPerLayer,
-            IVector &raceline_index_array,
-            const double veh_width,
-            float lat_resolution);

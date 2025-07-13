@@ -197,7 +197,6 @@ void genNode(NodeMap& nodesPerLayer,
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
-        node.layer_idx = i; 
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
         raceline_index_array.push_back(raceline_index);
@@ -212,16 +211,17 @@ void genNode(NodeMap& nodesPerLayer,
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;  // num_nodes : 좌우 총 가능한 노드 수
+        
         nodesPerLayer[i].resize(num_nodes); 
-
+        
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
         // node별 loop 
-        for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
-            // node_alphas.push_back(alpha);
+        for (int idx = 0; idx < num_nodes; ++idx) {
+            double alpha = start_alpha + idx * lat_resolution;
+
             // node의 좌표 계산.
             node_pos = ref_xy + alpha * norm_vec;
-            // node의 layer내의 인덱스 계산.
-            node.node_idx = node_idx;
+
             node.x = node_pos.x();
             node.y = node_pos.y();      
             node.raceline = (node_idx == raceline_index);
@@ -256,6 +256,7 @@ void genNode(NodeMap& nodesPerLayer,
 
             nodesPerLayer[i][node_idx] = node;
             ++node_idx;
+
         }
 
         
@@ -270,100 +271,47 @@ void genNode(NodeMap& nodesPerLayer,
 
 }
 
-unique_ptr<SplineResult> calcSplines(
-    const vector<Vector2d> &path,
-    double psi_s = NAN,
-    double psi_e = NAN) {
+unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode) {
+    // 하나의 3차 스플라인을 만들기 위해 계수 4개 필요 (x, y 각각)
+    MatrixXd M(4, 4);      // 시스템 행렬
+    VectorXd b_x(4), b_y(4);  // 우변
 
-    vector<Vector2d> closed_path = path;
-    bool closed = (path.front() - path.back()).norm() < 1e-6;
+    const double d = 1.0;
 
-    // if (closed) closed_path.push_back(path[0]);
+    // 조건 1: x(0) = startNode.x
+    M.row(0) << 1, 0, 0, 0;
+    b_x(0) = startNode.x;
+    b_y(0) = startNode.y;
 
-    int no_splines = closed_path.size() - 1;
-    VectorXd ds = VectorXd::Ones(no_splines);
+    // 조건 2: x(d) = endNode.x
+    M.row(1) << 1, d, d * d, d * d * d;
+    b_x(1) = endNode.x;
+    b_y(1) = endNode.y;
 
-    MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
-    VectorXd b_x = VectorXd::Zero(no_splines * 4);
-    VectorXd b_y = VectorXd::Zero(no_splines * 4);
+    // 조건 3: dx/dt t = 0 = cos(startNode.psi)
+    M.row(2) << 0, 1, 0, 0;
+    b_x(2) = cos(startNode.psi);
+    b_y(2) = sin(startNode.psi);
 
-    for (int j = 0; j < no_splines; ++j) {
-        int row0 = j * 4;
-        M(row0, row0) = 1;
-        b_x(row0) = closed_path[j].x();
-        b_y(row0) = closed_path[j].y();
+    // 조건 4: dx/dt t = d = cos(endNode.psi)
+    M.row(3) << 0, 1, 2 * d, 3 * d * d;
+    b_x(3) = cos(endNode.psi);
+    b_y(3) = sin(endNode.psi);
 
-        RowVector4d T;
-        double d = ds(j);
-        T << 1, d, d * d, d * d * d;
+    VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
+    VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
 
-        for (int k = 0; k < 4; ++k)
-            M(row0 + 1, row0 + k) = T(k);
+    // 1줄 → 행렬 형태로 reshape
+    MatrixXd coeffs_x_mat = coeffs_x.transpose();
+    MatrixXd coeffs_y_mat = coeffs_y.transpose();
 
-        b_x(row0 + 1) = closed_path[j + 1].x();
-        b_y(row0 + 1) = closed_path[j + 1].y();
-    }
-
-    for (int j = 0; j < no_splines - 1; ++j) {
-        int row = 2 * no_splines + j;
-        double d = ds(j);
-        RowVector4d T;
-        T << 0, 1, 2 * d, 3 * d * d;
-        for (int k = 0; k < 4; ++k) {
-            M(row, 4 * j + k) = T(k);
-            M(row, 4 * (j + 1) + k) = -T(k);
-        }
-    }
-
-    for (int j = 0; j < no_splines - 1; ++j) {
-        int row = 3 * no_splines - 1 + j;
-        double d = ds(j);
-        RowVector4d T;
-        T << 0, 0, 2, 6 * d;
-        for (int k = 0; k < 4; ++k) {
-            M(row, 4 * j + k) = T(k);
-            M(row, 4 * (j + 1) + k) = -T(k);
-        }
-    }
-
-    if (!isnan(psi_s)) {
-        M.row(4 * no_splines - 2).setZero();
-        M(4 * no_splines - 2, 1) = 1;
-        b_x(4 * no_splines - 2) = cos(psi_s);
-        b_y(4 * no_splines - 2) = sin(psi_s);
-    }
-
-    if (!isnan(psi_e)) {
-        double d = ds(no_splines - 1);
-        M.row(4 * no_splines - 1).setZero();
-        M(4 * no_splines - 1, 4 * (no_splines - 1) + 1) = 1;
-        M(4 * no_splines - 1, 4 * (no_splines - 1) + 2) = 2 * d;
-        M(4 * no_splines - 1, 4 * (no_splines - 1) + 3) = 3 * d * d;
-        b_x(4 * no_splines - 1) = cos(psi_e);
-        b_y(4 * no_splines - 1) = sin(psi_e);
-    }
-
-    VectorXd x_les = M.colPivHouseholderQr().solve(b_x);
-    VectorXd y_les = M.colPivHouseholderQr().solve(b_y);
-
-    MatrixXd coeffs_x = Map<MatrixXd>(x_les.data(), 4, no_splines).transpose();
-    MatrixXd coeffs_y = Map<MatrixXd>(y_les.data(), 4, no_splines).transpose();
-
-    MatrixXd normvec(no_splines, 2);
-    for (int i = 0; i < no_splines; ++i) {
-        double dx = coeffs_x(i, 1);
-        double dy = coeffs_y(i, 1);
-        normvec(i, 0) = -dy;
-        normvec(i, 1) = dx;
-    }
-
-    VectorXd norms = normvec.rowwise().norm();
-    MatrixXd normvec_normalized(no_splines, 2);
-    for (int i = 0; i < no_splines; ++i)
-        normvec_normalized.row(i) = normvec.row(i) / norms(i);
-
-    return make_unique<SplineResult>(SplineResult{coeffs_x, coeffs_y, M, normvec_normalized});
+    // 결과 반환
+    return make_unique<SplineResult>(SplineResult{
+        coeffs_x_mat,  // (1, 4)
+        coeffs_y_mat,  // (1, 4)
+    });
 }
+
 
 void genEdges(NodeMap &nodesPerLayer, 
               IVector &raceline_index_array,
@@ -371,9 +319,7 @@ void genEdges(NodeMap &nodesPerLayer,
               SplineMap &splineMap,
               const double lat_offset,
               const double lat_resolution,
-              const double curve_thr,
-              const double min_vel = 0.0,
-              bool closed = true) {
+              const double curve_thr) {
     
     if (lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
@@ -421,8 +367,7 @@ void genEdges(NodeMap &nodesPerLayer,
                 destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() -1), refDestIdx + lat_steps); ++destIdx) {
                     Node &endNode = nodesPerLayer[end_layer][destIdx];
 
-                    vector<Vector2d> path = { Vector2d(startNode.x, startNode.y), Vector2d(endNode.x, endNode.y) };
-                    auto result = calcSplines(path, startNode.psi, endNode.psi);
+                    auto result = calcSplines(startNode, endNode);
 
                     IPair startKey = make_pair(start_layer, startIdx);
                     IPair endKey = make_pair(end_layer, destIdx);
@@ -441,7 +386,6 @@ void genEdges(NodeMap &nodesPerLayer,
 }
 
 void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
-    cout << "\n=== 📌 SplineMap: Coefficients with Start/End Node Info ===\n";
 
     for (const auto& [edgeKey, spline] : splineMap) {
         const IPair& startKey = edgeKey.first;
@@ -450,7 +394,7 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
         const Node& startNode = nodesPerLayer[startKey.first][startKey.second];
         const Node& endNode = nodesPerLayer[endKey.first][endKey.second];
 
-        cout << "\n▶ (" << startKey.first << ", " << startKey.second << ") --> ("
+        cout << "\n(" << startKey.first << ", " << startKey.second << ") --> ("
                   << endKey.first << ", " << endKey.second << ")\n";
 
         cout << "  [Start Node] x: " << startNode.x
@@ -468,8 +412,6 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
 
         cout << "----------------------------------------";
     }
-
-    cout << "\n=== ✅ End of splineMap ===\n";
 }
 
 
