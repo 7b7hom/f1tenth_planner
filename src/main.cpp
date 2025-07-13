@@ -144,12 +144,54 @@ void calcHeading(DVector &x_raceline,
 
 }
 
+void computeCurvature(NodeMap& nodesPerLayer) {
+    const int num_layers = nodesPerLayer.size();
+
+    // safe node access: 없는 j 인덱스는 가장 가까운 노드로 fallback
+    auto safeGetNode = [](const std::vector<Node>& layer, int j) -> const Node* {
+        if (layer.empty()) return nullptr;
+        if (j < 0) return &layer.front();
+        if (j < static_cast<int>(layer.size())) return &layer[j];
+        return &layer.back();  // 가장 오른쪽 노드로 fallback
+    };
+
+    for (int i = 0; i < num_layers; ++i) {
+        int num_nodes_i = nodesPerLayer[i].size();
+
+        for (int j = 0; j < num_nodes_i; ++j) {
+            const Node* prev = nullptr;
+            const Node* next = nullptr;
+
+            if (i > 0 && i < num_layers - 1) {
+                prev = safeGetNode(nodesPerLayer[i - 1], j);
+                next = safeGetNode(nodesPerLayer[i + 1], j);
+            } else if (i == 0 && num_layers > 1) {
+                prev = safeGetNode(nodesPerLayer[i], j);
+                next = safeGetNode(nodesPerLayer[i + 1], j);
+            } else if (i == num_layers - 1 && num_layers > 1) {
+                prev = safeGetNode(nodesPerLayer[i - 1], j);
+                next = safeGetNode(nodesPerLayer[i], j);
+            }
+
+            double dpsi = 0.0, ds = 0.0;
+            if (prev && next) {
+                dpsi = normalizeAngle(next->psi - prev->psi);
+                ds = std::hypot(next->x - prev->x, next->y - prev->y);
+            }
+
+            double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
+            nodesPerLayer[i][j].kappa = kappa;
+        }
+    }
+}
+
+
 void genNode(NodeMap& nodesPerLayer,
             IVector &raceline_index_array,
             const double veh_width,
             float lat_resolution) {
     
-    const size_t N = sampling_map[__alpha].size();
+    const int N = sampling_map[__alpha].size();
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
@@ -215,42 +257,21 @@ void genNode(NodeMap& nodesPerLayer,
             nodesPerLayer[i][node_idx] = node;
             ++node_idx;
         }
-        // 곡률 계산 (헤딩 변화량 / 거리)
-        for (int j = 1; j < num_nodes - 1; ++j) {
-            const Node& prev = nodesPerLayer[i][j - 1];
-            const Node& next = nodesPerLayer[i][j + 1];
 
-            double dpsi = normalizeAngle(next.psi - prev.psi);
-            double ds = std::hypot(next.x - prev.x, next.y - prev.y);
-            double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
-            nodesPerLayer[i][j].kappa = kappa;
-        }
-
-        // 양 끝은 0으로 처리
-        nodesPerLayer[i][0].kappa = 0.0;
-        nodesPerLayer[i][num_nodes - 1].kappa = 0.0;
-
+        
+    }
+    // 곡률 계산 (헤딩 변화량 / 거리)
+    computeCurvature(nodesPerLayer);
         // cout << i << "번째 Layer의" << endl;
         // for (size_t i =0; i < node_pos.size(); ++i) {        
         //     cout << i << "번째 Node" << endl;
         //     cout << node_pos[i] << endl;
         // }
 
-    }
 }
-
-// VectorXd computeDist(const vector<Vector2d>& path) {
-//     int N = static_cast<int>(path.size()) - 1;
-//     VectorXd dists(N);
-//     for (int i = 0; i < N; ++i) {
-//         dists(i) = (path[i + 1] - path[i]).norm();
-//     }
-//     return dists;
-// }
 
 unique_ptr<SplineResult> calcSplines(
     const vector<Vector2d> &path,
-    const VectorXd *el_lengths = nullptr,
     double psi_s = NAN,
     double psi_e = NAN) {
 
@@ -401,7 +422,7 @@ void genEdges(NodeMap &nodesPerLayer,
                     Node &endNode = nodesPerLayer[end_layer][destIdx];
 
                     vector<Vector2d> path = { Vector2d(startNode.x, startNode.y), Vector2d(endNode.x, endNode.y) };
-                    auto result = calcSplines(path, nullptr, startNode.psi, endNode.psi);
+                    auto result = calcSplines(path, startNode.psi, endNode.psi);
 
                     IPair startKey = make_pair(start_layer, startIdx);
                     IPair endKey = make_pair(end_layer, destIdx);
@@ -420,7 +441,7 @@ void genEdges(NodeMap &nodesPerLayer,
 }
 
 void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
-    std::cout << "\n=== 📌 SplineMap: Coefficients with Start/End Node Info ===\n";
+    cout << "\n=== 📌 SplineMap: Coefficients with Start/End Node Info ===\n";
 
     for (const auto& [edgeKey, spline] : splineMap) {
         const IPair& startKey = edgeKey.first;
@@ -429,26 +450,26 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
         const Node& startNode = nodesPerLayer[startKey.first][startKey.second];
         const Node& endNode = nodesPerLayer[endKey.first][endKey.second];
 
-        std::cout << "\n▶ (" << startKey.first << ", " << startKey.second << ") --> ("
+        cout << "\n▶ (" << startKey.first << ", " << startKey.second << ") --> ("
                   << endKey.first << ", " << endKey.second << ")\n";
 
-        std::cout << "  [Start Node] x: " << startNode.x
+        cout << "  [Start Node] x: " << startNode.x
                   << ", y: " << startNode.y
                   << ", psi: " << startNode.psi << "\n";
-        std::cout << "  [End Node]   x: " << endNode.x
+        cout << "  [End Node]   x: " << endNode.x
                   << ", y: " << endNode.y
                   << ", psi: " << endNode.psi << "\n";
 
-        std::cout << "  coeffs_x (" << spline.coeffs_x.rows() << "x" << spline.coeffs_x.cols() << "):\n";
-        std::cout << spline.coeffs_x << "\n";
+        cout << "  coeffs_x (" << spline.coeffs_x.rows() << "x" << spline.coeffs_x.cols() << "):\n";
+        cout << spline.coeffs_x << "\n";
 
-        std::cout << "  coeffs_y (" << spline.coeffs_y.rows() << "x" << spline.coeffs_y.cols() << "):\n";
-        std::cout << spline.coeffs_y << "\n";
+        cout << "  coeffs_y (" << spline.coeffs_y.rows() << "x" << spline.coeffs_y.cols() << "):\n";
+        cout << spline.coeffs_y << "\n";
 
-        std::cout << "----------------------------------------";
+        cout << "----------------------------------------";
     }
 
-    std::cout << "\n=== ✅ End of splineMap ===\n";
+    cout << "\n=== ✅ End of splineMap ===\n";
 }
 
 
@@ -533,7 +554,7 @@ int main() {
              params.LAT_RESOLUTION,
              params.CURVE_THR);
 
-    // printSplineMapVerbose(splineMap, nodesPerLayer);
+    printSplineMapVerbose(splineMap, nodesPerLayer);
     // edgeList.printGraph();
     
     // visual process 

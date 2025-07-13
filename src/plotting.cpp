@@ -18,9 +18,9 @@ void plotHeading(const DVector &x,
         // psi 방향 
         DVector x_line = {x[i], x[i] + dx};
         DVector y_line = {y[i], y[i] + dy};
-        plt::plot(x_line, y_line, {{"color", "green"}});
+        // plt::plot(x_line, y_line, {{"color", "green"}});
 
-        #if 1
+        #if 0
         // 화살촉 
         theta = atan2(dy, dx);
         arrow_len = 0.2 * scale;
@@ -39,7 +39,7 @@ void plotHeading(const DVector &x,
 
     }
         // raceline 좌표와 psi 프린팅 
-        #if 0
+        #if 1
         for (size_t i = 0; i < x.size(); ++i) {
         ostringstream label;
         label.precision(2);
@@ -148,9 +148,9 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
 
-    plotHeading(sampling_map[__x_raceline],
-                sampling_map[__y_raceline],
-                sampling_map[__psi]);
+    // plotHeading(sampling_map[__x_raceline],
+    //             sampling_map[__y_raceline],
+    //             sampling_map[__psi]);
 
     // plotHeading(sampling_map[__x_bound_l],
     //             sampling_map[__y_bound_l],
