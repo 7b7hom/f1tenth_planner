@@ -331,275 +331,67 @@ VectorXd computeEuclideanDistances(const MatrixXd& path) {
     return dists;
 }
 
-// path : x,y 좌표 배열
-// el_lengths 전달 안 하면 nullptr (점 사이 거리는 필수 x)
-// psi_s, psi_e도 전달 안 하면 NAN (필수 x)
-SplineResult calcSplines(const MatrixXd& path, const VectorXd* el_lengths = nullptr,
-                         double psi_s = NAN, double psi_e = NAN,
-                         bool use_dist_scaling = true) {
+// only startNode, endNode
+SplineResult calcSplines(const Node& startNode, const Node& endNode) {
+    double dx = endNode.x - startNode.x;
+    double dy = endNode.y - startNode.y;
+    double d = std::sqrt(dx * dx + dy * dy);
 
-        // 1.폐곡선 여부 판단
-        MatrixXd updated_path = path;
-        
-        // 시작 점과 끝 점 사이 거리가 매우 작으면 같다고 간주한다.
-        bool closed = (path.row(0) - path.row(path.rows() - 1)).norm() < 1e-6;
+    MatrixXd M = MatrixXd::Zero(4, 4);
+    VectorXd b_x = VectorXd::Zero(4);
+    VectorXd b_y = VectorXd::Zero(4);
 
-        if (closed) {
-            // 폐곡선 유지 : 시작점 다시 한 번 넣기 (마지막 스플라인 조각을 만들기 위해서)
-            updated_path.conservativeResize(path.rows() + 1, Eigen::NoChange);
-            updated_path.row(updated_path.rows() - 1) = path.row(0);
-        }
+    // 조건 1: x(0) = startNode.x
+    M(0, 0) = 1.0;
+    b_x(0) = startNode.x;
+    b_y(0) = startNode.y;
 
-        int no_splines = updated_path.rows() - 1;   // 경로 구간 수 = 점 개수 - 1
+    // 조건 2: x(d) = endNode.x
+    M(1, 0) = 1.0;
+    M(1, 1) = d;
+    M(1, 2) = d * d;
+    M(1, 3) = d * d * d;
+    b_x(1) = endNode.x;
+    b_y(1) = endNode.y;
 
-        VectorXd ds;
-        // 유클리드 거리 담고 있는 el_lengths (nullptr -> 유클리드 거리 계산, 아니면 el_lengths가 가리키는 VerctorXd 객체 거리 사용)
-        if (el_lengths == nullptr) {
-            ds = computeEuclideanDistances(updated_path);  // 기본 거리 계산 함수 호출
-        } else {
-            ds = *el_lengths;  // 외부에서 받은 길이 벡터 사용
-        }
+    // 조건 3: x'(0) = cos(psi_s) * d
+    M(2, 1) = 1.0;
+    b_x(2) = std::cos(startNode.psi) * d;
+    b_y(2) = std::sin(startNode.psi) * d;
 
-        // 유클리드 거리 출력
-        cout << "ds(거리벡터):\n" << ds.transpose() << "\n";
+    // 조건 4: x'(d) = cos(psi_e) * d
+    M(3, 1) = 1.0;
+    M(3, 2) = 2.0 * d;
+    M(3, 3) = 3.0 * d * d;
+    b_x(3) = std::cos(endNode.psi) * d;
+    b_y(3) = std::sin(endNode.psi) * d;
 
-        // 2. 행렬 M 구성
-        // 각 스플라인은 x, y 각각에 대해 4개의 계수(a0 ~ a3) 가짐
-        // 스플라인 0 -> 행 0 ~ 3, 스플라인 1 -> 행 4 ~ 7
+    // Solve
+    VectorXd x_coeff = M.colPivHouseholderQr().solve(b_x);
+    VectorXd y_coeff = M.colPivHouseholderQr().solve(b_y);
 
-        // 위치 조건(각 스플라인은 시작점과 끝점에서 위치가 정확히 맞아야 함) : 식 2*(N-1)개
-        // 1차 도함수 연속(기울기 연속) : 식 (N-2)개
-        // 2차 도함수 연속(곡률 연속) : 식 (N-2)개
-        // 양 끝 점(경계 조건) : 식 2개
+    MatrixXd coeffs_x(1, 4), coeffs_y(1, 4);
+    coeffs_x.row(0) = x_coeff.transpose();
+    coeffs_y.row(0) = y_coeff.transpose();
 
-        // 스케일링 없이 진행. 1, 2차 도합수 조건에 직접 거리 d 사용하면 됨
-        
-        MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
-        VectorXd b_x = VectorXd::Zero(no_splines * 4);
-        VectorXd b_y = VectorXd::Zero(no_splines * 4);
+    // 법선 벡터 계산
+    Vector2d tangent(x_coeff(1), y_coeff(1));
+    Vector2d normal(-tangent.y(), tangent.x());
+    Vector2d norm_normal = (normal.norm() > 1e-6) ? normal.normalized() : Vector2d(0.0, 0.0);
 
-        // 위치 조건
-        for (int i = 0; i < no_splines; i++) {
-            int row_s = i * 4;  // 스플라인 시작 행
-            double d = ds(i);
+    MatrixXd normvec_normalized(1, 2);
+    normvec_normalized.row(0) = norm_normal;
 
-            // 시작점 위치 조건
-            M(row_s, row_s) = 1.0;  // a_0 = p_i
-            b_x(row_s) = updated_path(i,0);
-            b_y(row_s) = updated_path(i,1);
+    SplineResult result;
+    result.coeffs_x = coeffs_x;
+    result.coeffs_y = coeffs_y;
+    result.M = M;
+    result.normvec_normalized = normvec_normalized;
 
-            // 끝점 위치 조건
-            RowVector4d T(1.0, d, d*d, d*d*d);
-            M.block(row_s + 1, row_s, 1, 4) = T; // 시작 행, 시작 열, 선택할 행, 선택할 열
-            b_x(row_s + 1) = updated_path(i+1, 0);
-            b_y(row_s + 1) = updated_path(i+1, 1);
-        }
-
-        // 기울기 조건
-        // i = 0 ~ no_splines - 2까지만 적용 (마지막 스플라인 뒤에는 비교할 스플라인이 없기 때문)
-        for (int i = 0; i < no_splines - 1; ++i) {
-            int row = 2 * no_splines + i;
-            double d = ds(i);
-
-            M(row, 4 * i + 1) = 1.0;              // a_1^i
-            M(row, 4 * i + 2) = 2.0 * d;          // 2a_2^i * d
-            M(row, 4 * i + 3) = 3.0 * d * d;      // 3a_3^i * d^2
-            M(row, 4 * (i + 1) + 1) = -1.0;       // -a_1^{i+1}
-
-            b_x(row) = 0.0;
-            b_y(row) = 0.0;
-        }
-
-        // 곡률 조건
-        for (int i = 0; i < no_splines - 1; ++i) {
-            int row = 3 * no_splines - 1 + i;
-            double d = ds(i);
-
-            M(row, 4 * i + 2) = 2.0;                // 2a_2^i
-            M(row, 4 * i + 3) = 6.0 * d;            // 6a_3^i * d
-            M(row, 4 * (i + 1) + 2) = -2.0;         // -2a_2^{i+1}
-
-            b_x(row) = 0.0;
-            b_y(row) = 0.0;
-        }
-
-        // 닫히지 않은 경로에서 시작점과 끝점 방향 조건
-        if (!closed) {
-            // 시작점 도함수 조건 (t=0)
-            int start_row = 4 * no_splines - 2; // 마지막에서 두 번째 줄이 시작점 도함수 조건
-            M.row(start_row).setZero();
-            M(start_row, 1) = 1.0;  // a_1항에 1 설정 (S'(0) = a_1)
-
-            double d_s = ds(0); // 첫 번째 구간 길이
-            b_x(start_row) = cos(psi_s) * d_s;  // x방향 단위벡터 * d_s
-            b_y(start_row) = sin(psi_s) * d_s;  // y방향 단위벡터 * d_s
-
-            // 끝점 도함수 조건 (t=d)
-            int end_row = 4 * no_splines - 1;
-            M.row(end_row).setZero();
-            
-            double d_e = ds(no_splines - 1);    // 마지막 구간 길이
-            int offset = 4 * (no_splines - 1);  // 마지막 스플라인 계수들의 시작 인덱스
-            M(end_row, offset + 1) = 1.0;
-            M(end_row, offset + 2) = 2.0 * d_e;
-            M(end_row, offset + 3) = 3.0 * d_e * d_e;
-
-            b_x(end_row) = cos(psi_e) * d_e;
-            b_y(end_row) = sin(psi_e) * d_e;
-        }
-
-        // [DEBUG] M, b_x, b_y 출력
-        // cout << "[DEBUG] M 행렬:\n" << M << "\n";
-        // cout << "[DEBUG] b_x 벡터:\n" << b_x.transpose() << "\n";
-        // cout << "[DEBUG] b_y 벡터:\n" << b_y.transpose() << "\n";
-
-        // 연립방정식 풀기
-        VectorXd x_les = M.colPivHouseholderQr().solve(b_x);
-        VectorXd y_les = M.colPivHouseholderQr().solve(b_y);
-
-        MatrixXd coeffs_x = Map<MatrixXd>(x_les.data(), 4, no_splines).transpose();
-        MatrixXd coeffs_y = Map<MatrixXd>(y_les.data(), 4, no_splines).transpose();
-
-
-        // 법선 벡터 계산 (노멀 벡터)
-        MatrixXd normvec(no_splines, 2);
-        for (int i = 0; i < no_splines; ++i) {
-            double dx = coeffs_x(i, 1);  // a₁: x방향 도함수 시작점
-            double dy = coeffs_y(i, 1);  // a₁: y방향 도함수 시작점
-            normvec(i, 0) = -dy;
-            normvec(i, 1) = dx;
-        }
-
-       // 정규화된 법선 벡터 계산
-        MatrixXd normvec_normalized(no_splines, 2);
-        for (int i = 0; i < no_splines; ++i) {
-            double norm = normvec.row(i).norm();
-            if (norm > 1e-6)
-                normvec_normalized.row(i) = normvec.row(i) / norm;
-            else
-                normvec_normalized.row(i) = Vector2d(0.0, 0.0); // norm이 너무 작을 때 0으로 대체
-        }
-
-        // 결과 구조체에 저장
-        SplineResult result;
-        result.coeffs_x = coeffs_x;
-        result.coeffs_y = coeffs_y;
-        result.M = M;
-        result.normvec_normalized = normvec_normalized;
-
-
-        return result;
-
+    return result;
 }
 
-// ------------------evaluate spline------------------
-
-struct SplineEval {
-    Vector2d pos;    // 위치 (x, y)
-    double heading;  // 헤딩 (rad)
-    double curvature; // 곡률 (1/m)
-};
-
-SplineEval evaluateSpline(const RowVector4d& coeffs_x,
-                          const RowVector4d& coeffs_y,
-                          double t) {
-    // 위치
-    double x = coeffs_x(0) + coeffs_x(1) * t + coeffs_x(2) * t * t + coeffs_x(3) * t * t * t;
-    double y = coeffs_y(0) + coeffs_y(1) * t + coeffs_y(2) * t * t + coeffs_y(3) * t * t * t;
-
-    // 1차 미분 (속도 벡터)
-    double dx = coeffs_x(1) + 2 * coeffs_x(2) * t + 3 * coeffs_x(3) * t * t;
-    double dy = coeffs_y(1) + 2 * coeffs_y(2) * t + 3 * coeffs_y(3) * t * t;
-
-    // 2차 미분 (가속도 벡터)
-    double ddx = 2 * coeffs_x(2) + 6 * coeffs_x(3) * t;
-    double ddy = 2 * coeffs_y(2) + 6 * coeffs_y(3) * t;
-
-    // 헤딩 ψ = atan2(dy, dx)
-    double heading = std::atan2(dy, dx);
-
-    // 곡률 κ = (dx * ddy - dy * ddx) / (dx² + dy²)^(3/2)
-    double denom = std::pow(dx * dx + dy * dy, 1.5);
-    double curvature = 0.0;
-    if (denom > 1e-6) {
-        curvature = (dx * ddy - dy * ddx) / denom;
-    } else {
-        curvature = 0.0;  // 속도가 너무 작으면 곡률 계산이 불안정
-    }
-
-    return SplineEval{Vector2d(x, y), heading, curvature};
-}
-
-bool isInsideTrack(double x, double y, const DMap& sampling_map) {
-
-    if (sampling_map.empty() || sampling_map.begin()->second.empty()) {
-        return false;
-    }
-
-    const auto& x_ref = sampling_map.at(__x_ref);            // 중심선 x
-    const auto& y_ref = sampling_map.at(__y_ref);            // 중심선 y
-    const auto& x_normvec = sampling_map.at(__x_normvec);    // 중심선에서의 노멀 x
-    const auto& y_normvec = sampling_map.at(__y_normvec);    // 중심선에서의 노멀 y
-    const auto& width_left = sampling_map.at(__width_left);  // 왼쪽 경계 폭
-    const auto& width_right = sampling_map.at(__width_right);// 오른쪽 경계 폭
-
-    double min_dist_sq = std::numeric_limits<double>::max();
-    int closest_idx = -1;
-
-     // 가장 가까운 기준선 인덱스 찾기
-    for (size_t i = 0; i < x_ref.size(); ++i) {
-        double dx = x - x_ref[i];
-        double dy = y - y_ref[i];
-        double dist_sq = dx * dx + dy * dy;
-        if (dist_sq < min_dist_sq) {
-            min_dist_sq = dist_sq;
-            closest_idx = i;
-        }
-    }
-
-    if (closest_idx == -1) return false;
-
-    // 기준선 정보
-    double ref_x = x_ref[closest_idx];
-    double ref_y = y_ref[closest_idx];
-    double norm_x = x_normvec[closest_idx];
-    double norm_y = y_normvec[closest_idx];
-    double left = width_left[closest_idx];
-    double right = width_right[closest_idx];
-
-    // 횡방향 거리 계산 (노멀 벡터 방향)
-    double lateral_offset = (x - ref_x) * norm_x + (y - ref_y) * norm_y;
-
-    // 경계 안에 있는지 판별
-    return (lateral_offset >= -left && lateral_offset <= right);
-}
-
-bool isValidSpline(const RowVector4d& coeffs_x,
-                    const RowVector4d& coeffs_y,
-                    double stepsize,
-                    const DMap& sampling_map,
-                    double kappa_max = 0.2) {
-
-
-    const int num_samples = 20;
-
-    for (int i = 0; i <= num_samples; ++i) {
-        double t = stepsize * i / static_cast<double>(num_samples);
-        SplineEval eval = evaluateSpline(coeffs_x, coeffs_y, t);
-
-        // 트랙 안에 있는가?
-        if (!isInsideTrack(eval.pos.x(), eval.pos.y(), sampling_map)) {
-            return false;
-        }
-
-        // 곡률이 너무 큰가?
-        if (std::abs(eval.curvature) > kappa_max) {
-            return false;
-        }        
-    }
-
-    return true;  // 모든 샘플이 유효하면 true
-}
+// ------------------ genEdge ------------------
 
 void genEdge(Graph& graph, 
     const NodeMap& nodesPerLayer, 
@@ -611,20 +403,6 @@ void genEdge(Graph& graph,
             cout << "Too small lateral offset" << endl;
         }
 
-        const auto& xs = sampling_map[__x_raceline];
-        const auto& ys = sampling_map[__y_raceline];
-
-        Eigen::MatrixXd raceline_cl(xs.size(), 2);
-        for (size_t i = 0; i < xs.size(); ++i) {
-            raceline_cl(i, 0) = xs[i];
-            raceline_cl(i, 1) = ys[i];
-        }
-
-        // raceline 전체를 스플라인으로 만들고 계수 가져오기
-        auto raceline_result = calcSplines(raceline_cl);
-        const MatrixXd& x_coeff_r = raceline_result.coeffs_x;
-        const MatrixXd& y_coeff_r = raceline_result.coeffs_y;
-
         // closed -> 마지막과 0번 레이어 연결, open -> break
         for (size_t layer = 0; layer < nodesPerLayer.size(); ++layer) {
             
@@ -634,146 +412,143 @@ void genEdge(Graph& graph,
             if (!params.CLOSURE_DETECTION_DIST && end_layer == 0)
             break;
 
-        // 1. 각 레이어의 레이스라인 기준 인덱스
-        const int start_race_idx = raceline_index_array[start_layer];
-        const int end_race_idx   = raceline_index_array[end_layer];
+            // 1. 각 레이어의 레이스라인 기준 인덱스
+            const int start_race_idx = raceline_index_array[start_layer];
+            const int end_race_idx   = raceline_index_array[end_layer];
 
-        // 2. 시작 레이어의 각 노드에 대해 반복
-        const auto& start_layer_nodes = nodesPerLayer[start_layer];
-        const auto& end_layer_nodes   = nodesPerLayer[end_layer];
+            // 2. 시작 레이어의 각 노드에 대해 반복
+            const auto& start_layer_nodes = nodesPerLayer[start_layer];
+            const auto& end_layer_nodes   = nodesPerLayer[end_layer];
 
-        for (size_t start_idx = 0; start_idx < start_layer_nodes.size(); ++start_idx) {
-            const Node& start_node = start_layer_nodes[start_idx];
+            for (size_t start_idx = 0; start_idx < start_layer_nodes.size(); ++start_idx) {
+                const Node& startNode = start_layer_nodes[start_idx];
 
-        // 3. 레이스라인에서 같은 위치에 있는 end 레이어의 참조 노드 인덱스 계산
-        int rel_race_offset = static_cast<int>(start_idx) - start_race_idx;
-        int ref_end_idx = end_race_idx + rel_race_offset;
+            // 3. 레이스라인에서 같은 위치에 있는 end 레이어의 참조 노드 인덱스 계산
+            int rel_race_offset = static_cast<int>(start_idx) - start_race_idx;
+            int ref_end_idx = end_race_idx + rel_race_offset;
 
-        // 4. 범위 클램프
-        ref_end_idx = std::clamp(ref_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
+            // 4. 범위 클램프
+            ref_end_idx = std::clamp(ref_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
 
-        // 5. 거리 계산을 위한 노드 좌표 가져오기
-        const Node& ref_end_node = end_layer_nodes[ref_end_idx];
+            // 5. 거리 계산을 위한 노드 좌표 가져오기
+            const Node& ref_end_node = end_layer_nodes[ref_end_idx];
 
-        // 6. 거리 계산을 위한 좌표 행렬 생성
-        MatrixXd spline_path(2, 2);
-        spline_path << start_node.x, start_node.y,
-                    ref_end_node.x, ref_end_node.y;
+            // 6. 거리 계산을 위한 좌표 행렬 생성
+            MatrixXd spline_path(2, 2);
+            spline_path << startNode.x, startNode.y,
+                        ref_end_node.x, ref_end_node.y;
 
 
             VectorXd el_lengths = computeEuclideanDistances(spline_path);
             double dist = el_lengths(0);
 
             // 커브면 더 많이 연결
-            double factor = (start_node.kappa > params.CURVE_THR) ? 2.0 : 1.0;
+            double factor = (startNode.kappa > params.CURVE_THR) ? 2.0 : 1.0;
             int lat_steps = round(factor * dist * params.LAT_OFFSET / params.LAT_RESOLUTION);
 
-            for (int destIdx = std::max(0, destIdx - lat_steps);
-                destIdx <= std::min(static_cast<int>(nodesPerLayer[end_layer].size() - 1), destIdx + lat_steps);
+            for (int destIdx = std::max(0, ref_end_idx - lat_steps);
+                destIdx <= std::min(static_cast<int>(end_layer_nodes.size() - 1), ref_end_idx + lat_steps);
                 ++destIdx) {
 
-                const Node& endNode = nodesPerLayer[end_layer][destIdx];
-                MatrixXd x_coeffs, y_coeffs;
+                const Node& endNode = end_layer_nodes[destIdx];
 
-                if (start_node.raceline && endNode.raceline) {
-                    x_coeffs = x_coeff_r.row(start_layer);
-                    y_coeffs = y_coeff_r.row(start_layer);
-                } else {
-                    MatrixXd path(2, 2);
-                    path << start_node.x, start_node.y,
-                            endNode.x, endNode.y;
+                // 스플라인 계산
+                auto result = calcSplines(startNode, endNode);
+                const MatrixXd& x_coeffs = result.coeffs_x;
+                const MatrixXd& y_coeffs = result.coeffs_y;
 
-                    auto result = calcSplines(path, nullptr, start_node.psi, endNode.psi);
+                // DEBUG
+                std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
+                        << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
 
-                    const MatrixXd& x_coeff_r = raceline_result.coeffs_x;
-                    const MatrixXd& y_coeff_r = raceline_result.coeffs_y;
-                }
+                std::cout << "coeff_x: " << x_coeffs << std::endl;
+                std::cout << "coeff_y: " << y_coeffs << std::endl;
 
                 // 그래프에 엣지 추가
-                ITuple src_key(start_layer, start_node.node_idx);
-                graph.addEdge(src_key, endNode.node_idx); 
+                ITuple src_key(start_layer, startNode.node_idx);
+                graph.addEdge(src_key, endNode.node_idx);
             }
         }  
     }
 }
 
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
-    plt::clf();
+// void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
+//     plt::clf();
 
-    // 트랙 경계선
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+//     // 트랙 경계선
+//     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
+//     plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
-    // 레이싱 라인 및 샘플링된 포인트
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
-    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+//     // 레이싱 라인 및 샘플링된 포인트
+//     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
+//     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
+//     plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
-    plotHeading(nodesPerLayer);
+//     plotHeading(nodesPerLayer);
     
-    DVector spline_x_pts; 
-    DVector spline_y_pts;
+//     DVector spline_x_pts; 
+//     DVector spline_y_pts;
 
-    for (const auto& layer_nodes : nodesPerLayer) {
-        for (const auto& current_node : layer_nodes) {
-            ITuple src_key(current_node.layer_idx, current_node.node_idx);
-            IVector child_nodes_idx;
+//     for (const auto& layer_nodes : nodesPerLayer) {
+//         for (const auto& current_node : layer_nodes) {
+//             ITuple src_key(current_node.layer_idx, current_node.node_idx);
+//             IVector child_nodes_idx;
 
-            try {
-                graph.getChildIdx(src_key, child_nodes_idx);
-            } catch (const std::runtime_error& e) {
-                continue;
-            }
+//             try {
+//                 graph.getChildIdx(src_key, child_nodes_idx);
+//             } catch (const std::runtime_error& e) {
+//                 continue;
+//             }
             
-            for (int dest_node_idx : child_nodes_idx) {
+//             for (int dest_node_idx : child_nodes_idx) {
 
-                spline_x_pts.clear(); 
-                spline_y_pts.clear(); 
+//                 spline_x_pts.clear(); 
+//                 spline_y_pts.clear(); 
                 
-                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
+//                 size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
 
-                if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
-                    // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
-                    continue;
-                }
-                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
+//                 if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
+//                     // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
+//                     continue;
+//                 }
+//                 const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
 
-                MatrixXd spline_path(2, 2);
-                spline_path << current_node.x, current_node.y,
-                               next_node.x, next_node.y;
+//                 MatrixXd spline_path(2, 2);
+//                 spline_path << current_node.x, current_node.y,
+//                                next_node.x, next_node.y;
                 
-                double psi_s = current_node.psi;
-                double psi_e = next_node.psi;
+//                 double psi_s = current_node.psi;
+//                 double psi_e = next_node.psi;
 
-                VectorXd el_lengths(1);
-                el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
+//                 VectorXd el_lengths(1);
+//                 el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
 
-                SplineResult res;
-                try {
-                    res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
-                } catch (const std::exception& e) {
-                    continue;
-                }
+//                 SplineResult res;
+//                 try {
+//                     res = calcSplines(current_node, next_node);
+//                 } catch (const std::exception& e) {
+//                     continue;
+//                 }
 
-                const int num_spline_segments = 10; 
-                for (int k = 0; k <= num_spline_segments; ++k) {
-                    double t_eval = static_cast<double>(k) / num_spline_segments;
-                    SplineEval sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
-                    spline_x_pts.push_back(sp.pos.x());
-                    spline_y_pts.push_back(sp.pos.y());
+//                 const int num_spline_segments = 10; 
+//                 for (int k = 0; k <= num_spline_segments; ++k) {
+//                     double t_eval = static_cast<double>(k) / num_spline_segments;
+//                     SplineEval sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
+//                     spline_x_pts.push_back(sp.pos.x());
+//                     spline_y_pts.push_back(sp.pos.y());
 
-                }
-                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
-            }
-        }
-    }
+//                 }
+//                 plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+//             }
+//         }
+//     }
 
-    plt::title("Track and Planned Graph");
-    plt::grid(true);
-    plt::axis("equal");
-    plt::legend();
-    plt::show();
-}
+//     plt::title("Track and Planned Graph");
+//     plt::grid(true);
+//     plt::axis("equal");
+//     plt::legend();
+//     plt::show();
+// }
 
 
 
@@ -846,8 +621,6 @@ int main() {
     double psi_s = sampling_map[__psi][0];
     double psi_e = sampling_map[__psi].back();
 
-    SplineResult result = calcSplines(path_xy, nullptr, psi_s, psi_e);
-
     // 최종 그래프 생성
     Graph myGraph;
     genEdge(myGraph,
@@ -856,7 +629,7 @@ int main() {
             raceline_index_array);
     
     // 시각화
-    visual(nodesPerLayer, myGraph, params);
+    // visual(nodesPerLayer, myGraph, params);
 
     return 0;
 }
