@@ -337,6 +337,7 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
     double dy = endNode.y - startNode.y;
     double d = std::sqrt(dx * dx + dy * dy);
 
+
     MatrixXd M = MatrixXd::Zero(4, 4);
     VectorXd b_x = VectorXd::Zero(4);
     VectorXd b_y = VectorXd::Zero(4);
@@ -354,17 +355,22 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
     b_x(1) = endNode.x;
     b_y(1) = endNode.y;
 
-    // 조건 3: x'(0) = cos(psi_s) * d
+    // 조건 3: x'(0) = cos(psi_s)
+    M(2, 0) = 0.0;
     M(2, 1) = 1.0;
-    b_x(2) = std::cos(startNode.psi) * d;
-    b_y(2) = std::sin(startNode.psi) * d;
+    M(2, 2) = 0.0;
+    M(2, 3) = 0.0;
+    b_x(2) = cos(startNode.psi) * d;
+    b_y(2) = sin(startNode.psi) * d;
 
-    // 조건 4: x'(d) = cos(psi_e) * d
+
+    // 조건 4: x'(d) = cos(psi_e)
+    M(3, 0) = 0.0;
     M(3, 1) = 1.0;
     M(3, 2) = 2.0 * d;
     M(3, 3) = 3.0 * d * d;
-    b_x(3) = std::cos(endNode.psi) * d;
-    b_y(3) = std::sin(endNode.psi) * d;
+    b_x(3) = cos(endNode.psi) * d;
+    b_y(3) = sin(endNode.psi) * d;
 
     // Solve
     VectorXd x_coeff = M.colPivHouseholderQr().solve(b_x);
@@ -390,6 +396,7 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
 
     return result;
 }
+
 
 // ------------------ genEdge ------------------
 
@@ -461,94 +468,115 @@ void genEdge(Graph& graph,
                 std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
                         << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
 
-                std::cout << "coeff_x: " << x_coeffs << std::endl;
-                std::cout << "coeff_y: " << y_coeffs << std::endl;
+                // std::cout << "coeff_x: " << x_coeffs << std::endl;
+                // std::cout << "coeff_y: " << y_coeffs << std::endl;
+
+                // for (int k = 0; k <= 10; ++k) {
+                //     double t = static_cast<double>(k) / 10.0;
+                //     double x = x_coeffs(0) + x_coeffs(1) * t + x_coeffs(2) * t * t + x_coeffs(3) * t * t * t;
+                //     double y = y_coeffs(0) + y_coeffs(1) * t + y_coeffs(2) * t * t + y_coeffs(3) * t * t * t;
+                //     std::cout << "  - point(" << t << "): (" << x << ", " << y << ")\n";
+                // }
+                
 
                 // 그래프에 엣지 추가
                 ITuple src_key(start_layer, startNode.node_idx);
+                std::cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
+                        << ") → " << endNode.node_idx << "\n";
                 graph.addEdge(src_key, endNode.node_idx);
+
             }
         }  
     }
 }
 
-// void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
-//     plt::clf();
+Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& coeff_y, double t) {
+    double t2 = t * t;
+    double t3 = t2 * t;
+    double x = coeff_x(0) + coeff_x(1) * t + coeff_x(2) * t2 + coeff_x(3) * t3;
+    double y = coeff_y(0) + coeff_y(1) * t + coeff_y(2) * t2 + coeff_y(3) * t3;
+    return Vector2d(x, y);
+}
 
-//     // 트랙 경계선
-//     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-//     plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
+    plt::clf();
 
-//     // 레이싱 라인 및 샘플링된 포인트
-//     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
-//     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
-//     plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+    // 트랙 경계선
+    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
-//     plotHeading(nodesPerLayer);
+    // 레이싱 라인 및 샘플링된 포인트
+    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
+    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
+    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+
+    plotHeading(nodesPerLayer);
     
-//     DVector spline_x_pts; 
-//     DVector spline_y_pts;
+    DVector spline_x_pts; 
+    DVector spline_y_pts;
 
-//     for (const auto& layer_nodes : nodesPerLayer) {
-//         for (const auto& current_node : layer_nodes) {
-//             ITuple src_key(current_node.layer_idx, current_node.node_idx);
-//             IVector child_nodes_idx;
+    for (const auto& layer_nodes : nodesPerLayer) {
+        for (const auto& current_node : layer_nodes) {
+            ITuple src_key(current_node.layer_idx, current_node.node_idx);
+            IVector child_nodes_idx;
 
-//             try {
-//                 graph.getChildIdx(src_key, child_nodes_idx);
-//             } catch (const std::runtime_error& e) {
-//                 continue;
-//             }
+            try {
+                graph.getChildIdx(src_key, child_nodes_idx);
+            } catch (const std::runtime_error& e) {
+                continue;
+            }
             
-//             for (int dest_node_idx : child_nodes_idx) {
+            for (int dest_node_idx : child_nodes_idx) {
 
-//                 spline_x_pts.clear(); 
-//                 spline_y_pts.clear(); 
+                spline_x_pts.clear(); 
+                spline_y_pts.clear(); 
                 
-//                 size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
+                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
 
-//                 if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
-//                     // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
-//                     continue;
-//                 }
-//                 const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
+                if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
+                    // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
+                    continue;
+                }
+                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
 
-//                 MatrixXd spline_path(2, 2);
-//                 spline_path << current_node.x, current_node.y,
-//                                next_node.x, next_node.y;
+                MatrixXd spline_path(2, 2);
+                spline_path << current_node.x, current_node.y,
+                               next_node.x, next_node.y;
                 
-//                 double psi_s = current_node.psi;
-//                 double psi_e = next_node.psi;
+                double psi_s = current_node.psi;
+                double psi_e = next_node.psi;
 
-//                 VectorXd el_lengths(1);
-//                 el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
+                VectorXd el_lengths(1);
+                el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
 
-//                 SplineResult res;
-//                 try {
-//                     res = calcSplines(current_node, next_node);
-//                 } catch (const std::exception& e) {
-//                     continue;
-//                 }
+                SplineResult res;
+                try {
+                    res = calcSplines(current_node, next_node);
+                } catch (const std::exception& e) {
+                    continue;
+                }
 
-//                 const int num_spline_segments = 10; 
-//                 for (int k = 0; k <= num_spline_segments; ++k) {
-//                     double t_eval = static_cast<double>(k) / num_spline_segments;
-//                     SplineEval sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
-//                     spline_x_pts.push_back(sp.pos.x());
-//                     spline_y_pts.push_back(sp.pos.y());
+                const int num_spline_segments = 10; 
+                for (int k = 0; k <= num_spline_segments; ++k) {
+                    double t_eval = static_cast<double>(k) / num_spline_segments;
+                    
+                    Vector2d pos = computeSplinePosition(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
+                    
+                    spline_x_pts.push_back(pos.x());
+                    spline_y_pts.push_back(pos.y());
+                }
 
-//                 }
-//                 plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
-//             }
-//         }
-//     }
+                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+            }
+        }
+    }
 
-//     plt::title("Track and Planned Graph");
-//     plt::grid(true);
-//     plt::axis("equal");
-//     plt::legend();
-//     plt::show();
-// }
+    plt::title("Track and Planned Graph");
+    plt::grid(true);
+    plt::axis("equal");
+    plt::legend();
+    plt::show();
+}
 
 
 
@@ -629,7 +657,7 @@ int main() {
             raceline_index_array);
     
     // 시각화
-    // visual(nodesPerLayer, myGraph, params);
+    visual(nodesPerLayer, myGraph, params);
 
     return 0;
 }
