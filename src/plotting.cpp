@@ -155,7 +155,7 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 
 
     // 노드마다 psi확인할 수 있는 용도 
-    // plotHeading(nodesPerLayer);
+    plotHeading(nodesPerLayer);
     // plotSplinesFromMap(splineMap, nodesPerLayer);   
 
     plotAllSplines(splineMap);
