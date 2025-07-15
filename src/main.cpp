@@ -185,9 +185,7 @@ void computeCurvature(NodeMap& nodesPerLayer) {
     }
 }
 
-
 void genNode(NodeMap& nodesPerLayer,
-            IVector &raceline_index_array,
             const double veh_width,
             float lat_resolution) {
     
@@ -199,7 +197,7 @@ void genNode(NodeMap& nodesPerLayer,
         Node node;
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
-        raceline_index_array.push_back(raceline_index);
+        // raceline_index_array.push_back(raceline_index);
         
         // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
@@ -275,28 +273,29 @@ unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
     // 하나의 3차 스플라인을 만들기 위해 계수 4개 필요 (x, y 각각)
     MatrixXd M(4, 4);      // 시스템 행렬
     VectorXd b_x(4), b_y(4);  // 우변
+    double d = (Vector2d(endNode.x, endNode.y) - Vector2d(startNode.x, startNode.y)).norm();
+    double psi_s = startNode.psi - M_PI_2;
+    double psi_e = endNode.psi - M_PI_2;
+    
+    // M << 1,    0,     0,     0,
+    //     1,    d,    d*d,   d*d*d,
+    //     0,    1,     0,     0,
+    //     0,    1,   2*d,   3*d*d;
 
-    const double d = 1.0;
+    M << 1, 0, 0, 0,
+         1, 1, 1, 1,
+         0, 1, 0, 0,
+         0, 1, 2, 3;
 
-    // 조건 1: x(0) = startNode.x
-    M.row(0) << 1, 0, 0, 0;
-    b_x(0) = startNode.x;
-    b_y(0) = startNode.y;
+    b_x << startNode.x,
+           endNode.x,
+           cos(psi_s) * d,
+           cos(psi_e) * d;
 
-    // 조건 2: x(d) = endNode.x
-    M.row(1) << 1, d, d * d, d * d * d;
-    b_x(1) = endNode.x;
-    b_y(1) = endNode.y;
-
-    // 조건 3: dx/dt t = 0 = cos(startNode.psi)
-    M.row(2) << 0, 1, 0, 0;
-    b_x(2) = cos(startNode.psi);
-    b_y(2) = sin(startNode.psi);
-
-    // 조건 4: dx/dt t = d = cos(endNode.psi)
-    M.row(3) << 0, 1, 2 * d, 3 * d * d;
-    b_x(3) = cos(endNode.psi);
-    b_y(3) = sin(endNode.psi);
+    b_y << startNode.y,
+           endNode.y,
+           sin(psi_s) * d,
+           sin(psi_e) * d;
 
     VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
     VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
@@ -316,9 +315,10 @@ unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
 void genEdges(NodeMap &nodesPerLayer, 
               Graph &edgeList,
               SplineMap &splineMap,
-              const double lat_offset,
-              const double lat_resolution,
-              const double curve_thr) {
+              const float lat_offset,
+              const float lat_resolution,
+              const float curve_thr,
+              const int max_lat_steps) {
     
     if (lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
@@ -353,8 +353,11 @@ void genEdges(NodeMap &nodesPerLayer,
             // spline 연결할 노드 선정 기준 : lat_steps
             double dist = (d_end - d_start).norm();
             // genNode에서 kappa 계산한거 토대로(+기능 추가 완료)
-            double factor = (startNode.kappa > curve_thr) ? 2.0 : 1.0;  // 커브에서 더 많이 연결(추월 경로를 위하여)
-            int lat_steps = round(factor * dist * lat_offset / lat_resolution); // srcEndNode 기준 2*lat_steps + 1개의 노드와 연결한다.
+            double ratio = min(startNode.kappa / curve_thr, 2.0); // 최대 2배까지만 증폭
+            double factor = 1.0 + 0.5 * ratio;
+            // 커브에서 더 많이 연결(추월 경로를 위하여)
+            int lat_steps = round(factor * dist * lat_offset / lat_resolution);
+            lat_steps = min(lat_steps, max_lat_steps); // srcEndNode 기준 2*lat_steps + 1개의 노드와 연결한다.
             cout << startIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int destIdx = max(0, refDestIdx - lat_steps); 
@@ -468,11 +471,10 @@ int main() {
     // sampling_map[__psi_bound_r] = psi_bound_r;
 
     NodeMap nodesPerLayer;
-    IVector raceline_index_array;
+    // IVector raceline_index_array;
     Vector2d node_pos;
 
     genNode(nodesPerLayer,
-            raceline_index_array,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
@@ -487,9 +489,10 @@ int main() {
              splineMap,
              params.LAT_OFFSET,
              params.LAT_RESOLUTION,
-             params.CURVE_THR);
+             params.CURVE_THR,
+             params.MAX_LAT_STEPS);
 
-    // printSplineMapVerbose(splineMap, nodesPerLayer);
+    printSplineMapVerbose(splineMap, nodesPerLayer);
     // edgeList.printGraph();
     
     // visual process 

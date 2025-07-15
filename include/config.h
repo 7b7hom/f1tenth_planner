@@ -15,7 +15,8 @@ struct Offline_Params {
         float LON_CURVE_STEP=0.7;      // Max norm vector spacing (m) on reference-line curves.
                                         // NOTE: Set notably higher than base values.
         float CURVE_THR=0.25;          // recommand: 0.15 ~ 0.3
-        float LAT_OFFSET=0.25;          // Permitted lateral deviation from the raceline per meter traveled.
+        float LAT_OFFSET=0.25;  
+        int MAX_LAT_STEPS=3;    // Permitted lateral deviation from the raceline per meter traveled.
         float VIRT_GOAL_N=true;         // Proxy target node per layer. Graph search uses this node directly, skipping iterative checks on adjacent goal-layer nodes.
         float MIN_VEL_RACE=0.50;        // Minimum allowed speed as % of global race line; splines below this are excluded (set to 0.0 to allow all).
         float CLOSURE_DETECTION_DIST=0.1; // If track ends(first, last) are within this distance (m), treat as closed loop.
