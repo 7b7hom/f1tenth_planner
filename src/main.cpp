@@ -273,9 +273,8 @@ unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
     // 하나의 3차 스플라인을 만들기 위해 계수 4개 필요 (x, y 각각)
     MatrixXd M(4, 4);      // 시스템 행렬
     VectorXd b_x(4), b_y(4);  // 우변
-    double d = (Vector2d(endNode.x, endNode.y) - Vector2d(startNode.x, startNode.y)).norm();
-    double psi_s = startNode.psi - M_PI_2;
-    double psi_e = endNode.psi - M_PI_2;
+    double psi_s = startNode.psi + M_PI_2;
+    double psi_e = endNode.psi + M_PI_2;
     
     // M << 1,    0,     0,     0,
     //     1,    d,    d*d,   d*d*d,
@@ -289,13 +288,13 @@ unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
 
     b_x << startNode.x,
            endNode.x,
-           cos(psi_s) * d,
-           cos(psi_e) * d;
+           cos(psi_s),
+           cos(psi_e);
 
     b_y << startNode.y,
            endNode.y,
-           sin(psi_s) * d,
-           sin(psi_e) * d;
+           sin(psi_s),
+           sin(psi_e);
 
     VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
     VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);

@@ -95,12 +95,13 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
-vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points = 50) {
+vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points = 20) {
     vector<Vector2d> points;
-    points.reserve(num_points);
+    points.reserve(num_points + 1);
 
     for (int i = 0; i <= num_points; ++i) {
-        double t = static_cast<double>(i) / num_points;
+        double t = static_cast<double>(i) / num_points;  
+
         double t2 = t * t;
         double t3 = t2 * t;
 
@@ -112,15 +113,28 @@ vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points
     return points;
 }
 
-void plotAllSplines(const SplineMap& splineMap) {
+
+void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
     for (const auto& [edge_key, spline] : splineMap) {
+        const auto& [startKey, endKey] = edge_key;  // EdgeKey = pair<IPair, IPair>
+        int start_layer = startKey.first;
+        int start_idx = startKey.second;
+        int end_layer = endKey.first;
+        int end_idx = endKey.second;
+
+        const Node& startNode = nodesPerLayer[start_layer][start_idx];
+        const Node& endNode = nodesPerLayer[end_layer][end_idx];
+
+        double d = (Vector2d(endNode.x, endNode.y) - Vector2d(startNode.x, startNode.y)).norm();
+        // 시각화를 위한 spline 점 위 샘플링
         vector<Vector2d> spline_points = generateSplinePoints(spline);
+
         DVector xs, ys;
         for (const auto& pt : spline_points) {
             xs.push_back(pt.x());
             ys.push_back(pt.y());
         }
-        plt::plot(xs, ys);
+        plt::plot(xs, ys, {{"color", "orange"}});
     }
 
     plt::title("All Spline Paths");
@@ -129,6 +143,7 @@ void plotAllSplines(const SplineMap& splineMap) {
     plt::axis("equal");
     plt::show();
 }
+
 
 void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap) {
     plt::clf();
@@ -155,10 +170,10 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 
 
     // 노드마다 psi확인할 수 있는 용도 
-    plotHeading(nodesPerLayer);
+    // plotHeading(nodesPerLayer);
     // plotSplinesFromMap(splineMap, nodesPerLayer);   
 
-    plotAllSplines(splineMap);
+    plotAllSplines(splineMap, nodesPerLayer);
 
     // plt::title("Track");
     // plt::grid(true);
