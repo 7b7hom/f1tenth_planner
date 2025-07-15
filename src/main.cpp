@@ -214,11 +214,11 @@ void genNode(NodeMap& nodesPerLayer,
         
         nodesPerLayer[i].resize(num_nodes); 
         
-        // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
+        cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
         // node별 loop 
         for (int idx = 0; idx < num_nodes; ++idx) {
             double alpha = start_alpha + idx * lat_resolution;
-
+            cout << idx << "번째 노드" << endl;
             // node의 좌표 계산.
             node_pos = ref_xy + alpha * norm_vec;
 
@@ -364,7 +364,7 @@ void genEdges(NodeMap &nodesPerLayer,
 
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int destIdx = max(0, refDestIdx - lat_steps); 
-                destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() -1), refDestIdx + lat_steps); ++destIdx) {
+                destIdx < min(static_cast<int>(nodesPerLayer[end_layer].size() -1), refDestIdx + lat_steps); ++destIdx) {
                     Node &endNode = nodesPerLayer[end_layer][destIdx];
 
                     auto result = calcSplines(startNode, endNode);

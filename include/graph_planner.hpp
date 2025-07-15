@@ -72,11 +72,10 @@ typedef map<EdgeKey, SplineResult> SplineMap;
 
 class Graph {
 private:
-    
     bool isDirected;
 
 public:
-IPairAdjList adjLists;
+    IPairAdjList adjLists;
     Graph(bool directed = true);
     void addEdge(IPair srcNodeIdx, IPair destNodeIdx);
     void printGraph();

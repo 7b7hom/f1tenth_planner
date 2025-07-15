@@ -53,6 +53,7 @@ void plotHeading(const DVector &x,
 void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     DVector x_line, y_line;
     DVector node_x, node_y;
+    int layer_idx, node_idx;
     for (const auto& layer_nodes : nodesPerLayer) {
         for (const auto& node : layer_nodes) {
             double dx = scale * cos(node.psi + M_PI_2);
@@ -62,7 +63,14 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
             node_y.push_back(node.y);
             plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}});
 
-            #if 0
+            ostringstream label;
+            label.precision(2);
+            label << fixed << layer_idx << ", " << node_idx;
+
+            plt::text(layer_idx, node_idx, label.str());
+            
+
+#if 0
             x_line = {node.x, node.x + dx};
             y_line = {node.y, node.y + dy};
             plt::plot(x_line, y_line, {{"color", "purple"}});
@@ -82,8 +90,8 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
             plt::plot({node.x + dx, x_arrow1}, {node.y + dy, y_arrow1}, {{"color", "purple"}});
             plt::plot({node.x + dx, x_arrow2}, {node.y + dy, y_arrow2}, {{"color", "purple"}});
             #endif
-        }
-        
+            }
+            layer_idx++;
     }
 }
 
