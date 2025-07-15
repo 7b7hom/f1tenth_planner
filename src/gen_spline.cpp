@@ -116,28 +116,29 @@ void addDVectorToMap(DMap &map,
     // map_size(map);
 }
 
-void samplePointsFromRaceline(const DVector& kappa,
-                              const DVector& dist,
-                              double d_curve,
-                              double d_straight,
-                              double curve_th,
-                              IVector& idx_array) {
+// samplePoint : 레이어가 생성될 위치 정하는 것. (결과적으로 레이어 간격 의미)
+void samplePointsFromRaceline(const DVector& kappa,     // 곡률
+                              const DVector& dist,      // 점 사이 거리
+                              double d_curve,           // 곡선 구간 샘플링 간격
+                              double d_straight,        // 직선 구간 샘플링 간격
+                              double curve_th,          // 곡선 판단 기준 곡률
+                              IVector& idx_array) {     // 결과 (샘플링 인덱스) 저장할 벡터
 
-    const size_t n = kappa.size();
-    double cur_dist = 0.0;
-    double next_dist = 0.0;
-    double next_dist_min = 0.0;
+    const size_t n = kappa.size();  // 전체 경로 길이 (전체 경로에서 몇 개의 점을 갖는지)
+    double cur_dist = 0.0;          // 지금까지 이동한 거리
+    double next_dist = 0.0;         // 다음 샘플링 지점 결정하는 기준 거리
+    double next_dist_min = 0.0;     // 곡선 구간일 경우 : 다음 샘플링까지 최소 간격 확보용
 
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {    // 경로의 각 점에 대해 반복
 
         // 곡선이면 최소 거리 갱신
-        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_th) {
+        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_th) {    // fabs() : float absolute value (절댓값 반환)
             next_dist = cur_dist;
         }
 
         // 다음 샘플링 지점 도달
-        if ((cur_dist + dist[i]) > next_dist) {
-            idx_array.push_back(static_cast<int>(i));
+        if ((cur_dist + dist[i]) > next_dist) { // 현재 위치가 next_dist 넘었다면 샘플링 지점 도달!
+            idx_array.push_back(static_cast<int>(i));   // 명시적 형변환
 
             if (fabs(kappa[i]) < curve_th) {  // 직선 구간
                 next_dist += d_straight;
@@ -145,7 +146,7 @@ void samplePointsFromRaceline(const DVector& kappa,
                 next_dist += d_curve;
             }
 
-            next_dist_min = cur_dist + d_curve;
+            next_dist_min = cur_dist + d_curve; // 너무 가까운 곳은 샘플 중복해서 찍지 않도록 해줌
         }
 
         cur_dist += dist[i];
@@ -190,36 +191,38 @@ void calcHeading(DVector &x_raceline,
 
 }
 
-void genNode(NodeMap& nodesPerLayer,
-            IVector& raceline_index_array,
-            const double veh_width,
-            float lat_resolution) {
+void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드 저장하는 2차원 벡터
+            IVector& raceline_index_array,  // 각 레이어에서 레이싱라인이 위치한 노드의 인덱스
+            const double veh_width,         // 차량의 너비
+            float lat_resolution) {         // 노드 간 lateral 간격 (옆 방향 노드들 간격, m 단위)
     
-    const size_t N = sampling_map[__alpha].size();
+    const size_t N = sampling_map[__alpha].size();  // 총 레이어 수
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
+    
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
         node.layer_idx = i; 
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
-        raceline_index_array.push_back(raceline_index);
+        raceline_index_array.push_back(raceline_index); // 레이스라인 노드 저장
         
         // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
         // cout << "-----" << endl;
 
-        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 기준선에서의 위치
-        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 레이어의 기준이 되는 점 (기준선 위 한 점)
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // ref point에서 옆 방향을 알려주는 벡터
         
-        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지 (lat_resolution씩 증가시키며 노드 생성)
         int node_idx = 0;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;  // num_nodes : 좌우 총 가능한 노드 수
         nodesPerLayer[i].resize(num_nodes); 
 
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
-        // node별 loop 
+
+        // node별 loop (노드 생성 시작)
         for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
             // node_alphas.push_back(alpha);
             // node의 좌표 계산.
@@ -232,6 +235,7 @@ void genNode(NodeMap& nodesPerLayer,
             node.kappa = 0.0;        
             node.raceline = (node_idx == raceline_index);
 
+            // psi 보간 처리
             double psi_interp;
             if (node_idx < raceline_index) {
                 
@@ -271,7 +275,9 @@ void genNode(NodeMap& nodesPerLayer,
                 // 각 node의 psi, kappa 계산하는 로직 추가
 
     }
-}
+}       // 저장 결과 : nodesPerLayer[i][j] (i번째 레이어에서 j번째 lateral 위치의 노드)
+        //           raceline_index_array[i] (i번째 레이어에서 레이싱라인이 위치한 인덱스)
+        //           노드 정보
 
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale = 0.5) {
     double dx, dy;
@@ -406,7 +412,7 @@ void genEdge(Graph& graph,
     const IVector& raceline_index_array,
     bool closed = true) {
 
-        if (params.LAT_OFFSET <= 0.0) {
+        if (params.CLOSURE_DETECTION_DIST < 1e-6 && end_layer == 0) {
             cout << "Too small lateral offset" << endl;
         }
 
@@ -417,7 +423,7 @@ void genEdge(Graph& graph,
             const size_t end_layer = (layer + 1) % nodesPerLayer.size();
         
             if (!params.CLOSURE_DETECTION_DIST && end_layer == 0)
-            break;
+                break;
 
             // 1. 각 레이어의 레이스라인 기준 인덱스
             const int start_race_idx = raceline_index_array[start_layer];
@@ -431,14 +437,14 @@ void genEdge(Graph& graph,
                 const Node& startNode = start_layer_nodes[start_idx];
 
             // 3. 레이스라인에서 같은 위치에 있는 end 레이어의 참조 노드 인덱스 계산
-            int rel_race_offset = static_cast<int>(start_idx) - start_race_idx;
-            int ref_end_idx = end_race_idx + rel_race_offset;
+            int offset_from_raceline = static_cast<int>(start_idx) - start_race_idx;
+            int aligned_end_idx = end_race_idx + offset_from_raceline;
 
-            // 4. 범위 클램프
-            ref_end_idx = std::clamp(ref_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
+            // 4. 범위 클램프 (value, min, max) : value가 [min, max] 사이에 있도록 제한 (min보다 작으면 min, max보다 크면 max 반환)
+            aligned_end_idx = std::clamp(aligned_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
 
             // 5. 거리 계산을 위한 노드 좌표 가져오기
-            const Node& ref_end_node = end_layer_nodes[ref_end_idx];
+            const Node& ref_end_node = end_layer_nodes[aligned_end_idx];
 
             // 6. 거리 계산을 위한 좌표 행렬 생성
             MatrixXd spline_path(2, 2);
@@ -453,8 +459,8 @@ void genEdge(Graph& graph,
             double factor = (startNode.kappa > params.CURVE_THR) ? 2.0 : 1.0;
             int lat_steps = round(factor * dist * params.LAT_OFFSET / params.LAT_RESOLUTION);
 
-            for (int destIdx = std::max(0, ref_end_idx - lat_steps);
-                destIdx <= std::min(static_cast<int>(end_layer_nodes.size() - 1), ref_end_idx + lat_steps);
+            for (int destIdx = std::max(0, aligned_end_idx - lat_steps);
+                destIdx <= std::min(static_cast<int>(end_layer_nodes.size() - 1), aligned_end_idx + lat_steps);
                 ++destIdx) {
 
                 const Node& endNode = end_layer_nodes[destIdx];
@@ -465,8 +471,16 @@ void genEdge(Graph& graph,
                 const MatrixXd& y_coeffs = result.coeffs_y;
 
                 // DEBUG
-                std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
-                        << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
+
+                double d = std::sqrt(std::pow(endNode.x - startNode.x, 2) +
+                     std::pow(endNode.y - startNode.y, 2));
+
+                for (double t = 0; t <= d; t += 0.2) {
+                    Vector2d pt = computeSplinePosition(x_coeffs.row(0), y_coeffs.row(0), t);
+                    std::cout << "  - t=" << t << " → (" << pt.x() << ", " << pt.y() << ")\n";
+                }
+                // std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
+                //         << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
 
                 // std::cout << "coeff_x: " << x_coeffs << std::endl;
                 // std::cout << "coeff_y: " << y_coeffs << std::endl;
