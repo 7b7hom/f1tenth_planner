@@ -12,10 +12,11 @@ struct Offline_Params {
         float VARIABLE_HEADING=true;    // Determines if node headings are interpolated between boundary and race line angles (else: match race line).
         
         float LON_STRAIGHT_STEP=2.2;   // Max distance (m) between norm vectors along straights on the reference line
-        float LON_CURVE_STEP=0.7;      // Max norm vector spacing (m) on reference-line curves.
+        float LON_CURVE_STEP=0.7;      // Max norm vector spacing (m) on reference-line curves. 0.3~0
                                         // NOTE: Set notably higher than base values.
         float CURVE_THR=0.25;          // recommand: 0.15 ~ 0.3
         float LAT_OFFSET=0.25;          // Permitted lateral deviation from the raceline per meter traveled.
+        int MAX_LAT_STEPS=3;
         float VIRT_GOAL_N=true;         // Proxy target node per layer. Graph search uses this node directly, skipping iterative checks on adjacent goal-layer nodes.
         float MIN_VEL_RACE=0.50;        // Minimum allowed speed as % of global race line; splines below this are excluded (set to 0.0 to allow all).
         float CLOSURE_DETECTION_DIST=0.1; // If track ends(first, last) are within this distance (m), treat as closed loop.
@@ -32,7 +33,7 @@ struct Offline_Params {
         // [VEHICLE]
         float VEH_WIDTH=0.4;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=4.7;   // vehicle length in m (in order to obtain a safety distance in follow mode)
-        float VEH_TURN=7.0;     // Min turn radius (m); splines below this are excluded.
+        float VEH_TURN=1.0;     // Min turn radius (m); splines below this are excluded. 3.0~6.0
 
         // [COST]
         float W_RACELINE=1.0;   // Penalty for path length and lateral offset from raceline, applied per meter

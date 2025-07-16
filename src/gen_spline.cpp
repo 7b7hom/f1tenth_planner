@@ -137,6 +137,66 @@ void calcHeading(DVector &x_raceline, DVector &y_raceline, DVector &psi) {
 // 샘플링된 레이어마다 경로 계획을 위한 Node(차량이 횡방향으로 이동 가능한 위치들) 생성
 void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolution) {
     const size_t N = sampling_map[__alpha].size();
+    nodesPerLayer.resize(N); 
+
+    for (size_t i = 0; i < N; ++i){ // 각 레이어(층)에 대해 반복
+
+        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
+        
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
+        
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
+        nodesPerLayer[i].resize(num_nodes); // 현재 레이어의 노드 벡터 크기 조정 (NodeMap은 vector<vector<Node>> 이므로 inner vector의 resize)
+
+        for (int idx = 0; idx < num_nodes; ++idx) { 
+            double alpha = start_alpha + idx * lat_resolution; // 현재 노드의 횡방향 오프셋 계산
+            Vector2d node_pos = ref_xy + alpha * norm_vec; // 노드의 (x, y) 좌표 계산 (여기서 선언)
+
+            Node current_node_instance; // 각 노드 인스턴스를 이 루프 안에서 새로 생성하여 초기화 문제를 방지
+            
+            // 필수 멤버 초기화 및 할당
+            current_node_instance.layer_idx = i; // 현재 레이어 인덱스
+            current_node_instance.node_idx = idx; // 노드 인덱스
+            current_node_instance.x = node_pos.x();
+            current_node_instance.y = node_pos.y();
+            current_node_instance.kappa = 0.0;
+            current_node_instance.raceline = (idx == raceline_index); // raceline_index는 현재 레이어의 레이싱 라인 인덱스
+
+
+            // --- 노드의 헤딩(psi) 계산 (보간) ---
+            double psi_interp;
+            if (idx < raceline_index) { 
+                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) {
+                    double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
+                    double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+                    psi_interp = bl + (p - bl) * idx / raceline_index; 
+                } else {
+                    psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (idx+1) / raceline_index;
+                }
+                current_node_instance.psi = normalizeAngle(psi_interp);
+            }
+            else if (idx == raceline_index) { 
+                psi_interp = sampling_map[__psi][i];
+                current_node_instance.psi = psi_interp;
+            }
+            else { 
+                int remain = num_nodes - raceline_index - 1;
+                double t = static_cast<double>(idx - raceline_index) / std::max(remain, 1); 
+                psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
+                current_node_instance.psi = normalizeAngle(psi_interp);
+            }
+            
+            nodesPerLayer[i][idx] = current_node_instance; // <-- 생성된 노드 인스턴스를 NodeMap에 할당
+        }
+    }
+}
+
+/*
+// 샘플링된 레이어마다 경로 계획을 위한 Node(차량이 횡방향으로 이동 가능한 위치들) 생성
+void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolution) {
+    const size_t N = sampling_map[__alpha].size();
     IVector raceline_index_array;
     Vector2d node_pos;
     nodesPerLayer.resize(N); 
@@ -190,6 +250,10 @@ void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolutio
         }
     }
 }
+*/
+// gen_spline.cpp 파일 내, genNode 함수 위에 (또는 다른 spline 관련 함수들과 함께) 추가하세요.
+
+
 
 // 주어진 X, Y 좌표에서 해당 psi (헤딩) 방향을 화살표로 시각화
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale = 0.5) {
@@ -204,7 +268,7 @@ void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double 
         dy = scale * sin(psi[i] + M_PI_2);
         DVector x_line = {x[i], x[i] + dx};
         DVector y_line = {y[i], y[i] + dy};
-        plt::plot(x_line, y_line, {{"color", "green"}});
+        plt::plot(x_line, y_line, {{"color", "red"}});
 
         #if 1 // 화살촉 그리기
         theta = atan2(dy, dx);
@@ -216,8 +280,8 @@ void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double 
         x_arrow2 = x[i] + dx - arrow_len * cos(theta + angle);
         y_arrow2 = y[i] + dy - arrow_len * sin(theta + angle);
 
-        plt::plot({x[i] + dx, x_arrow1}, {y[i] + dy, y_arrow1}, {{"color", "green"}});
-        plt::plot({x[i] + dx, x_arrow2}, {y[i] + dy, y_arrow2}, {{"color", "green"}});
+        plt::plot({x[i] + dx, x_arrow1}, {y[i] + dy, y_arrow1}, {{"color", "red"}});
+        plt::plot({x[i] + dx, x_arrow2}, {y[i] + dy, y_arrow2}, {{"color", "red"}});
         #endif
     }
 }
@@ -281,7 +345,7 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
             temp_ds(ds.size()) = ds(0);
             ds = temp_ds;
         }
-        // ds(i) / dis(i+1) -> 현재 구간 길이 / 다음 구간 길이
+        // ds(i) / ds(i+1) -> 현재 구간 길이 / 다음 구간 길이
         scaling = ds.head(no_splines).cwiseQuotient(ds.tail(no_splines));
     }else{ // 거리 기반 스케일링 사용 x
         scaling = VectorXd::Ones(no_splines - 1); // scaling 벡터를 모든 요소가 1인 벡터로 설정
@@ -483,6 +547,9 @@ bool isPointInsideTrackBounds(double x, double y){
     // spline 점의 기준선 법선 방향 횡방향 오프셋 계산
     // -> (x, y) 점이 기준선으로부터 법선 벡터 방향으로 얼마나 떨어져 있는가
     double lateral_offset = (x - ref_x) * norm_x + (y - ref_y) * norm_y; // 법선 벡터 norm_x, norm_y: 기준선에 수직인 방향을 가리키는 단위 벡터
+    cout << "DEBUG OOB: Point(" << x << "," << y << ") RefIdx=" << closest_ref_idx
+     << " Offset=" << lateral_offset << " Bounds=[" << -width_left << "," << width_right << "]"
+     << " NormVec=(" << norm_x << "," << norm_y << ")" << endl;
 
     // lateral_offset이 트랙의 유효한 횡방향 범위 내에 있는지 직접적으로 확인하는 최종 단계
     if(lateral_offset >= -width_left && lateral_offset <= width_right){
@@ -498,19 +565,23 @@ bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, 
     // spline 경로 샘플링
     const int num_samples = 20;
 
+    double max_allowed_kappa = 4.0 / params.VEH_TURN;
+
     for(int k = 0; k <= num_samples; ++k){
         double t_eval = static_cast<double>(k) / num_samples; // 파라미터 t 값을 균등하게 분할
         SplinePoint sp = evaluateSpline(coeff_x, coeff_y, t_eval, ds_current, true);
 
         // 트랙 경계 벗어나는지 확인
         if(!isPointInsideTrackBounds(sp.x, sp.y)){
+            cout << "REJECTED (OUT OF BOUNDS): Spline from " << sp.x << "," << sp.y << " is out of bounds." << endl;
             return false;
         }
 
         // 곡률 제약 조건 확인
         // std::abs(sp.kappa): 현재 spline 점에서의 kappa 절댓값
-        // 1.0 / params.VEH_TURN: 차량이 허용하는 최대 곡률 (최소 회전 반경의 역수)
-        if(std::abs(sp.kappa) > (1.0 / params.VEH_TURN)){
+        // 4.0 / params.VEH_TURN: 차량이 허용하는 최대 곡률 (최소 회전 반경의 역수)
+        if(std::abs(sp.kappa) > max_allowed_kappa){
+            cout << "REJECTED (EXCESSIVE CURVATURE): Point (" << sp.x << "," << sp.y << "), kappa=" << sp.kappa << ", max_allowed=" << max_allowed_kappa << endl;
             return false;
         }
     }
@@ -556,6 +627,9 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
                 if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params)){
                     ITuple src_key(current_node.layer_idx, current_node.node_idx);
                     graph.addEdge(src_key, next_node.node_idx); // 검사 통과 시 그래프에 edge 추가(src_key: 특정 node를 고유하게 식별하는 key 역할, tuple)
+                }else { // 스플라인이 유효하지 않을 때
+                    cout << "SPLINE REJECTED from (" << current_node.layer_idx << "," << current_node.node_idx
+                       << ") to (" << next_node.layer_idx << "," << next_node.node_idx << ")" << endl;
                 }
             }
         }
@@ -563,7 +637,6 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
 }
 
 // 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
-// params를 인자로 받도록 수정했습니다.
 void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
     plt::clf();
 
@@ -634,7 +707,15 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                     spline_x_pts.push_back(sp.x);
                     spline_y_pts.push_back(sp.y);
                 }
-                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+                if(current_node.layer_idx==0){
+                    if(dest_node_idx==0){
+                        plt::plot(spline_x_pts, spline_y_pts, {{"color", "yellow"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+                    }else{
+                        plt::plot(spline_x_pts, spline_y_pts, {{"color", "black"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+                    }
+                }else{
+                    plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+                }
             }
         }
     }
