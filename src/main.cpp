@@ -186,6 +186,7 @@ void computeCurvature(NodeMap& nodesPerLayer) {
 }
 
 void genNode(NodeMap& nodesPerLayer,
+            IVector& raceline_index_array,
             const double veh_width,
             float lat_resolution) {
     
@@ -197,7 +198,7 @@ void genNode(NodeMap& nodesPerLayer,
         Node node;
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
-        // raceline_index_array.push_back(raceline_index);
+        raceline_index_array.push_back(raceline_index);
         
         // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
@@ -212,7 +213,7 @@ void genNode(NodeMap& nodesPerLayer,
         
         nodesPerLayer[i].resize(num_nodes); 
         
-        cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;  
+        // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;  
         // node별 loop 
         for (int idx = 0; idx < num_nodes; ++idx) {
             double alpha = start_alpha + idx * lat_resolution;
@@ -269,17 +270,16 @@ void genNode(NodeMap& nodesPerLayer,
 
 }
 
+unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
+
+#if 0
+// 단일 스플라인 계산 + 거리 생각 X -> 울퉁불퉁 spline 생성 
 unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode) {
     // 하나의 3차 스플라인을 만들기 위해 계수 4개 필요 (x, y 각각)
     MatrixXd M(4, 4);      // 시스템 행렬
     VectorXd b_x(4), b_y(4);  // 우변
     double psi_s = startNode.psi + M_PI_2;
     double psi_e = endNode.psi + M_PI_2;
-    
-    // M << 1,    0,     0,     0,
-    //     1,    d,    d*d,   d*d*d,
-    //     0,    1,     0,     0,
-    //     0,    1,   2*d,   3*d*d;
 
     M << 1, 0, 0, 0,
          1, 1, 1, 1,
@@ -309,11 +309,12 @@ unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
         coeffs_y_mat,  // (1, 4)
     });
 }
-
+#endif
 
 void genEdges(NodeMap &nodesPerLayer, 
               Graph &edgeList,
               SplineMap &splineMap,
+              const IVector &raceline_index_array,
               const float lat_offset,
               const float lat_resolution,
               const float curve_thr,
@@ -330,7 +331,7 @@ void genEdges(NodeMap &nodesPerLayer,
         int start_layer = layerIdx;
         int end_layer = layerIdx + 1;
 
-        cout << "start_layer:" << start_layer << endl;
+        // cout << "start_layer:" << start_layer << endl;
         // cout << "nodesPerLayer.size()" << nodesPerLayer.size() << endl;
 
         // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 end_layer 조정 
@@ -343,9 +344,13 @@ void genEdges(NodeMap &nodesPerLayer,
             // 기준 노드
             Node &startNode = nodesPerLayer[start_layer][startIdx];
             
+            int refDestIdx = raceline_index_array[end_layer] - (raceline_index_array[start_layer] - startIdx);
+            refDestIdx = max(0, min(refDestIdx, static_cast<int>(nodesPerLayer[end_layer].size() -1)));
             // refDestIdx = clamp(refDestIdx, 0, static_cast<int>(nodesPerLayer[end_layer].size() - 1));
-            int refDestIdx = startIdx;
+            // int refDestIdx = startIdx;
+            // int refDestIdx = raceline_index_array[end_layer];
             Node &srcEndNode = nodesPerLayer[end_layer][refDestIdx];
+
             Vector2d d_start(startNode.x, startNode.y);
             Vector2d d_end(srcEndNode.x, srcEndNode.y);
 
@@ -356,8 +361,9 @@ void genEdges(NodeMap &nodesPerLayer,
             double factor = 1.0 + 0.5 * ratio;
             // 커브에서 더 많이 연결(추월 경로를 위하여)
             int lat_steps = round(factor * dist * lat_offset / lat_resolution);
+            // cout << start_layer << "의 " << startIdx << "가 다음 refendNode와의 거리: " << dist << endl;
             lat_steps = min(lat_steps, max_lat_steps); // srcEndNode 기준 2*lat_steps + 1개의 노드와 연결한다.
-            cout << startIdx << "번째 노드의 lat_steps" << lat_steps << endl;
+            // cout << startIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int destIdx = max(0, refDestIdx - lat_steps); 
                 destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() - 1), refDestIdx + lat_steps); ++destIdx) {
@@ -470,12 +476,20 @@ int main() {
     // sampling_map[__psi_bound_r] = psi_bound_r;
 
     NodeMap nodesPerLayer;
-    // IVector raceline_index_array;
-    Vector2d node_pos;
+    IVector raceline_index_array;
+    // Vector2d node_pos;
 
     genNode(nodesPerLayer,
+            raceline_index_array,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
+
+    // raceline 확인용 
+    // IVector::iterator vec_iter;
+    // for (vec_iter = raceline_index_array.begin(); vec_iter != raceline_index_array.end(); vec_iter++) {
+    //     cout << *vec_iter << endl;
+    // }
+    
 
     // sampling points' info 
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
@@ -486,12 +500,13 @@ int main() {
     genEdges(nodesPerLayer,
              edgeList,
              splineMap,
+             raceline_index_array,
              params.LAT_OFFSET,
              params.LAT_RESOLUTION,
              params.CURVE_THR,
              params.MAX_LAT_STEPS);
 
-    printSplineMapVerbose(splineMap, nodesPerLayer);
+    // printSplineMapVerbose(splineMap, nodesPerLayer);
     // edgeList.printGraph();
     
     // visual process 
