@@ -47,7 +47,7 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',') {
 void map_size(DMap& map) {
     size_t num_cols = map.size();
     size_t num_rows = map.begin()->second.size();
-    cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
+    // cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
 }
 
 // Dvector를 Map 구조로 추가(연산)
@@ -152,9 +152,9 @@ void samplePointsFromRaceline(const DVector& kappa,     // 곡률
         cur_dist += dist[i];
     }
 
-    // for (size_t i=0; i < idx_array.size(); ++i) 
-    //     cout << idx_array[i] << endl;
-    // cout << "size: " << idx_array.size() << endl;
+    //  for (size_t i=0; i < idx_array.size(); ++i) 
+    //      cout << idx_array[i] << endl;
+    //  cout << "size: " << idx_array.size() << endl;
 }
 
 double normalizeAngle(double angle) {
@@ -181,12 +181,11 @@ void calcHeading(DVector &x_raceline,
             dx = x_raceline[0] - x_raceline[N - 1];
             dy = y_raceline[0] - y_raceline[N - 1];
         } 
-    psi[i] = atan2(dy, dx) - M_PI_2;
-        
-    normalizeAngle(psi[i]);
+    psi[i] = normalizeAngle(atan2(dy, dx) - M_PI_2);
+
+    // cout << i<< ": " << psi[i] << endl;
 
     }
-    // cout << i<< ": " << psi[i] << endl;
     // cout << psi.size() << endl;
 
 }
@@ -210,7 +209,7 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
         
         // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
-        // cout << "-----" << endl;
+
 
         Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 레이어의 기준이 되는 점 (기준선 위 한 점)
         Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // ref point에서 옆 방향을 알려주는 벡터
@@ -339,66 +338,41 @@ VectorXd computeEuclideanDistances(const MatrixXd& path) {
 
 // only startNode, endNode
 SplineResult calcSplines(const Node& startNode, const Node& endNode) {
-    double dx = endNode.x - startNode.x;
-    double dy = endNode.y - startNode.y;
-    double d = std::sqrt(dx * dx + dy * dy);
+    // fixed M matrix assuming d = 1
+    MatrixXd M(4, 4);
+    VectorXd b_x(4), b_y(4);
 
+    // heading 방향 90도 회전
+    double psi_s = startNode.psi + M_PI_2;
+    double psi_e = endNode.psi + M_PI_2;
 
-    MatrixXd M = MatrixXd::Zero(4, 4);
-    VectorXd b_x = VectorXd::Zero(4);
-    VectorXd b_y = VectorXd::Zero(4);
+    // 거리 정규화
+    // d = 1 fixed
+    M << 1, 0, 0, 0,    // x(0) = a_0
+         1, 1, 1, 1,    // x(1) = a_0 + a_1 + a_2 + a_3
+         0, 1, 0, 0,    // x'(0) = a_1
+         0, 1, 2, 3;    // x'(1) = a_1 + 2a_2 + 3a_3
 
-    // 조건 1: x(0) = startNode.x
-    M(0, 0) = 1.0;
-    b_x(0) = startNode.x;
-    b_y(0) = startNode.y;
+    b_x << startNode.x,
+           endNode.x,
+           cos(psi_s),
+           cos(psi_e);
 
-    // 조건 2: x(d) = endNode.x
-    M(1, 0) = 1.0;
-    M(1, 1) = d;
-    M(1, 2) = d * d;
-    M(1, 3) = d * d * d;
-    b_x(1) = endNode.x;
-    b_y(1) = endNode.y;
+    b_y << startNode.y,
+           endNode.y,
+           sin(psi_s),
+           sin(psi_e);
 
-    // 조건 3: x'(0) = cos(psi_s)
-    M(2, 0) = 0.0;
-    M(2, 1) = 1.0;
-    M(2, 2) = 0.0;
-    M(2, 3) = 0.0;
-    b_x(2) = cos(startNode.psi) * d;
-    b_y(2) = sin(startNode.psi) * d;
+    VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
+    VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
 
-
-    // 조건 4: x'(d) = cos(psi_e)
-    M(3, 0) = 0.0;
-    M(3, 1) = 1.0;
-    M(3, 2) = 2.0 * d;
-    M(3, 3) = 3.0 * d * d;
-    b_x(3) = cos(endNode.psi) * d;
-    b_y(3) = sin(endNode.psi) * d;
-
-    // Solve
-    VectorXd x_coeff = M.colPivHouseholderQr().solve(b_x);
-    VectorXd y_coeff = M.colPivHouseholderQr().solve(b_y);
-
-    MatrixXd coeffs_x(1, 4), coeffs_y(1, 4);
-    coeffs_x.row(0) = x_coeff.transpose();
-    coeffs_y.row(0) = y_coeff.transpose();
-
-    // 법선 벡터 계산
-    Vector2d tangent(x_coeff(1), y_coeff(1));
-    Vector2d normal(-tangent.y(), tangent.x());
-    Vector2d norm_normal = (normal.norm() > 1e-6) ? normal.normalized() : Vector2d(0.0, 0.0);
-
-    MatrixXd normvec_normalized(1, 2);
-    normvec_normalized.row(0) = norm_normal;
+    // transpose
+    MatrixXd coeffs_x_trans = coeffs_x.transpose();  // (1x4)
+    MatrixXd coeffs_y_trans = coeffs_y.transpose();  // (1x4)
 
     SplineResult result;
-    result.coeffs_x = coeffs_x;
-    result.coeffs_y = coeffs_y;
-    result.M = M;
-    result.normvec_normalized = normvec_normalized;
+    result.coeffs_x = coeffs_x_trans;
+    result.coeffs_y = coeffs_y_trans;
 
     return result;
 }
@@ -406,15 +380,21 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
 
 // ------------------ genEdge ------------------
 
+Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& coeff_y, double t) {
+    double t2 = t * t;
+    double t3 = t2 * t;
+    double x = coeff_x(0) + coeff_x(1) * t + coeff_x(2) * t2 + coeff_x(3) * t3;
+    double y = coeff_y(0) + coeff_y(1) * t + coeff_y(2) * t2 + coeff_y(3) * t3;
+    return Vector2d(x, y);
+}
+
+
 void genEdge(Graph& graph, 
     const NodeMap& nodesPerLayer, 
     const Offline_Params& params,
     const IVector& raceline_index_array,
     bool closed = true) {
 
-        if (params.CLOSURE_DETECTION_DIST < 1e-6 && end_layer == 0) {
-            cout << "Too small lateral offset" << endl;
-        }
 
         // closed -> 마지막과 0번 레이어 연결, open -> break
         for (size_t layer = 0; layer < nodesPerLayer.size(); ++layer) {
@@ -422,8 +402,7 @@ void genEdge(Graph& graph,
             const size_t start_layer = layer;
             const size_t end_layer = (layer + 1) % nodesPerLayer.size();
         
-            if (!params.CLOSURE_DETECTION_DIST && end_layer == 0)
-                break;
+            if (params.CLOSURE_DETECTION_DIST < 1e-6 && end_layer == 0) break;
 
             // 1. 각 레이어의 레이스라인 기준 인덱스
             const int start_race_idx = raceline_index_array[start_layer];
@@ -472,13 +451,13 @@ void genEdge(Graph& graph,
 
                 // DEBUG
 
-                double d = std::sqrt(std::pow(endNode.x - startNode.x, 2) +
-                     std::pow(endNode.y - startNode.y, 2));
+                // double d = std::sqrt(std::pow(endNode.x - startNode.x, 2) +
+                //      std::pow(endNode.y - startNode.y, 2));
 
-                for (double t = 0; t <= d; t += 0.2) {
-                    Vector2d pt = computeSplinePosition(x_coeffs.row(0), y_coeffs.row(0), t);
-                    std::cout << "  - t=" << t << " → (" << pt.x() << ", " << pt.y() << ")\n";
-                }
+                // for (double t = 0; t <= d; t += 0.2) {
+                //     Vector2d pt = computeSplinePosition(x_coeffs.row(0), y_coeffs.row(0), t);
+                //     std::cout << "  - t=" << t << " → (" << pt.x() << ", " << pt.y() << ")\n";
+                // }
                 // std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
                 //         << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
 
@@ -488,28 +467,20 @@ void genEdge(Graph& graph,
                 // for (int k = 0; k <= 10; ++k) {
                 //     double t = static_cast<double>(k) / 10.0;
                 //     double x = x_coeffs(0) + x_coeffs(1) * t + x_coeffs(2) * t * t + x_coeffs(3) * t * t * t;
-                //     double y = y_coeffs(0) + y_coeffs(1) * t + y_coeffs(2) * t * t + y_coeffs(3) * t * t * t;
+                //     double y = y_coeffs(0) + y_cofeffs(1) * t + y_coeffs(2) * t * t + y_coeffs(3) * t * t * t;
                 //     std::cout << "  - point(" << t << "): (" << x << ", " << y << ")\n";
                 // }
                 
 
                 // 그래프에 엣지 추가
                 ITuple src_key(start_layer, startNode.node_idx);
-                std::cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
-                        << ") → " << endNode.node_idx << "\n";
+                // std::cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
+                //         << ") → " << endNode.node_idx << "\n";
                 graph.addEdge(src_key, endNode.node_idx);
 
             }
         }  
     }
-}
-
-Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& coeff_y, double t) {
-    double t2 = t * t;
-    double t3 = t2 * t;
-    double x = coeff_x(0) + coeff_x(1) * t + coeff_x(2) * t2 + coeff_x(3) * t3;
-    double y = coeff_y(0) + coeff_y(1) * t + coeff_y(2) * t2 + coeff_y(3) * t3;
-    return Vector2d(x, y);
 }
 
 void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
