@@ -148,7 +148,7 @@ void computeCurvature(NodeMap& nodesPerLayer) {
     const int num_layers = nodesPerLayer.size();
 
     // safe node access: 없는 j 인덱스는 가장 가까운 노드로 fallback
-    auto safeGetNode = [](const std::vector<Node>& layer, int j) -> const Node* {
+    auto safeGetNode = [](const vector<Node>& layer, int j) -> const Node* {
         if (layer.empty()) return nullptr;
         if (j < 0) return &layer.front();
         if (j < static_cast<int>(layer.size())) return &layer[j];
@@ -176,7 +176,7 @@ void computeCurvature(NodeMap& nodesPerLayer) {
             double dpsi = 0.0, ds = 0.0;
             if (prev && next) {
                 dpsi = normalizeAngle(next->psi - prev->psi);
-                ds = std::hypot(next->x - prev->x, next->y - prev->y);
+                ds = hypot(next->x - prev->x, next->y - prev->y);
             }
 
             double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
@@ -270,46 +270,89 @@ void genNode(NodeMap& nodesPerLayer,
 
 }
 
-unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode)
+unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
+                                     double psi_s = NAN,
+                                     double psi_e = NAN,
+                                     bool use_dist_scaling = true) {
+    // 구간 길이 계산
+    VectorXd el_lengths;
+    if (use_dist_scaling) {
+        el_lengths.resize(path.rows() - 1);
+        for (int i = 0; i < path.rows() - 1; ++i) {
+            el_lengths(i) = (path.row(i+1) - path.row(i)).norm();
+        }
+    } 
+    // 맨 마지막 거리 추가
+    if (use_dist_scaling) {
+        VectorXd el_tmp(el_lengths.size() + 1);
+        el_tmp << el_lengths, el_lengths(0);
+        el_lengths = el_tmp;
+    }
+    // 도함수 스케일링
+    // 인접 구간 간 거리 비율로 스케일링 계수를 만들어 도함수 연속 조건 맞춤
+    int no_splines = path.rows() - 1;
+    VectorXd scaling = VectorXd::Ones(no_splines - 1);
+    if (use_dist_scaling) {
+        for (int i = 0; i < no_splines - 1; ++i) {
+            scaling(i) = el_lengths(i) / el_lengths(i+1);
+        }
+    }
 
-#if 0
-// 단일 스플라인 계산 + 거리 생각 X -> 울퉁불퉁 spline 생성 
-unique_ptr<SplineResult> calcSplines(const Node& startNode, const Node& endNode) {
-    // 하나의 3차 스플라인을 만들기 위해 계수 4개 필요 (x, y 각각)
-    MatrixXd M(4, 4);      // 시스템 행렬
-    VectorXd b_x(4), b_y(4);  // 우변
-    double psi_s = startNode.psi + M_PI_2;
-    double psi_e = endNode.psi + M_PI_2;
+    MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4);
+    VectorXd b_x = VectorXd::Zero(no_splines * 4);
+    VectorXd b_y = VectorXd::Zero(no_splines * 4);
 
-    M << 1, 0, 0, 0,
-         1, 1, 1, 1,
-         0, 1, 0, 0,
-         0, 1, 2, 3;
+    // spline 위치/도함수/2차 도함수 연속 조건 표현
+    Matrix<double, 4, 8> template_M;
+    template_M << 1, 0, 0, 0, 0, 0, 0, 0,
+                  1, 1, 1, 1, 0, 0, 0, 0,
+                  0, 1, 2, 3, 0, -1, 0, 0,
+                  0, 0, 2, 6, 0, 0, -2, 0;
+    // spline 구간별로 행렬 세팅
+    // 마지막 spline은 위치조건만 
+    for (int i = 0; i < no_splines; ++i) {
+        int j = i * 4;
+        if (i < no_splines - 1) {
+            M.block(j, j, 4, 8) = template_M;
+            M(j+2, j+5) *= scaling(i); // 이웃한 구간 도함수 값 일치하도록 
+            M(j+3, j+6) *= pow(scaling(i), 2); // 2차 도함수 가속도 연속 조건
+        } else {
+            M.block(j, j, 2, 4) << 1, 0, 0, 0,
+                                   1, 1, 1, 1;
+        }
+        // b_x.segment(j, 2): b_x[j]와 b_x[j+1]
+        b_x.segment(j, 2) << path(i, 0), path(i+1, 0); // x좌표에 대한 위치 조건 벡터
+        b_y.segment(j, 2) << path(i, 1), path(i+1, 1); // y좌표에 대한 위치 조건 벡터
+    }
+    // 시작/끝점에서의 psi 반영
+    psi_s += M_PI_2;
+    psi_e += M_PI_2;
 
-    b_x << startNode.x,
-           endNode.x,
-           cos(psi_s),
-           cos(psi_e);
+    M(no_splines * 4 - 2, 1) = 1.0;
+    double el_length_s = el_lengths.size() > 0 ? el_lengths(0) : 1.0;
+    b_x(no_splines * 4 - 2) = cos(psi_s) * el_length_s;
+    b_y(no_splines * 4 - 2) = sin(psi_s) * el_length_s;
+    // el_lengths.tail(1): 벡터의 마지막 원소 반환
+    // el_lengths.tail(1)(0): 원소 값 가져옴 
+    M.block(no_splines * 4 - 1, no_splines * 4 - 4, 1, 4) << 0, 1, 2, 3;
+    double el_length_e = el_lengths.size() > 0 ? el_lengths.tail(1)(0) : 1.0;
+    // 끝점에서의 곡선의 방향(psi_e)이 실제 경로의 마지막 구간 길이에 맞게 변화량이 되도록 스케일을 맞춰주는 것
+    // 방향만 넣으면, 구간 길이가 1로 가정된 것처럼 도함수 조건이 설정되어 실제 경로의 스케일과 맞지 않게 된다.
+    b_x(no_splines * 4 - 1) = cos(psi_e) * el_length_e;
+    b_y(no_splines * 4 - 1) = sin(psi_e) * el_length_e;
 
-    b_y << startNode.y,
-           endNode.y,
-           sin(psi_s),
-           sin(psi_e);
+    VectorXd x_les = M.fullPivLu().solve(b_x);
+    VectorXd y_les = M.fullPivLu().solve(b_y);
 
-    VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
-    VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
-
-    // 1줄 → 행렬 형태로 reshape
-    MatrixXd coeffs_x_mat = coeffs_x.transpose();
-    MatrixXd coeffs_y_mat = coeffs_y.transpose();
+    MatrixXd coeffs_x = x_les.transpose();
+    MatrixXd coeffs_y = y_les.transpose();
 
     // 결과 반환
     return make_unique<SplineResult>(SplineResult{
-        coeffs_x_mat,  // (1, 4)
-        coeffs_y_mat,  // (1, 4)
+        coeffs_x,  // (1, 4)
+        coeffs_y,  // (1, 4)
     });
 }
-#endif
 
 void genEdges(NodeMap &nodesPerLayer, 
               Graph &edgeList,
@@ -368,8 +411,14 @@ void genEdges(NodeMap &nodesPerLayer,
             for (int destIdx = max(0, refDestIdx - lat_steps); 
                 destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() - 1), refDestIdx + lat_steps); ++destIdx) {
                     Node &endNode = nodesPerLayer[end_layer][destIdx];
+                    
+                    MatrixXd path(2, 2);
+                    path(0,0) = startNode.x;
+                    path(0,1) = startNode.y;
+                    path(1,0) = endNode.x;
+                    path(1,1) = endNode.y;
 
-                    auto result = calcSplines(startNode, endNode);
+                    auto result = calcSplines(path, startNode.psi, endNode.psi);
 
                     IPair startKey = make_pair(start_layer, startIdx);
                     IPair endKey = make_pair(end_layer, destIdx);
