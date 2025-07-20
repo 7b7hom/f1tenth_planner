@@ -50,6 +50,7 @@ struct Node {
 struct SplineResult {
     MatrixXd coeffs_x;          // x 계수
     MatrixXd coeffs_y;             // y 계수     
+    VectorXd el_lengths;
 };
 
 typedef vector<double> DVector;
@@ -97,3 +98,18 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
+
+//genSplines
+unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
+                                     double psi_s, 
+                                     double psi_e, 
+                                     bool use_dist_scaling);
+void genEdges(NodeMap &nodesPerLayer, 
+              Graph &edgeList,
+              SplineMap &splineMap,
+              const IVector &raceline_index_array,
+              const float lat_offset,
+              const float lat_resolution,
+              const float curve_thr,
+              const int max_lat_steps,
+              const float stepsize_approx);

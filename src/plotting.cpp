@@ -148,9 +148,24 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
 void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap) {
     plt::clf();
 
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+    DVector x_bound_l = sampling_map[__x_bound_l];
+    DVector y_bound_l = sampling_map[__y_bound_l];
 
+    DVector x_bound_r = sampling_map[__x_bound_r];
+    DVector y_bound_r = sampling_map[__y_bound_r];
+    // 첫 점을 맨 뒤에 추가
+    x_bound_l.push_back(x_bound_l.front());
+    y_bound_l.push_back(y_bound_l.front());
+    
+    x_bound_r.push_back(x_bound_r.front());
+    y_bound_r.push_back(y_bound_r.front());
+
+    plt::plot(x_bound_l, y_bound_l, {{"color", "orange"}});
+    plt::plot(x_bound_r, y_bound_r, {{"color", "orange"}});
+
+    plt::plot(sampling_map[__x_bound_l], sampling_map[__y_bound_l], {{"color", "orange"}});
+    plt::plot(sampling_map[__x_bound_r], sampling_map[__y_bound_r], {{"color", "orange"}});
+    
     // plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
 

@@ -198,6 +198,30 @@ include/graph.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.s
 .PHONY : include/graph.cpp.s
 
+src/genSplines.o: src/genSplines.cpp.o
+.PHONY : src/genSplines.o
+
+# target to build an object file
+src/genSplines.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/genSplines.cpp.o
+.PHONY : src/genSplines.cpp.o
+
+src/genSplines.i: src/genSplines.cpp.i
+.PHONY : src/genSplines.i
+
+# target to preprocess a source file
+src/genSplines.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/genSplines.cpp.i
+.PHONY : src/genSplines.cpp.i
+
+src/genSplines.s: src/genSplines.cpp.s
+.PHONY : src/genSplines.s
+
+# target to generate assembly for a file
+src/genSplines.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/genSplines.cpp.s
+.PHONY : src/genSplines.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -286,6 +310,9 @@ help:
 	@echo "... include/graph.o"
 	@echo "... include/graph.i"
 	@echo "... include/graph.s"
+	@echo "... src/genSplines.o"
+	@echo "... src/genSplines.i"
+	@echo "... src/genSplines.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

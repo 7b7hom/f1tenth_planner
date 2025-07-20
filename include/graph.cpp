@@ -33,8 +33,9 @@ void Graph::printGraph() {
 void Graph::getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx) {
     if (adjLists[srcNodeIdx].size() <= 0) 
         throw runtime_error{"Unable to print child node for srcNodeIdx"};
-    for (const auto& value : adjLists[srcNodeIdx]) {
+    for (auto& value : adjLists[srcNodeIdx]) {
         childNodeIdx.push_back(value);
+        // cout << "("<< value.first << ", " << value.second << ")" << endl;
     }
 }
 // 코드 수정 필요. 제기능은 함.
