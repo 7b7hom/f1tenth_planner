@@ -19,6 +19,8 @@
         "new": "cpp",
         "forward_list": "cpp",
         "list": "cpp",
-        "stdexcept": "cpp"
+        "stdexcept": "cpp",
+        "ostream": "cpp",
+        "complex": "cpp"
     }
 }

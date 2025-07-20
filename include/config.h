@@ -19,9 +19,10 @@ struct Offline_Params {
 
         int MAX_LAT_STEPS=3;    // Permitted lateral deviation from the raceline per meter traveled.
         float VIRT_GOAL_N=true;         // Proxy target node per layer. Graph search uses this node directly, skipping iterative checks on adjacent goal-layer nodes.
-        float MIN_VEL_RACE=0.50;        // Minimum allowed speed as % of global race line; splines below this are excluded (set to 0.0 to allow all).
+        float MIN_VEL_RACE=0.5;        // Minimum allowed speed as % of global race line; splines below this are excluded (set to 0.0 to allow all).
+        float MAX_LATERAL_ACCEL=4.0;
         float CLOSURE_DETECTION_DIST=0.1; // If track ends(first, last) are within this distance (m), treat as closed loop.
-
+        
         // [PLANNINGTARGET]
         float VEL_DECREASE_LAT=0.1;     // PLANNING TARGET VELOCITY : % goal speed reduced per meter the goal is offset from the raceline.
         float MIN_PLAN_HORIZON=300;     // Minimum number of layers (or distance) included in the online planning graph.
@@ -34,7 +35,7 @@ struct Offline_Params {
         // [VEHICLE]
         float VEH_WIDTH=0.4;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=4.7;   // vehicle length in m (in order to obtain a safety distance in follow mode)
-        float VEH_TURN=7.0;     // Min turn radius (m); splines below this are excluded.
+        float VEH_TURN=3.0;     // Min turn radius (m); splines below this are excluded.
 
         // [COST]
         float W_RACELINE=1.0;   // Penalty for path length and lateral offset from raceline, applied per meter

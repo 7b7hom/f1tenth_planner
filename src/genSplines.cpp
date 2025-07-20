@@ -84,12 +84,48 @@ unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
         el_lengths,
     });
 }
+#if 1
+VectorXd* calcPsiKappa(MatrixXd &coeffs_x,
+                         MatrixXd &coeffs_y,
+                         MatrixXd &spl_coords,
+                         VectorXd &t_steps) {
+    int N = t_steps.size();
+    VectorXd psi(N);
+    VectorXd* kappa = new VectorXd(N);
+    // 샘플링 개수만큼 loop
+
+    for (int i = 0; i < N; ++i) {
+        double t = t_steps(i);
+
+        // 단일 스플라인이므로 항상 0번째 row 사용
+        double x_d = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t * t;
+        double y_d = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
+
+        psi(i) = atan2(y_d, x_d) - M_PI_2;
+
+        double x_dd = 2 * coeffs_x(0, 2) + 6 * coeffs_x(0, 3) * t;
+        double y_dd = 2 * coeffs_y(0, 2) + 6 * coeffs_y(0, 3) * t;
+
+        double denom = pow(x_d * x_d + y_d * y_d, 1.5);
+        (*kappa)(i)= (x_d * y_dd - y_d * x_dd) / denom;
+    }
+
+    // psi 각도 정규화
+    for (int i = 0; i < psi.size(); ++i) {
+        while (psi(i) > M_PI) psi(i) -= 2 * M_PI;
+        while (psi(i) < -M_PI) psi(i) += 2 * M_PI;
+    }
+
+    return kappa;
+}
+#endif
+
 // 단일 스플라인에 대한 spline에 대한 샘플링 
-MatrixXd* interpSplines(MatrixXd &coeffs_x,
-                   MatrixXd &coeffs_y,
-                   float stepsize_approx,
-                   double spline_len = NAN, 
-                   int no_interp_points = 15) {
+VectorXd* interpSplines(MatrixXd &coeffs_x,
+                        MatrixXd &coeffs_y,
+                        float stepsize_approx,
+                        double spline_len = NAN, 
+                        int no_interp_points = 15) {
     if (coeffs_x.rows() != coeffs_y.rows()) {
         throw invalid_argument("Coefficient matrices must have the same length!");
     }
@@ -112,7 +148,7 @@ MatrixXd* interpSplines(MatrixXd &coeffs_x,
         for (size_t i = 0; i < no_interp_points; ++i) {
             t_steps[i] = i*step;
         }
-
+        // cout << "spline 개수: " << no_splines << endl;
         MatrixXd* spl_coords = new MatrixXd(no_interp_points, 2);
 
         for (int i = 0; i < no_splines; ++i) {
@@ -136,7 +172,10 @@ MatrixXd* interpSplines(MatrixXd &coeffs_x,
             spline_len +=sqrt(dx*dx + dy*dy);
         }
         // cout << spline_len << endl; // levine: 0.5~2.5
-        return spl_coords;
+        VectorXd* kappa = calcPsiKappa(coeffs_x, coeffs_y, *spl_coords, t_steps);
+        delete spl_coords;
+
+        return kappa;
     }
 
     return nullptr;
@@ -166,7 +205,10 @@ void genEdges(NodeMap &nodesPerLayer,
               const float lat_resolution,
               const float curve_thr,
               const int max_lat_steps,
-              const float stepsize_approx) {
+              const float stepsize_approx,
+              const float min_vel_race,
+              const float max_lateral_accel,
+              const float veh_turn) {
     
     if (lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
@@ -248,7 +290,8 @@ void genEdges(NodeMap &nodesPerLayer,
         IPairVector childNode;
         IPair start = make_pair(i ,s);
         edgeList.getChildIdx(start, childNode);
-        for (const auto& child : childNode) {
+        // 연결되어있는 child node에 대하여 
+        for (auto& child : childNode) {
           edge_cnt++;
           EdgeKey srcKey = make_pair(start, child);
           // int end_layer = child.first;
@@ -257,13 +300,63 @@ void genEdges(NodeMap &nodesPerLayer,
           MatrixXd coeffs_x = splineMap[srcKey].coeffs_x;
           MatrixXd coeffs_y = splineMap[srcKey].coeffs_y;
 
-          MatrixXd* spl_coords = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
-        
+          VectorXd* kappa = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
+            if (kappa == nullptr) {
+                cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
+            }
+            
 
-          delete spl_coords;
-        //   calcHeadCurv(coeffs_x, coeffs_y);
+            double vel_rl = sampling_map[__vx][i] * min_vel_race;
+            double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
+            
+            bool removeFlag = false;
+
+            for (int j = 0; j < kappa->size(); ++j) {
+                double kappa_val = abs((*kappa)(j));
+                cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
+                // if (kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) {
+                //     removeFlag = true;
+                //     break; // 더 볼 필요 없음, 바로 탈출
+                // }
+                if (kappa_val > 1.9) {
+                removeFlag = true;
+                break; // 더 볼 필요 없음, 바로 탈출
+            }
+            }
+
+            if (removeFlag) {
+                edgeList.removeEdge(start, child);
+                auto it = splineMap.find(srcKey);
+                if (it != splineMap.end()) {
+                    splineMap.erase(it);
+                }
+                cout << "remove!" << endl;
+            }
+
+            delete kappa;
+            kappa = nullptr;
+
+          
+        //   if (abs((*kappa)(i)) <= 1 / veh_turn && abs((*kappa)(i)) <= 1 / min_turn) {
+        //     delete kappa;
+        //     kappa = nullptr;
+        //     continue;
+        //   }
+        //   else {
+        //     edgeList.removeEdge(start, child);
+        //     auto it = splineMap.find(srcKey);
+        //     if (it != splineMap.end()) {
+        //         splineMap.erase(it);
+        //     }
+        //     cout << "remove!" << endl;
+        //     delete kappa;
+        //     kappa = nullptr;
+        //   }
         }
       }
+      cout << "node loop!" << endl;
     }
+    cout << "the end" << endl;
+
 }
 

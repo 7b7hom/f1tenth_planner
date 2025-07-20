@@ -22,6 +22,7 @@
 #define __kappa " kappa_racetraj_radpm"
 #define __s_racetraj " s_racetraj_m"
 #define __psi " psi_racetraj_rad"
+#define __vx " vx_racetraj_mps"
 
 #define __x_raceline "x_raceline"
 #define __y_raceline "y_raceline"
@@ -82,7 +83,7 @@ public:
     void printGraph();
     void getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx);
     void getParentNode(IPair& srcNodeIdx, IPairVector& parent);
-    void removeEdge(IPair& srcNodeIdx, IPairVector& parent);
+    void removeEdge(IPair& srcNodeIdx, IPair& delNodeIdx);
 };
 
 extern DMap gtpl_map;
@@ -112,4 +113,7 @@ void genEdges(NodeMap &nodesPerLayer,
               const float lat_resolution,
               const float curve_thr,
               const int max_lat_steps,
-              const float stepsize_approx);
+              const float stepsize_approx,
+              const float min_vel_race,
+              const float max_lateral_accel,
+              const float veh_turn);

@@ -388,11 +388,14 @@ int main() {
              params.LAT_RESOLUTION,
              params.CURVE_THR,
              params.MAX_LAT_STEPS,
-             params.STEPSIZE_APPROX);
+             params.STEPSIZE_APPROX,
+             params.MIN_VEL_RACE,
+             params.MAX_LATERAL_ACCEL,
+             params.VEH_TURN);
 
     // printSplineMapVerbose(splineMap, nodesPerLayer);
     // edgeList.printGraph();
-    
+    cout << "hi2222222" << endl;
     // visual process 
     visual(edgeList, nodesPerLayer, splineMap);
 

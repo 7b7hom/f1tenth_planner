@@ -49,10 +49,8 @@ void Graph::getParentNode(IPair &srcNodeIdx, IPairVector &parent) {
         }
     }
 
-// parent와 연결된 노드 리스트에서 delNodeIdx를 삭제한다.
-void Graph::removeEdge(IPair& delNodeIdx, IPairVector& parent) {
-    for (size_t i = 0; i < parent.size(); ++i) {
-        adjLists[parent[i]].erase(remove(adjLists[parent[i]].begin(), adjLists[parent[i]].end(), delNodeIdx), 
-                                        adjLists[parent[i]].end());
-    }
+// adjLists[srcNodeIdx]에서 delNodeIdx만 제거
+void Graph::removeEdge(IPair& srcNodeIdx, IPair& delNodeIdx) {
+    IPairVector& neighbors = adjLists[srcNodeIdx];
+    neighbors.erase(remove(neighbors.begin(), neighbors.end(), delNodeIdx), neighbors.end());
 }
