@@ -1,0 +1,3748 @@
+[PASS] SPLINE OK: max_kappa=0.270162, min_kappa=0.0124309, limit=4.28571
+SPLINE PASSED!!!! from (0,0) to (1,0)
+
+[PASS] SPLINE OK: max_kappa=0.522929, min_kappa=0.0365938, limit=4.28571
+SPLINE PASSED!!!! from (0,0) to (1,1)
+
+[PASS] SPLINE OK: max_kappa=0.754161, min_kappa=0.0371339, limit=4.28571
+SPLINE PASSED!!!! from (0,0) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.955273, min_kappa=0.0360788, limit=4.28571
+SPLINE PASSED!!!! from (0,0) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.0330666, min_kappa=0.0290496, limit=4.28571
+SPLINE PASSED!!!! from (0,1) to (1,0)
+
+[PASS] SPLINE OK: max_kappa=0.296545, min_kappa=0.0167746, limit=4.28571
+SPLINE PASSED!!!! from (0,1) to (1,1)
+
+[PASS] SPLINE OK: max_kappa=0.549536, min_kappa=0.0370694, limit=4.28571
+SPLINE PASSED!!!! from (0,1) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.780422, min_kappa=0.0374221, limit=4.28571
+SPLINE PASSED!!!! from (0,1) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.980656, min_kappa=0.0361866, limit=4.28571
+SPLINE PASSED!!!! from (0,1) to (1,4)
+
+[PASS] SPLINE OK: max_kappa=0.256868, min_kappa=0.0189471, limit=4.28571
+SPLINE PASSED!!!! from (0,2) to (1,0)
+
+[PASS] SPLINE OK: max_kappa=0.0587736, min_kappa=0.00486167, limit=4.28571
+SPLINE PASSED!!!! from (0,2) to (1,1)
+
+[PASS] SPLINE OK: max_kappa=0.322996, min_kappa=0.0211162, limit=4.28571
+SPLINE PASSED!!!! from (0,2) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.576182, min_kappa=0.0375275, limit=4.28571
+SPLINE PASSED!!!! from (0,2) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.806691, min_kappa=0.0376908, limit=4.28571
+SPLINE PASSED!!!! from (0,2) to (1,4)
+
+[PASS] SPLINE OK: max_kappa=0.991067, min_kappa=0.0332153, limit=4.28571
+SPLINE PASSED!!!! from (0,2) to (1,5)
+
+[PASS] SPLINE OK: max_kappa=0.47157, min_kappa=0.0217086, limit=4.28571
+SPLINE PASSED!!!! from (0,3) to (1,0)
+
+[PASS] SPLINE OK: max_kappa=0.233866, min_kappa=0.0134832, limit=4.28571
+SPLINE PASSED!!!! from (0,3) to (1,1)
+
+[PASS] SPLINE OK: max_kappa=0.0845691, min_kappa=0.00135675, limit=4.28571
+SPLINE PASSED!!!! from (0,3) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.349511, min_kappa=0.0254534, limit=4.28571
+SPLINE PASSED!!!! from (0,3) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.602865, min_kappa=0.0379678, limit=4.28571
+SPLINE PASSED!!!! from (0,3) to (1,4)
+
+[PASS] SPLINE OK: max_kappa=0.816792, min_kappa=0.0344034, limit=4.28571
+SPLINE PASSED!!!! from (0,3) to (1,5)
+
+[PASS] SPLINE OK: max_kappa=0.449977, min_kappa=0.0225217, limit=4.28571
+SPLINE PASSED!!!! from (0,4) to (1,1)
+
+[PASS] SPLINE OK: max_kappa=0.210757, min_kappa=0.00797956, limit=4.28571
+SPLINE PASSED!!!! from (0,4) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.110451, min_kappa=0.00244964, limit=4.28571
+SPLINE PASSED!!!! from (0,4) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.376089, min_kappa=0.0297838, limit=4.28571
+SPLINE PASSED!!!! from (0,4) to (1,4)
+
+[PASS] SPLINE OK: max_kappa=0.612404, min_kappa=0.0344152, limit=4.28571
+SPLINE PASSED!!!! from (0,4) to (1,5)
+
+[PASS] SPLINE OK: max_kappa=0.428275, min_kappa=0.023339, limit=4.28571
+SPLINE PASSED!!!! from (0,5) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.187543, min_kappa=0.00243891, limit=4.28571
+SPLINE PASSED!!!! from (0,5) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.136417, min_kappa=0.00685477, limit=4.28571
+SPLINE PASSED!!!! from (0,5) to (1,4)
+
+[PASS] SPLINE OK: max_kappa=0.384844, min_kappa=0.0330119, limit=4.28571
+SPLINE PASSED!!!! from (0,5) to (1,5)
+
+[PASS] SPLINE OK: max_kappa=0.638325, min_kappa=0.0214793, limit=4.28571
+SPLINE PASSED!!!! from (0,6) to (1,2)
+
+[PASS] SPLINE OK: max_kappa=0.421234, min_kappa=0.0277243, limit=4.28571
+SPLINE PASSED!!!! from (0,6) to (1,3)
+
+[PASS] SPLINE OK: max_kappa=0.179503, min_kappa=0.00465087, limit=4.28571
+SPLINE PASSED!!!! from (0,6) to (1,4)
+
+[PASS] SPLINE OK: max_kappa=0.136519, min_kappa=0.00680101, limit=4.28571
+SPLINE PASSED!!!! from (0,6) to (1,5)
+
+[PASS] SPLINE OK: max_kappa=0.305614, min_kappa=0.0136538, limit=4.28571
+SPLINE PASSED!!!! from (1,0) to (2,0)
+
+[PASS] SPLINE OK: max_kappa=2.16909, min_kappa=0.0904434, limit=4.28571
+SPLINE PASSED!!!! from (1,0) to (2,1)
+
+[PASS] SPLINE OK: max_kappa=2.16635, min_kappa=0.0209099, limit=4.28571
+SPLINE PASSED!!!! from (1,1) to (2,0)
+
+[PASS] SPLINE OK: max_kappa=0.106807, min_kappa=0.0728152, limit=4.28571
+SPLINE PASSED!!!! from (1,1) to (2,1)
+
+[PASS] SPLINE OK: max_kappa=2.37415, min_kappa=0.129297, limit=4.28571
+SPLINE PASSED!!!! from (1,1) to (2,2)
+
+[PASS] SPLINE OK: max_kappa=1.93097, min_kappa=0.0636909, limit=4.28571
+SPLINE PASSED!!!! from (1,2) to (2,1)
+
+[PASS] SPLINE OK: max_kappa=0.362098, min_kappa=0.00413008, limit=4.28571
+SPLINE PASSED!!!! from (1,2) to (2,2)
+
+[PASS] SPLINE OK: max_kappa=2.56863, min_kappa=0.164295, limit=4.28571
+SPLINE PASSED!!!! from (1,2) to (2,3)
+
+[PASS] SPLINE OK: max_kappa=1.70285, min_kappa=0.107595, limit=4.28571
+SPLINE PASSED!!!! from (1,3) to (2,2)
+
+[PASS] SPLINE OK: max_kappa=0.640967, min_kappa=0.0026979, limit=4.28571
+SPLINE PASSED!!!! from (1,3) to (2,3)
+
+[PASS] SPLINE OK: max_kappa=2.75243, min_kappa=0.19542, limit=4.28571
+SPLINE PASSED!!!! from (1,3) to (2,4)
+
+[PASS] SPLINE OK: max_kappa=1.48183, min_kappa=0.102684, limit=4.28571
+SPLINE PASSED!!!! from (1,4) to (2,3)
+
+[PASS] SPLINE OK: max_kappa=0.909144, min_kappa=0.0410082, limit=4.28571
+SPLINE PASSED!!!! from (1,4) to (2,4)
+
+[PASS] SPLINE OK: max_kappa=2.71922, min_kappa=0.181948, limit=4.28571
+SPLINE PASSED!!!! from (1,4) to (2,5)
+
+[PASS] SPLINE OK: max_kappa=1.31438, min_kappa=0.00636724, limit=4.28571
+SPLINE PASSED!!!! from (1,5) to (2,4)
+
+[PASS] SPLINE OK: max_kappa=0.905387, min_kappa=0.0443202, limit=4.28571
+SPLINE PASSED!!!! from (1,5) to (2,5)
+
+[PASS] SPLINE OK: max_kappa=1.34517, min_kappa=0.0459847, limit=4.28571
+SPLINE PASSED!!!! from (2,0) to (3,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4504,1.67989), kappa=4.48099, max_allowed=4.28571
+SPLINE REJECTED from (2,0) to (3,1)
+
+[PASS] SPLINE OK: max_kappa=1.76404, min_kappa=0.0301369, limit=4.28571
+SPLINE PASSED!!!! from (2,1) to (3,0)
+
+[PASS] SPLINE OK: max_kappa=2.22422, min_kappa=0.162038, limit=4.28571
+SPLINE PASSED!!!! from (2,1) to (3,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4076,2.29319), kappa=-4.57299, max_allowed=4.28571
+SPLINE REJECTED from (2,1) to (3,2)
+
+[PASS] SPLINE OK: max_kappa=0.882732, min_kappa=0.0616351, limit=4.28571
+SPLINE PASSED!!!! from (2,2) to (3,1)
+
+[PASS] SPLINE OK: max_kappa=3.01213, min_kappa=0.244699, limit=4.28571
+SPLINE PASSED!!!! from (2,2) to (3,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.6076,2.29417), kappa=-4.94404, max_allowed=4.28571
+SPLINE REJECTED from (2,2) to (3,3)
+
+[PASS] SPLINE OK: max_kappa=0.317632, min_kappa=0.11549, limit=4.28571
+SPLINE PASSED!!!! from (2,3) to (3,2)
+
+[PASS] SPLINE OK: max_kappa=3.70197, min_kappa=0.258206, limit=4.28571
+SPLINE PASSED!!!! from (2,3) to (3,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.8076,2.29516), kappa=-4.9504, max_allowed=4.28571
+SPLINE REJECTED from (2,3) to (3,4)
+
+[PASS] SPLINE OK: max_kappa=1.25312, min_kappa=0.0434607, limit=4.28571
+SPLINE PASSED!!!! from (2,4) to (3,3)
+
+[PASS] SPLINE OK: max_kappa=3.6997, min_kappa=0.241847, limit=4.28571
+SPLINE PASSED!!!! from (2,4) to (3,4)
+
+[PASS] SPLINE OK: max_kappa=3.82794, min_kappa=0.177824, limit=4.28571
+SPLINE PASSED!!!! from (2,4) to (3,5)
+
+[PASS] SPLINE OK: max_kappa=1.2641, min_kappa=0.0612236, limit=4.28571
+SPLINE PASSED!!!! from (2,5) to (3,4)
+
+[PASS] SPLINE OK: max_kappa=1.88781, min_kappa=0.0492855, limit=4.28571
+SPLINE PASSED!!!! from (2,5) to (3,5)
+
+[PASS] SPLINE OK: max_kappa=0.846882, min_kappa=0.00596559, limit=4.28571
+SPLINE PASSED!!!! from (3,0) to (4,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.3824,1.18516), kappa=4.35815, max_allowed=4.28571
+SPLINE REJECTED from (3,0) to (4,1)
+
+[PASS] SPLINE OK: max_kappa=4.0489, min_kappa=0.172247, limit=4.28571
+SPLINE PASSED!!!! from (3,1) to (4,0)
+
+[PASS] SPLINE OK: max_kappa=1.7707, min_kappa=0.0125099, limit=4.28571
+SPLINE PASSED!!!! from (3,1) to (4,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4504,1.67989), kappa=-5.04425, max_allowed=4.28571
+SPLINE REJECTED from (3,1) to (4,2)
+
+[PASS] SPLINE OK: max_kappa=1.46009, min_kappa=0.0712077, limit=4.28571
+SPLINE PASSED!!!! from (3,2) to (4,1)
+
+[PASS] SPLINE OK: max_kappa=3.86509, min_kappa=0.127539, limit=4.28571
+SPLINE PASSED!!!! from (3,2) to (4,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.6494,1.66005), kappa=-5.29079, max_allowed=4.28571
+SPLINE REJECTED from (3,2) to (4,3)
+
+[PASS] SPLINE OK: max_kappa=1.18871, min_kappa=0.00752472, limit=4.28571
+SPLINE PASSED!!!! from (3,3) to (4,2)
+
+[PASS] SPLINE OK: max_kappa=3.99365, min_kappa=0.24741, limit=4.28571
+SPLINE PASSED!!!! from (3,3) to (4,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.8484,1.64021), kappa=-4.67959, max_allowed=4.28571
+SPLINE REJECTED from (3,3) to (4,4)
+
+[PASS] SPLINE OK: max_kappa=1.25796, min_kappa=0.0610616, limit=4.28571
+SPLINE PASSED!!!! from (3,4) to (4,3)
+
+[PASS] SPLINE OK: max_kappa=2.44935, min_kappa=0.0764932, limit=4.28571
+SPLINE PASSED!!!! from (3,4) to (4,4)
+
+[PASS] SPLINE OK: max_kappa=3.58845, min_kappa=0.20025, limit=4.28571
+SPLINE PASSED!!!! from (3,4) to (4,5)
+
+[PASS] SPLINE OK: max_kappa=2.3202, min_kappa=0.105718, limit=4.28571
+SPLINE PASSED!!!! from (3,5) to (4,4)
+
+[PASS] SPLINE OK: max_kappa=0.775952, min_kappa=0.011455, limit=4.28571
+SPLINE PASSED!!!! from (3,5) to (4,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.3742,0.580389), kappa=5.14138, max_allowed=4.28571
+SPLINE REJECTED from (4,0) to (5,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.1776,1.18853), kappa=-4.31542, max_allowed=4.28571
+SPLINE REJECTED from (4,0) to (5,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.3597,0.515252), kappa=5.32381, max_allowed=4.28571
+SPLINE REJECTED from (4,1) to (5,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.369,1.13055), kappa=-4.92793, max_allowed=4.28571
+SPLINE REJECTED from (4,1) to (5,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.369,1.13055), kappa=-4.99862, max_allowed=4.28571
+SPLINE REJECTED from (4,1) to (5,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.5604,1.07257), kappa=-4.92929, max_allowed=4.28571
+SPLINE REJECTED from (4,2) to (5,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.5604,1.07257), kappa=-5.45556, max_allowed=4.28571
+SPLINE REJECTED from (4,2) to (5,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.5604,1.07257), kappa=-5.35976, max_allowed=4.28571
+SPLINE REJECTED from (4,2) to (5,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.7519,1.01459), kappa=-4.4223, max_allowed=4.28571
+SPLINE REJECTED from (4,3) to (5,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.7519,1.01459), kappa=-4.98252, max_allowed=4.28571
+SPLINE REJECTED from (4,3) to (5,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.7519,1.01459), kappa=-5.00177, max_allowed=4.28571
+SPLINE REJECTED from (4,3) to (5,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.8458,0.134635), kappa=4.46207, max_allowed=4.28571
+SPLINE REJECTED from (4,4) to (5,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-14.0055,0.00847553), kappa=6.06526, max_allowed=4.28571
+SPLINE REJECTED from (4,4) to (5,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-14.1963,-0.038343), kappa=4.76428, max_allowed=4.28571
+SPLINE REJECTED from (4,4) to (5,5)
+
+[PASS] SPLINE OK: max_kappa=3.68153, min_kappa=0.0364344, limit=4.28571
+SPLINE PASSED!!!! from (4,5) to (5,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-14.1703,-0.122211), kappa=5.06809, max_allowed=4.28571
+SPLINE REJECTED from (4,5) to (5,5)
+
+REJECTED (OUT OF BOUNDS): Spline from -12.9517,0.433925 is out of bounds.
+SPLINE REJECTED from (5,0) to (6,0)
+
+[PASS] SPLINE OK: max_kappa=2.93877, min_kappa=0.00588082, limit=4.28571
+SPLINE PASSED!!!! from (5,0) to (6,1)
+
+REJECTED (OUT OF BOUNDS): Spline from -12.9293,0.409222 is out of bounds.
+SPLINE REJECTED from (5,1) to (6,0)
+
+[PASS] SPLINE OK: max_kappa=3.2435, min_kappa=0.228572, limit=4.28571
+SPLINE PASSED!!!! from (5,1) to (6,1)
+
+[PASS] SPLINE OK: max_kappa=2.40378, min_kappa=0.112553, limit=4.28571
+SPLINE PASSED!!!! from (5,1) to (6,2)
+
+[PASS] SPLINE OK: max_kappa=3.13549, min_kappa=0.134889, limit=4.28571
+SPLINE PASSED!!!! from (5,2) to (6,1)
+
+[PASS] SPLINE OK: max_kappa=2.75481, min_kappa=0.0306207, limit=4.28571
+SPLINE PASSED!!!! from (5,2) to (6,2)
+
+[PASS] SPLINE OK: max_kappa=1.62144, min_kappa=0.0408276, limit=4.28571
+SPLINE PASSED!!!! from (5,2) to (6,3)
+
+[PASS] SPLINE OK: max_kappa=2.78799, min_kappa=0.0146989, limit=4.28571
+SPLINE PASSED!!!! from (5,3) to (6,2)
+
+[PASS] SPLINE OK: max_kappa=2.04567, min_kappa=0.0205459, limit=4.28571
+SPLINE PASSED!!!! from (5,3) to (6,3)
+
+[PASS] SPLINE OK: max_kappa=0.570215, min_kappa=0.0188925, limit=4.28571
+SPLINE PASSED!!!! from (5,3) to (6,4)
+
+[PASS] SPLINE OK: max_kappa=2.22172, min_kappa=0.0564723, limit=4.28571
+SPLINE PASSED!!!! from (5,4) to (6,3)
+
+[PASS] SPLINE OK: max_kappa=0.985163, min_kappa=0.0540752, limit=4.28571
+SPLINE PASSED!!!! from (5,4) to (6,4)
+
+[PASS] SPLINE OK: max_kappa=0.915023, min_kappa=0.0217509, limit=4.28571
+SPLINE PASSED!!!! from (5,4) to (6,5)
+
+[PASS] SPLINE OK: max_kappa=2.21313, min_kappa=0.0774918, limit=4.28571
+SPLINE PASSED!!!! from (5,5) to (6,3)
+
+[PASS] SPLINE OK: max_kappa=1.18164, min_kappa=0.0467669, limit=4.28571
+SPLINE PASSED!!!! from (5,5) to (6,4)
+
+[PASS] SPLINE OK: max_kappa=0.340168, min_kappa=0.155391, limit=4.28571
+SPLINE PASSED!!!! from (5,5) to (6,5)
+
+[PASS] SPLINE OK: max_kappa=1.48622, min_kappa=0.0347845, limit=4.28571
+SPLINE PASSED!!!! from (6,0) to (7,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.5363,0.505196), kappa=-4.57275, max_allowed=4.28571
+SPLINE REJECTED from (6,0) to (7,1)
+
+[PASS] SPLINE OK: max_kappa=4.07349, min_kappa=0.264149, limit=4.28571
+SPLINE PASSED!!!! from (6,1) to (7,0)
+
+[PASS] SPLINE OK: max_kappa=0.37618, min_kappa=0.0880209, limit=4.28571
+SPLINE PASSED!!!! from (6,1) to (7,1)
+
+[PASS] SPLINE OK: max_kappa=2.84287, min_kappa=0.098122, limit=4.28571
+SPLINE PASSED!!!! from (6,1) to (7,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.6514,0.122102), kappa=4.86645, max_allowed=4.28571
+SPLINE REJECTED from (6,2) to (7,1)
+
+[PASS] SPLINE OK: max_kappa=1.92497, min_kappa=0.13138, limit=4.28571
+SPLINE PASSED!!!! from (6,2) to (7,2)
+
+[PASS] SPLINE OK: max_kappa=1.50421, min_kappa=0.083322, limit=4.28571
+SPLINE PASSED!!!! from (6,2) to (7,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.7089,-0.0694455), kappa=4.55729, max_allowed=4.28571
+SPLINE REJECTED from (6,3) to (7,2)
+
+[PASS] SPLINE OK: max_kappa=2.00501, min_kappa=0.00587604, limit=4.28571
+SPLINE PASSED!!!! from (6,3) to (7,3)
+
+[PASS] SPLINE OK: max_kappa=1.21976, min_kappa=0.0591985, limit=4.28571
+SPLINE PASSED!!!! from (6,3) to (7,4)
+
+[PASS] SPLINE OK: max_kappa=3.15695, min_kappa=0.0359457, limit=4.28571
+SPLINE PASSED!!!! from (6,4) to (7,3)
+
+[PASS] SPLINE OK: max_kappa=0.585835, min_kappa=0.0449157, limit=4.28571
+SPLINE PASSED!!!! from (6,4) to (7,4)
+
+[PASS] SPLINE OK: max_kappa=2.83245, min_kappa=0.227263, limit=4.28571
+SPLINE PASSED!!!! from (6,4) to (7,5)
+
+[PASS] SPLINE OK: max_kappa=2.17914, min_kappa=0.00654491, limit=4.28571
+SPLINE PASSED!!!! from (6,5) to (7,4)
+
+[PASS] SPLINE OK: max_kappa=1.50405, min_kappa=0.0510156, limit=4.28571
+SPLINE PASSED!!!! from (6,5) to (7,5)
+
+[PASS] SPLINE OK: max_kappa=1.13027, min_kappa=0.0400107, limit=4.28571
+SPLINE PASSED!!!! from (7,0) to (8,0)
+
+[PASS] SPLINE OK: max_kappa=2.65161, min_kappa=0.151055, limit=4.28571
+SPLINE PASSED!!!! from (7,0) to (8,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.0661,0.176948), kappa=4.53283, max_allowed=4.28571
+SPLINE REJECTED from (7,1) to (8,0)
+
+[PASS] SPLINE OK: max_kappa=1.55808, min_kappa=0.0133296, limit=4.28571
+SPLINE PASSED!!!! from (7,1) to (8,1)
+
+[PASS] SPLINE OK: max_kappa=2.17766, min_kappa=0.172395, limit=4.28571
+SPLINE PASSED!!!! from (7,1) to (8,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.0799,-0.0225742), kappa=4.70349, max_allowed=4.28571
+SPLINE REJECTED from (7,2) to (8,1)
+
+[PASS] SPLINE OK: max_kappa=1.95724, min_kappa=0.0120275, limit=4.28571
+SPLINE PASSED!!!! from (7,2) to (8,2)
+
+[PASS] SPLINE OK: max_kappa=1.72852, min_kappa=0.0309911, limit=4.28571
+SPLINE PASSED!!!! from (7,2) to (8,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.0937,-0.222096), kappa=4.85825, max_allowed=4.28571
+SPLINE REJECTED from (7,3) to (8,2)
+
+[PASS] SPLINE OK: max_kappa=2.32846, min_kappa=0.0360292, limit=4.28571
+SPLINE PASSED!!!! from (7,3) to (8,3)
+
+[PASS] SPLINE OK: max_kappa=1.30271, min_kappa=0.0863413, limit=4.28571
+SPLINE PASSED!!!! from (7,3) to (8,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.1076,-0.421618), kappa=4.75212, max_allowed=4.28571
+SPLINE REJECTED from (7,4) to (8,3)
+
+[PASS] SPLINE OK: max_kappa=2.33607, min_kappa=0.0905444, limit=4.28571
+SPLINE PASSED!!!! from (7,4) to (8,4)
+
+[PASS] SPLINE OK: max_kappa=1.20809, min_kappa=0.0588769, limit=4.28571
+SPLINE PASSED!!!! from (7,4) to (8,5)
+
+[PASS] SPLINE OK: max_kappa=3.57457, min_kappa=0.0427988, limit=4.28571
+SPLINE PASSED!!!! from (7,5) to (8,4)
+
+[PASS] SPLINE OK: max_kappa=0.940945, min_kappa=0.0589793, limit=4.28571
+SPLINE PASSED!!!! from (7,5) to (8,5)
+
+[PASS] SPLINE OK: max_kappa=0.99242, min_kappa=0.0364811, limit=4.28571
+SPLINE PASSED!!!! from (8,0) to (9,0)
+
+[PASS] SPLINE OK: max_kappa=3.06369, min_kappa=0.0281519, limit=4.28571
+SPLINE PASSED!!!! from (8,0) to (9,1)
+
+[PASS] SPLINE OK: max_kappa=1.78365, min_kappa=0.0663185, limit=4.28571
+SPLINE PASSED!!!! from (8,1) to (9,0)
+
+[PASS] SPLINE OK: max_kappa=0.926196, min_kappa=0.0725922, limit=4.28571
+SPLINE PASSED!!!! from (8,1) to (9,1)
+
+[PASS] SPLINE OK: max_kappa=2.98962, min_kappa=0.0549578, limit=4.28571
+SPLINE PASSED!!!! from (8,1) to (9,2)
+
+[PASS] SPLINE OK: max_kappa=1.89874, min_kappa=0.0992809, limit=4.28571
+SPLINE PASSED!!!! from (8,2) to (9,1)
+
+[PASS] SPLINE OK: max_kappa=0.860554, min_kappa=0.0401636, limit=4.28571
+SPLINE PASSED!!!! from (8,2) to (9,2)
+
+[PASS] SPLINE OK: max_kappa=2.91614, min_kappa=0.0824193, limit=4.28571
+SPLINE PASSED!!!! from (8,2) to (9,3)
+
+[PASS] SPLINE OK: max_kappa=2.0121, min_kappa=0.131397, limit=4.28571
+SPLINE PASSED!!!! from (8,3) to (9,2)
+
+[PASS] SPLINE OK: max_kappa=0.795534, min_kappa=0.015636, limit=4.28571
+SPLINE PASSED!!!! from (8,3) to (9,3)
+
+[PASS] SPLINE OK: max_kappa=2.84327, min_kappa=0.110492, limit=4.28571
+SPLINE PASSED!!!! from (8,3) to (9,4)
+
+[PASS] SPLINE OK: max_kappa=2.12369, min_kappa=0.162629, limit=4.28571
+SPLINE PASSED!!!! from (8,4) to (9,3)
+
+[PASS] SPLINE OK: max_kappa=0.731176, min_kappa=0.0375924, limit=4.28571
+SPLINE PASSED!!!! from (8,4) to (9,4)
+
+[PASS] SPLINE OK: max_kappa=2.76293, min_kappa=0.137413, limit=4.28571
+SPLINE PASSED!!!! from (8,4) to (9,5)
+
+[PASS] SPLINE OK: max_kappa=2.10702, min_kappa=0.164482, limit=4.28571
+SPLINE PASSED!!!! from (8,5) to (9,4)
+
+[PASS] SPLINE OK: max_kappa=0.724628, min_kappa=0.0358574, limit=4.28571
+SPLINE PASSED!!!! from (8,5) to (9,5)
+
+[PASS] SPLINE OK: max_kappa=0.0146254, min_kappa=0.000445444, limit=4.28571
+SPLINE PASSED!!!! from (9,0) to (10,0)
+
+[PASS] SPLINE OK: max_kappa=0.249383, min_kappa=0.0045926, limit=4.28571
+SPLINE PASSED!!!! from (9,0) to (10,1)
+
+[PASS] SPLINE OK: max_kappa=0.497878, min_kappa=0.00675119, limit=4.28571
+SPLINE PASSED!!!! from (9,0) to (10,2)
+
+[PASS] SPLINE OK: max_kappa=0.723886, min_kappa=0.00834166, limit=4.28571
+SPLINE PASSED!!!! from (9,0) to (10,3)
+
+[PASS] SPLINE OK: max_kappa=0.260881, min_kappa=0.00125961, limit=4.28571
+SPLINE PASSED!!!! from (9,1) to (10,0)
+
+[PASS] SPLINE OK: max_kappa=0.0062975, min_kappa=0.00151106, limit=4.28571
+SPLINE PASSED!!!! from (9,1) to (10,1)
+
+[PASS] SPLINE OK: max_kappa=0.262619, min_kappa=0.00639575, limit=4.28571
+SPLINE PASSED!!!! from (9,1) to (10,2)
+
+[PASS] SPLINE OK: max_kappa=0.511987, min_kappa=0.00844217, limit=4.28571
+SPLINE PASSED!!!! from (9,1) to (10,3)
+
+[PASS] SPLINE OK: max_kappa=0.738436, min_kappa=0.00986283, limit=4.28571
+SPLINE PASSED!!!! from (9,1) to (10,4)
+
+[PASS] SPLINE OK: max_kappa=0.496158, min_kappa=0.000465741, limit=4.28571
+SPLINE PASSED!!!! from (9,2) to (10,0)
+
+[PASS] SPLINE OK: max_kappa=0.253903, min_kappa=0.00306307, limit=4.28571
+SPLINE PASSED!!!! from (9,2) to (10,1)
+
+[PASS] SPLINE OK: max_kappa=0.0135784, min_kappa=0.000509254, limit=4.28571
+SPLINE PASSED!!!! from (9,2) to (10,2)
+
+[PASS] SPLINE OK: max_kappa=0.275918, min_kappa=0.00820296, limit=4.28571
+SPLINE PASSED!!!! from (9,2) to (10,3)
+
+[PASS] SPLINE OK: max_kappa=0.526154, min_kappa=0.0101314, limit=4.28571
+SPLINE PASSED!!!! from (9,2) to (10,4)
+
+[PASS] SPLINE OK: max_kappa=0.743534, min_kappa=0.00921357, limit=4.28571
+SPLINE PASSED!!!! from (9,2) to (10,5)
+
+[PASS] SPLINE OK: max_kappa=0.710601, min_kappa=0.000235286, limit=4.28571
+SPLINE PASSED!!!! from (9,3) to (10,0)
+
+[PASS] SPLINE OK: max_kappa=0.490516, min_kappa=0.00216776, limit=4.28571
+SPLINE PASSED!!!! from (9,3) to (10,1)
+
+[PASS] SPLINE OK: max_kappa=0.246892, min_kappa=0.00488014, limit=4.28571
+SPLINE PASSED!!!! from (9,3) to (10,2)
+
+[PASS] SPLINE OK: max_kappa=0.0257093, min_kappa=0.000368971, limit=4.28571
+SPLINE PASSED!!!! from (9,3) to (10,3)
+
+[PASS] SPLINE OK: max_kappa=0.289281, min_kappa=0.0100139, limit=4.28571
+SPLINE PASSED!!!! from (9,3) to (10,4)
+
+[PASS] SPLINE OK: max_kappa=0.530336, min_kappa=0.00942304, limit=4.28571
+SPLINE PASSED!!!! from (9,3) to (10,5)
+
+[PASS] SPLINE OK: max_kappa=0.705689, min_kappa=0.00131582, limit=4.28571
+SPLINE PASSED!!!! from (9,4) to (10,1)
+
+[PASS] SPLINE OK: max_kappa=0.484851, min_kappa=0.00388585, limit=4.28571
+SPLINE PASSED!!!! from (9,4) to (10,2)
+
+[PASS] SPLINE OK: max_kappa=0.239846, min_kappa=0.00671066, limit=4.28571
+SPLINE PASSED!!!! from (9,4) to (10,3)
+
+[PASS] SPLINE OK: max_kappa=0.037904, min_kappa=0.00189473, limit=4.28571
+SPLINE PASSED!!!! from (9,4) to (10,4)
+
+[PASS] SPLINE OK: max_kappa=0.292294, min_kappa=0.00926413, limit=4.28571
+SPLINE PASSED!!!! from (9,4) to (10,5)
+
+[PASS] SPLINE OK: max_kappa=0.70412, min_kappa=0.00354841, limit=4.28571
+SPLINE PASSED!!!! from (9,5) to (10,2)
+
+[PASS] SPLINE OK: max_kappa=0.482193, min_kappa=0.0063502, limit=4.28571
+SPLINE PASSED!!!! from (9,5) to (10,3)
+
+[PASS] SPLINE OK: max_kappa=0.235897, min_kappa=0.00932988, limit=4.28571
+SPLINE PASSED!!!! from (9,5) to (10,4)
+
+[PASS] SPLINE OK: max_kappa=0.0380052, min_kappa=0.00189974, limit=4.28571
+SPLINE PASSED!!!! from (9,5) to (10,5)
+
+[PASS] SPLINE OK: max_kappa=0.0957069, min_kappa=0.00858901, limit=4.28571
+SPLINE PASSED!!!! from (10,0) to (11,0)
+
+[PASS] SPLINE OK: max_kappa=0.169746, min_kappa=0.00434124, limit=4.28571
+SPLINE PASSED!!!! from (10,0) to (11,1)
+
+[PASS] SPLINE OK: max_kappa=0.411306, min_kappa=4.58377e-05, limit=4.28571
+SPLINE PASSED!!!! from (10,0) to (11,2)
+
+[PASS] SPLINE OK: max_kappa=0.643651, min_kappa=0.00389923, limit=4.28571
+SPLINE PASSED!!!! from (10,0) to (11,3)
+
+[PASS] SPLINE OK: max_kappa=0.324919, min_kappa=0.0109672, limit=4.28571
+SPLINE PASSED!!!! from (10,1) to (11,0)
+
+[PASS] SPLINE OK: max_kappa=0.0731344, min_kappa=0.0063155, limit=4.28571
+SPLINE PASSED!!!! from (10,1) to (11,1)
+
+[PASS] SPLINE OK: max_kappa=0.189063, min_kappa=0.00247868, limit=4.28571
+SPLINE PASSED!!!! from (10,1) to (11,2)
+
+[PASS] SPLINE OK: max_kappa=0.434363, min_kappa=0.00181628, limit=4.28571
+SPLINE PASSED!!!! from (10,1) to (11,3)
+
+[PASS] SPLINE OK: max_kappa=0.666259, min_kappa=0.00549832, limit=4.28571
+SPLINE PASSED!!!! from (10,1) to (11,4)
+
+[PASS] SPLINE OK: max_kappa=0.539175, min_kappa=0.0125887, limit=4.28571
+SPLINE PASSED!!!! from (10,2) to (11,0)
+
+[PASS] SPLINE OK: max_kappa=0.303157, min_kappa=0.0091947, limit=4.28571
+SPLINE PASSED!!!! from (10,2) to (11,1)
+
+[PASS] SPLINE OK: max_kappa=0.050508, min_kappa=0.00403503, limit=4.28571
+SPLINE PASSED!!!! from (10,2) to (11,2)
+
+[PASS] SPLINE OK: max_kappa=0.208413, min_kappa=0.000619349, limit=4.28571
+SPLINE PASSED!!!! from (10,2) to (11,3)
+
+[PASS] SPLINE OK: max_kappa=0.457424, min_kappa=0.00357275, limit=4.28571
+SPLINE PASSED!!!! from (10,2) to (11,4)
+
+[PASS] SPLINE OK: max_kappa=0.67245, min_kappa=0.00328404, limit=4.28571
+SPLINE PASSED!!!! from (10,2) to (11,5)
+
+[PASS] SPLINE OK: max_kappa=0.730222, min_kappa=0.0135616, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,0)
+
+[PASS] SPLINE OK: max_kappa=0.518521, min_kappa=0.0109623, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,1)
+
+[PASS] SPLINE OK: max_kappa=0.281322, min_kappa=0.00740505, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,2)
+
+[PASS] SPLINE OK: max_kappa=0.0278302, min_kappa=0.00174837, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,3)
+
+[PASS] SPLINE OK: max_kappa=0.230273, min_kappa=0.00123544, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,4)
+
+[PASS] SPLINE OK: max_kappa=0.463314, min_kappa=0.00117419, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,5)
+
+[PASS] SPLINE OK: max_kappa=0.634298, min_kappa=0.0178867, limit=4.28571
+SPLINE PASSED!!!! from (10,3) to (11,6)
+
+[PASS] SPLINE OK: max_kappa=0.710882, min_kappa=0.0121202, limit=4.28571
+SPLINE PASSED!!!! from (10,4) to (11,1)
+
+[PASS] SPLINE OK: max_kappa=0.497778, min_kappa=0.00931179, limit=4.28571
+SPLINE PASSED!!!! from (10,4) to (11,2)
+
+[PASS] SPLINE OK: max_kappa=0.259416, min_kappa=0.00559934, limit=4.28571
+SPLINE PASSED!!!! from (10,4) to (11,3)
+
+[PASS] SPLINE OK: max_kappa=0.00510323, min_kappa=0.000216234, limit=4.28571
+SPLINE PASSED!!!! from (10,4) to (11,4)
+
+[PASS] SPLINE OK: max_kappa=0.238333, min_kappa=0.0012849, limit=4.28571
+SPLINE PASSED!!!! from (10,4) to (11,5)
+
+[PASS] SPLINE OK: max_kappa=0.428834, min_kappa=0.0217449, limit=4.28571
+SPLINE PASSED!!!! from (10,4) to (11,6)
+
+[PASS] SPLINE OK: max_kappa=0.696325, min_kappa=0.00848855, limit=4.28571
+SPLINE PASSED!!!! from (10,5) to (11,2)
+
+[PASS] SPLINE OK: max_kappa=0.481945, min_kappa=0.00527461, limit=4.28571
+SPLINE PASSED!!!! from (10,5) to (11,3)
+
+[PASS] SPLINE OK: max_kappa=0.242519, min_kappa=0.0012747, limit=4.28571
+SPLINE PASSED!!!! from (10,5) to (11,4)
+
+[PASS] SPLINE OK: max_kappa=0.00521976, min_kappa=0.000260986, limit=4.28571
+SPLINE PASSED!!!! from (10,5) to (11,5)
+
+[PASS] SPLINE OK: max_kappa=0.195479, min_kappa=0.0116096, limit=4.28571
+SPLINE PASSED!!!! from (10,5) to (11,6)
+
+[PASS] SPLINE OK: max_kappa=0.095579, min_kappa=0.00618229, limit=4.28571
+SPLINE PASSED!!!! from (11,0) to (12,0)
+
+[PASS] SPLINE OK: max_kappa=0.163298, min_kappa=0.00629174, limit=4.28571
+SPLINE PASSED!!!! from (11,0) to (12,1)
+
+[PASS] SPLINE OK: max_kappa=0.402344, min_kappa=0.006159, limit=4.28571
+SPLINE PASSED!!!! from (11,0) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.623138, min_kappa=0.00581661, limit=4.28571
+SPLINE PASSED!!!! from (11,0) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.318694, min_kappa=0.00165215, limit=4.28571
+SPLINE PASSED!!!! from (11,1) to (12,0)
+
+[PASS] SPLINE OK: max_kappa=0.0772532, min_kappa=0.00184686, limit=4.28571
+SPLINE PASSED!!!! from (11,1) to (12,1)
+
+[PASS] SPLINE OK: max_kappa=0.172634, min_kappa=0.00197462, limit=4.28571
+SPLINE PASSED!!!! from (11,1) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.411299, min_kappa=0.00202165, limit=4.28571
+SPLINE PASSED!!!! from (11,1) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.631679, min_kappa=0.00198928, limit=4.28571
+SPLINE PASSED!!!! from (11,1) to (12,4)
+
+[PASS] SPLINE OK: max_kappa=0.53166, min_kappa=0.00251533, limit=4.28571
+SPLINE PASSED!!!! from (11,2) to (12,0)
+
+[PASS] SPLINE OK: max_kappa=0.305516, min_kappa=0.00255122, limit=4.28571
+SPLINE PASSED!!!! from (11,2) to (12,1)
+
+[PASS] SPLINE OK: max_kappa=0.0639199, min_kappa=0.00248817, limit=4.28571
+SPLINE PASSED!!!! from (11,2) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.18662, min_kappa=0.00232722, limit=4.28571
+SPLINE PASSED!!!! from (11,2) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.424455, min_kappa=0.0020875, limit=4.28571
+SPLINE PASSED!!!! from (11,2) to (12,4)
+
+[PASS] SPLINE OK: max_kappa=0.643601, min_kappa=0.0019237, limit=4.28571
+SPLINE PASSED!!!! from (11,2) to (12,5)
+
+[PASS] SPLINE OK: max_kappa=0.723587, min_kappa=0.0059928, limit=4.28571
+SPLINE PASSED!!!! from (11,3) to (12,0)
+
+[PASS] SPLINE OK: max_kappa=0.521714, min_kappa=0.00647178, limit=4.28571
+SPLINE PASSED!!!! from (11,3) to (12,1)
+
+[PASS] SPLINE OK: max_kappa=0.295671, min_kappa=0.00676732, limit=4.28571
+SPLINE PASSED!!!! from (11,3) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.0542939, min_kappa=0.00266939, limit=4.28571
+SPLINE PASSED!!!! from (11,3) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.204522, min_kappa=0.00661219, limit=4.28571
+SPLINE PASSED!!!! from (11,3) to (12,4)
+
+[PASS] SPLINE OK: max_kappa=0.441345, min_kappa=0.00630077, limit=4.28571
+SPLINE PASSED!!!! from (11,3) to (12,5)
+
+[PASS] SPLINE OK: max_kappa=0.713674, min_kappa=0.00962342, limit=4.28571
+SPLINE PASSED!!!! from (11,4) to (12,1)
+
+[PASS] SPLINE OK: max_kappa=0.51178, min_kappa=0.0104524, limit=4.28571
+SPLINE PASSED!!!! from (11,4) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.28584, min_kappa=0.0109946, limit=4.28571
+SPLINE PASSED!!!! from (11,4) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.0446813, min_kappa=0.00225671, limit=4.28571
+SPLINE PASSED!!!! from (11,4) to (12,4)
+
+[PASS] SPLINE OK: max_kappa=0.222099, min_kappa=0.0110186, limit=4.28571
+SPLINE PASSED!!!! from (11,4) to (12,5)
+
+[PASS] SPLINE OK: max_kappa=0.712324, min_kappa=0.00950397, limit=4.28571
+SPLINE PASSED!!!! from (11,5) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.510602, min_kappa=0.0103194, limit=4.28571
+SPLINE PASSED!!!! from (11,5) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.284898, min_kappa=0.0108516, limit=4.28571
+SPLINE PASSED!!!! from (11,5) to (12,4)
+
+[PASS] SPLINE OK: max_kappa=0.0445863, min_kappa=0.00222842, limit=4.28571
+SPLINE PASSED!!!! from (11,5) to (12,5)
+
+[PASS] SPLINE OK: max_kappa=0.938599, min_kappa=0.00737431, limit=4.28571
+SPLINE PASSED!!!! from (11,6) to (12,2)
+
+[PASS] SPLINE OK: max_kappa=0.769956, min_kappa=0.0084913, limit=4.28571
+SPLINE PASSED!!!! from (11,6) to (12,3)
+
+[PASS] SPLINE OK: max_kappa=0.571298, min_kappa=0.00952839, limit=4.28571
+SPLINE PASSED!!!! from (11,6) to (12,4)
+
+[PASS] SPLINE OK: max_kappa=0.348259, min_kappa=0.0102234, limit=4.28571
+SPLINE PASSED!!!! from (11,6) to (12,5)
+
+[PASS] SPLINE OK: max_kappa=0.0150208, min_kappa=0.000453723, limit=4.28571
+SPLINE PASSED!!!! from (12,0) to (13,0)
+
+[PASS] SPLINE OK: max_kappa=0.243907, min_kappa=0.00550103, limit=4.28571
+SPLINE PASSED!!!! from (12,0) to (13,1)
+
+[PASS] SPLINE OK: max_kappa=0.483204, min_kappa=0.00772546, limit=4.28571
+SPLINE PASSED!!!! from (12,0) to (13,2)
+
+[PASS] SPLINE OK: max_kappa=0.698073, min_kappa=0.0093729, limit=4.28571
+SPLINE PASSED!!!! from (12,0) to (13,3)
+
+[PASS] SPLINE OK: max_kappa=0.273085, min_kappa=0.0029582, limit=4.28571
+SPLINE PASSED!!!! from (12,1) to (13,0)
+
+[PASS] SPLINE OK: max_kappa=0.0255771, min_kappa=0.00177304, limit=4.28571
+SPLINE PASSED!!!! from (12,1) to (13,1)
+
+[PASS] SPLINE OK: max_kappa=0.237965, min_kappa=0.00830744, limit=4.28571
+SPLINE PASSED!!!! from (12,1) to (13,2)
+
+[PASS] SPLINE OK: max_kappa=0.47631, min_kappa=0.010386, limit=4.28571
+SPLINE PASSED!!!! from (12,1) to (13,3)
+
+[PASS] SPLINE OK: max_kappa=0.690458, min_kappa=0.0118191, limit=4.28571
+SPLINE PASSED!!!! from (12,1) to (13,4)
+
+[PASS] SPLINE OK: max_kappa=0.516762, min_kappa=0.00291363, limit=4.28571
+SPLINE PASSED!!!! from (12,2) to (13,0)
+
+[PASS] SPLINE OK: max_kappa=0.282362, min_kappa=0.0057463, limit=4.28571
+SPLINE PASSED!!!! from (12,2) to (13,1)
+
+[PASS] SPLINE OK: max_kappa=0.0360857, min_kappa=0.00241246, limit=4.28571
+SPLINE PASSED!!!! from (12,2) to (13,2)
+
+[PASS] SPLINE OK: max_kappa=0.232052, min_kappa=0.0111061, limit=4.28571
+SPLINE PASSED!!!! from (12,2) to (13,3)
+
+[PASS] SPLINE OK: max_kappa=0.469451, min_kappa=0.0130451, limit=4.28571
+SPLINE PASSED!!!! from (12,2) to (13,4)
+
+[PASS] SPLINE OK: max_kappa=0.68809, min_kappa=0.0119229, limit=4.28571
+SPLINE PASSED!!!! from (12,2) to (13,5)
+
+[PASS] SPLINE OK: max_kappa=0.735436, min_kappa=0.00276625, limit=4.28571
+SPLINE PASSED!!!! from (12,3) to (13,0)
+
+[PASS] SPLINE OK: max_kappa=0.524666, min_kappa=0.00552952, limit=4.28571
+SPLINE PASSED!!!! from (12,3) to (13,1)
+
+[PASS] SPLINE OK: max_kappa=0.291592, min_kappa=0.00851647, limit=4.28571
+SPLINE PASSED!!!! from (12,3) to (13,2)
+
+[PASS] SPLINE OK: max_kappa=0.0465465, min_kappa=0.00262987, limit=4.28571
+SPLINE PASSED!!!! from (12,3) to (13,3)
+
+[PASS] SPLINE OK: max_kappa=0.226168, min_kappa=0.0138967, limit=4.28571
+SPLINE PASSED!!!! from (12,3) to (13,4)
+
+[PASS] SPLINE OK: max_kappa=0.467937, min_kappa=0.0131539, limit=4.28571
+SPLINE PASSED!!!! from (12,3) to (13,5)
+
+[PASS] SPLINE OK: max_kappa=0.741991, min_kappa=0.00513785, limit=4.28571
+SPLINE PASSED!!!! from (12,4) to (13,1)
+
+[PASS] SPLINE OK: max_kappa=0.532525, min_kappa=0.00812514, limit=4.28571
+SPLINE PASSED!!!! from (12,4) to (13,2)
+
+[PASS] SPLINE OK: max_kappa=0.300775, min_kappa=0.0112685, limit=4.28571
+SPLINE PASSED!!!! from (12,4) to (13,3)
+
+[PASS] SPLINE OK: max_kappa=0.0569596, min_kappa=0.002846, limit=4.28571
+SPLINE PASSED!!!! from (12,4) to (13,4)
+
+[PASS] SPLINE OK: max_kappa=0.225686, min_kappa=0.0140084, limit=4.28571
+SPLINE PASSED!!!! from (12,4) to (13,5)
+
+[PASS] SPLINE OK: max_kappa=0.748783, min_kappa=0.00736724, limit=4.28571
+SPLINE PASSED!!!! from (12,5) to (13,2)
+
+[PASS] SPLINE OK: max_kappa=0.540623, min_kappa=0.0105669, limit=4.28571
+SPLINE PASSED!!!! from (12,5) to (13,3)
+
+[PASS] SPLINE OK: max_kappa=0.310198, min_kappa=0.0138609, limit=4.28571
+SPLINE PASSED!!!! from (12,5) to (13,4)
+
+[PASS] SPLINE OK: max_kappa=0.0568345, min_kappa=0.00283995, limit=4.28571
+SPLINE PASSED!!!! from (12,5) to (13,5)
+
+[PASS] SPLINE OK: max_kappa=0.0636273, min_kappa=3.59834e-05, limit=4.28571
+SPLINE PASSED!!!! from (13,0) to (14,0)
+
+[PASS] SPLINE OK: max_kappa=0.296184, min_kappa=0.00342467, limit=4.28571
+SPLINE PASSED!!!! from (13,0) to (14,1)
+
+[PASS] SPLINE OK: max_kappa=0.512714, min_kappa=0.00639749, limit=4.28571
+SPLINE PASSED!!!! from (13,0) to (14,2)
+
+[PASS] SPLINE OK: max_kappa=0.704904, min_kappa=0.00873756, limit=4.28571
+SPLINE PASSED!!!! from (13,0) to (14,3)
+
+[PASS] SPLINE OK: max_kappa=0.191542, min_kappa=0.00257803, limit=4.28571
+SPLINE PASSED!!!! from (13,1) to (14,0)
+
+[PASS] SPLINE OK: max_kappa=0.0459799, min_kappa=0.00089263, limit=4.28571
+SPLINE PASSED!!!! from (13,1) to (14,1)
+
+[PASS] SPLINE OK: max_kappa=0.278492, min_kappa=0.00426523, limit=4.28571
+SPLINE PASSED!!!! from (13,1) to (14,2)
+
+[PASS] SPLINE OK: max_kappa=0.49526, min_kappa=0.00720888, limit=4.28571
+SPLINE PASSED!!!! from (13,1) to (14,3)
+
+[PASS] SPLINE OK: max_kappa=0.687943, min_kappa=0.00950957, limit=4.28571
+SPLINE PASSED!!!! from (13,1) to (14,4)
+
+[PASS] SPLINE OK: max_kappa=0.439182, min_kappa=0.0049466, limit=4.28571
+SPLINE PASSED!!!! from (13,2) to (14,0)
+
+[PASS] SPLINE OK: max_kappa=0.208835, min_kappa=0.00172411, limit=4.28571
+SPLINE PASSED!!!! from (13,2) to (14,1)
+
+[PASS] SPLINE OK: max_kappa=0.0283528, min_kappa=0.00174879, limit=4.28571
+SPLINE PASSED!!!! from (13,2) to (14,2)
+
+[PASS] SPLINE OK: max_kappa=0.260811, min_kappa=0.00510841, limit=4.28571
+SPLINE PASSED!!!! from (13,2) to (14,3)
+
+[PASS] SPLINE OK: max_kappa=0.477808, min_kappa=0.00802566, limit=4.28571
+SPLINE PASSED!!!! from (13,2) to (14,4)
+
+[PASS] SPLINE OK: max_kappa=0.677632, min_kappa=0.00732339, limit=4.28571
+SPLINE PASSED!!!! from (13,2) to (14,5)
+
+[PASS] SPLINE OK: max_kappa=0.667963, min_kappa=0.00682823, limit=4.28571
+SPLINE PASSED!!!! from (13,3) to (14,0)
+
+[PASS] SPLINE OK: max_kappa=0.455855, min_kappa=0.00411752, limit=4.28571
+SPLINE PASSED!!!! from (13,3) to (14,1)
+
+[PASS] SPLINE OK: max_kappa=0.2261, min_kappa=0.000874233, limit=4.28571
+SPLINE PASSED!!!! from (13,3) to (14,2)
+
+[PASS] SPLINE OK: max_kappa=0.0107464, min_kappa=0.000652873, limit=4.28571
+SPLINE PASSED!!!! from (13,3) to (14,3)
+
+[PASS] SPLINE OK: max_kappa=0.243143, min_kappa=0.00595377, limit=4.28571
+SPLINE PASSED!!!! from (13,3) to (14,4)
+
+[PASS] SPLINE OK: max_kappa=0.467167, min_kappa=0.00561204, limit=4.28571
+SPLINE PASSED!!!! from (13,3) to (14,5)
+
+[PASS] SPLINE OK: max_kappa=0.683806, min_kappa=0.00604337, limit=4.28571
+SPLINE PASSED!!!! from (13,4) to (14,1)
+
+[PASS] SPLINE OK: max_kappa=0.472493, min_kappa=0.00329561, limit=4.28571
+SPLINE PASSED!!!! from (13,4) to (14,2)
+
+[PASS] SPLINE OK: max_kappa=0.243336, min_kappa=2.8822e-05, limit=4.28571
+SPLINE PASSED!!!! from (13,4) to (14,3)
+
+[PASS] SPLINE OK: max_kappa=0.0137546, min_kappa=0.000660684, limit=4.28571
+SPLINE PASSED!!!! from (13,4) to (14,4)
+
+[PASS] SPLINE OK: max_kappa=0.232403, min_kappa=0.00338212, limit=4.28571
+SPLINE PASSED!!!! from (13,4) to (14,5)
+
+[PASS] SPLINE OK: max_kappa=0.689881, min_kappa=0.00302173, limit=4.28571
+SPLINE PASSED!!!! from (13,5) to (14,2)
+
+[PASS] SPLINE OK: max_kappa=0.478911, min_kappa=2.73292e-05, limit=4.28571
+SPLINE PASSED!!!! from (13,5) to (14,3)
+
+[PASS] SPLINE OK: max_kappa=0.256909, min_kappa=0.0034006, limit=4.28571
+SPLINE PASSED!!!! from (13,5) to (14,4)
+
+[PASS] SPLINE OK: max_kappa=0.0138232, min_kappa=0.000691134, limit=4.28571
+SPLINE PASSED!!!! from (13,5) to (14,5)
+
+[PASS] SPLINE OK: max_kappa=0.0830676, min_kappa=7.82562e-05, limit=4.28571
+SPLINE PASSED!!!! from (14,0) to (15,0)
+
+[PASS] SPLINE OK: max_kappa=0.32038, min_kappa=0.00168809, limit=4.28571
+SPLINE PASSED!!!! from (14,0) to (15,1)
+
+[PASS] SPLINE OK: max_kappa=0.542493, min_kappa=0.00322982, limit=4.28571
+SPLINE PASSED!!!! from (14,0) to (15,2)
+
+[PASS] SPLINE OK: max_kappa=0.740472, min_kappa=0.00442901, limit=4.28571
+SPLINE PASSED!!!! from (14,0) to (15,3)
+
+[PASS] SPLINE OK: max_kappa=0.177058, min_kappa=0.00355748, limit=4.28571
+SPLINE PASSED!!!! from (14,1) to (15,0)
+
+[PASS] SPLINE OK: max_kappa=0.0691728, min_kappa=0.00175891, limit=4.28571
+SPLINE PASSED!!!! from (14,1) to (15,1)
+
+[PASS] SPLINE OK: max_kappa=0.304362, min_kappa=6.46051e-05, limit=4.28571
+SPLINE PASSED!!!! from (14,1) to (15,2)
+
+[PASS] SPLINE OK: max_kappa=0.527875, min_kappa=0.00172095, limit=4.28571
+SPLINE PASSED!!!! from (14,1) to (15,3)
+
+[PASS] SPLINE OK: max_kappa=0.727303, min_kappa=0.00307293, limit=4.28571
+SPLINE PASSED!!!! from (14,1) to (15,4)
+
+[PASS] SPLINE OK: max_kappa=0.430795, min_kappa=0.00672081, limit=4.28571
+SPLINE PASSED!!!! from (14,2) to (15,0)
+
+[PASS] SPLINE OK: max_kappa=0.195344, min_kappa=0.00522832, limit=4.28571
+SPLINE PASSED!!!! from (14,2) to (15,1)
+
+[PASS] SPLINE OK: max_kappa=0.0552199, min_kappa=0.00344816, limit=4.28571
+SPLINE PASSED!!!! from (14,2) to (15,2)
+
+[PASS] SPLINE OK: max_kappa=0.291424, min_kappa=0.0015733, limit=4.28571
+SPLINE PASSED!!!! from (14,2) to (15,3)
+
+[PASS] SPLINE OK: max_kappa=0.513174, min_kappa=0.000193605, limit=4.28571
+SPLINE PASSED!!!! from (14,2) to (15,4)
+
+[PASS] SPLINE OK: max_kappa=0.717555, min_kappa=0.000175826, limit=4.28571
+SPLINE PASSED!!!! from (14,2) to (15,5)
+
+[PASS] SPLINE OK: max_kappa=0.666392, min_kappa=0.00923186, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,0)
+
+[PASS] SPLINE OK: max_kappa=0.449715, min_kappa=0.00829993, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,1)
+
+[PASS] SPLINE OK: max_kappa=0.213696, min_kappa=0.00690018, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,2)
+
+[PASS] SPLINE OK: max_kappa=0.0412088, min_kappa=0.00206552, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,3)
+
+[PASS] SPLINE OK: max_kappa=0.278561, min_kappa=0.00322513, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,4)
+
+[PASS] SPLINE OK: max_kappa=0.508109, min_kappa=0.00302767, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,5)
+
+[PASS] SPLINE OK: max_kappa=0.752099, min_kappa=0.011587, limit=4.28571
+SPLINE PASSED!!!! from (14,3) to (15,6)
+
+[PASS] SPLINE OK: max_kappa=0.685489, min_kappa=0.0106539, limit=4.28571
+SPLINE PASSED!!!! from (14,4) to (15,1)
+
+[PASS] SPLINE OK: max_kappa=0.468686, min_kappa=0.00987242, limit=4.28571
+SPLINE PASSED!!!! from (14,4) to (15,2)
+
+[PASS] SPLINE OK: max_kappa=0.232111, min_kappa=0.00857237, limit=4.28571
+SPLINE PASSED!!!! from (14,4) to (15,3)
+
+[PASS] SPLINE OK: max_kappa=0.0271392, min_kappa=0.00126447, limit=4.28571
+SPLINE PASSED!!!! from (14,4) to (15,4)
+
+[PASS] SPLINE OK: max_kappa=0.27289, min_kappa=0.00667992, limit=4.28571
+SPLINE PASSED!!!! from (14,4) to (15,5)
+
+[PASS] SPLINE OK: max_kappa=0.544444, min_kappa=0.0160599, limit=4.28571
+SPLINE PASSED!!!! from (14,4) to (15,6)
+
+[PASS] SPLINE OK: max_kappa=0.691614, min_kappa=0.00906688, limit=4.28571
+SPLINE PASSED!!!! from (14,5) to (15,2)
+
+[PASS] SPLINE OK: max_kappa=0.474054, min_kappa=0.00815316, limit=4.28571
+SPLINE PASSED!!!! from (14,5) to (15,3)
+
+[PASS] SPLINE OK: max_kappa=0.236542, min_kappa=0.00676811, limit=4.28571
+SPLINE PASSED!!!! from (14,5) to (15,4)
+
+[PASS] SPLINE OK: max_kappa=0.0274605, min_kappa=0.00137282, limit=4.28571
+SPLINE PASSED!!!! from (14,5) to (15,5)
+
+[PASS] SPLINE OK: max_kappa=0.316881, min_kappa=0.01719, limit=4.28571
+SPLINE PASSED!!!! from (14,5) to (15,6)
+
+[PASS] SPLINE OK: max_kappa=0.0559335, min_kappa=0.00330082, limit=4.28571
+SPLINE PASSED!!!! from (15,0) to (16,0)
+
+[PASS] SPLINE OK: max_kappa=0.284951, min_kappa=0.00278615, limit=4.28571
+SPLINE PASSED!!!! from (15,0) to (16,1)
+
+[PASS] SPLINE OK: max_kappa=0.50481, min_kappa=0.0022132, limit=4.28571
+SPLINE PASSED!!!! from (15,0) to (16,2)
+
+[PASS] SPLINE OK: max_kappa=0.706347, min_kappa=0.0016421, limit=4.28571
+SPLINE PASSED!!!! from (15,0) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.188897, min_kappa=0.00501815, limit=4.28571
+SPLINE PASSED!!!! from (15,1) to (16,0)
+
+[PASS] SPLINE OK: max_kappa=0.0507484, min_kappa=0.00457895, limit=4.28571
+SPLINE PASSED!!!! from (15,1) to (16,1)
+
+[PASS] SPLINE OK: max_kappa=0.281651, min_kappa=0.00409597, limit=4.28571
+SPLINE PASSED!!!! from (15,1) to (16,2)
+
+[PASS] SPLINE OK: max_kappa=0.503304, min_kappa=0.00344897, limit=4.28571
+SPLINE PASSED!!!! from (15,1) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.706402, min_kappa=0.00277014, limit=4.28571
+SPLINE PASSED!!!! from (15,1) to (16,4)
+
+[PASS] SPLINE OK: max_kappa=0.41853, min_kappa=0.00645505, limit=4.28571
+SPLINE PASSED!!!! from (15,2) to (16,0)
+
+[PASS] SPLINE OK: max_kappa=0.198611, min_kappa=0.00634375, limit=4.28571
+SPLINE PASSED!!!! from (15,2) to (16,1)
+
+[PASS] SPLINE OK: max_kappa=0.0455208, min_kappa=0.00191485, limit=4.28571
+SPLINE PASSED!!!! from (15,2) to (16,2)
+
+[PASS] SPLINE OK: max_kappa=0.278332, min_kappa=0.00541855, limit=4.28571
+SPLINE PASSED!!!! from (15,2) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.501801, min_kappa=0.0046977, limit=4.28571
+SPLINE PASSED!!!! from (15,2) to (16,4)
+
+[PASS] SPLINE OK: max_kappa=0.708145, min_kappa=0.00429341, limit=4.28571
+SPLINE PASSED!!!! from (15,2) to (16,5)
+
+[PASS] SPLINE OK: max_kappa=0.629909, min_kappa=0.00748833, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,0)
+
+[PASS] SPLINE OK: max_kappa=0.4298, min_kappa=0.00771472, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,1)
+
+[PASS] SPLINE OK: max_kappa=0.208407, min_kappa=0.00767775, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,2)
+
+[PASS] SPLINE OK: max_kappa=0.0402501, min_kappa=0.000771585, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.274993, min_kappa=0.00675395, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,4)
+
+[PASS] SPLINE OK: max_kappa=0.502058, min_kappa=0.00638085, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,5)
+
+[PASS] SPLINE OK: max_kappa=0.709531, min_kappa=0.00574215, limit=4.28571
+SPLINE PASSED!!!! from (15,3) to (16,6)
+
+[PASS] SPLINE OK: max_kappa=0.642313, min_kappa=0.0086398, limit=4.28571
+SPLINE PASSED!!!! from (15,4) to (16,1)
+
+[PASS] SPLINE OK: max_kappa=0.441163, min_kappa=0.00897913, limit=4.28571
+SPLINE PASSED!!!! from (15,4) to (16,2)
+
+[PASS] SPLINE OK: max_kappa=0.218287, min_kappa=0.00902013, limit=4.28571
+SPLINE PASSED!!!! from (15,4) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.0349357, min_kappa=0.0017606, limit=4.28571
+SPLINE PASSED!!!! from (15,4) to (16,4)
+
+[PASS] SPLINE OK: max_kappa=0.273453, min_kappa=0.00855107, limit=4.28571
+SPLINE PASSED!!!! from (15,4) to (16,5)
+
+[PASS] SPLINE OK: max_kappa=0.501922, min_kappa=0.00798219, limit=4.28571
+SPLINE PASSED!!!! from (15,4) to (16,6)
+
+[PASS] SPLINE OK: max_kappa=0.648232, min_kappa=0.00826664, limit=4.28571
+SPLINE PASSED!!!! from (15,5) to (16,2)
+
+[PASS] SPLINE OK: max_kappa=0.445701, min_kappa=0.0085788, limit=4.28571
+SPLINE PASSED!!!! from (15,5) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.221107, min_kappa=0.00860159, limit=4.28571
+SPLINE PASSED!!!! from (15,5) to (16,4)
+
+[PASS] SPLINE OK: max_kappa=0.0350391, min_kappa=0.00175152, limit=4.28571
+SPLINE PASSED!!!! from (15,5) to (16,5)
+
+[PASS] SPLINE OK: max_kappa=0.275095, min_kappa=0.0084804, limit=4.28571
+SPLINE PASSED!!!! from (15,5) to (16,6)
+
+[PASS] SPLINE OK: max_kappa=0.617627, min_kappa=0.00123596, limit=4.28571
+SPLINE PASSED!!!! from (15,6) to (16,3)
+
+[PASS] SPLINE OK: max_kappa=0.412829, min_kappa=0.0017768, limit=4.28571
+SPLINE PASSED!!!! from (15,6) to (16,4)
+
+[PASS] SPLINE OK: max_kappa=0.184472, min_kappa=0.00186956, limit=4.28571
+SPLINE PASSED!!!! from (15,6) to (16,5)
+
+REJECTED (OUT OF BOUNDS): Spline from 3.70322,-0.936288 is out of bounds.
+SPLINE REJECTED from (15,6) to (16,6)
+
+[PASS] SPLINE OK: max_kappa=0.242143, min_kappa=0.00116634, limit=4.28571
+SPLINE PASSED!!!! from (16,0) to (17,0)
+
+[PASS] SPLINE OK: max_kappa=0.0166488, min_kappa=0.00123293, limit=4.28571
+SPLINE PASSED!!!! from (16,0) to (17,1)
+
+[PASS] SPLINE OK: max_kappa=0.279979, min_kappa=0.00359378, limit=4.28571
+SPLINE PASSED!!!! from (16,0) to (17,2)
+
+[PASS] SPLINE OK: max_kappa=0.534544, min_kappa=0.00563209, limit=4.28571
+SPLINE PASSED!!!! from (16,0) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.476272, min_kappa=0.000662933, limit=4.28571
+SPLINE PASSED!!!! from (16,1) to (17,0)
+
+[PASS] SPLINE OK: max_kappa=0.237187, min_kappa=0.00166827, limit=4.28571
+SPLINE PASSED!!!! from (16,1) to (17,1)
+
+[PASS] SPLINE OK: max_kappa=0.0253511, min_kappa=0.000108192, limit=4.28571
+SPLINE PASSED!!!! from (16,1) to (17,2)
+
+[PASS] SPLINE OK: max_kappa=0.288883, min_kappa=0.00643932, limit=4.28571
+SPLINE PASSED!!!! from (16,1) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.543428, min_kappa=0.00830622, limit=4.28571
+SPLINE PASSED!!!! from (16,1) to (17,4)
+
+[PASS] SPLINE OK: max_kappa=0.685145, min_kappa=0.000207808, limit=4.28571
+SPLINE PASSED!!!! from (16,2) to (17,0)
+
+[PASS] SPLINE OK: max_kappa=0.472561, min_kappa=0.0020065, limit=4.28571
+SPLINE PASSED!!!! from (16,2) to (17,1)
+
+[PASS] SPLINE OK: max_kappa=0.234568, min_kappa=0.00450955, limit=4.28571
+SPLINE PASSED!!!! from (16,2) to (17,2)
+
+[PASS] SPLINE OK: max_kappa=0.0340622, min_kappa=0.00163531, limit=4.28571
+SPLINE PASSED!!!! from (16,2) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.29779, min_kappa=0.00928292, limit=4.28571
+SPLINE PASSED!!!! from (16,2) to (17,4)
+
+[PASS] SPLINE OK: max_kappa=0.552306, min_kappa=0.0109742, limit=4.28571
+SPLINE PASSED!!!! from (16,2) to (17,5)
+
+[PASS] SPLINE OK: max_kappa=0.86335, min_kappa=0.000166657, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,0)
+
+[PASS] SPLINE OK: max_kappa=0.682547, min_kappa=0.00222481, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,1)
+
+[PASS] SPLINE OK: max_kappa=0.470188, min_kappa=0.00468558, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,2)
+
+[PASS] SPLINE OK: max_kappa=0.231947, min_kappa=0.00735728, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.0427819, min_kappa=0.0031844, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,4)
+
+[PASS] SPLINE OK: max_kappa=0.306698, min_kappa=0.0121243, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,5)
+
+[PASS] SPLINE OK: max_kappa=0.551855, min_kappa=0.0114205, limit=4.28571
+SPLINE PASSED!!!! from (16,3) to (17,6)
+
+[PASS] SPLINE OK: max_kappa=0.861317, min_kappa=0.0023249, limit=4.28571
+SPLINE PASSED!!!! from (16,4) to (17,1)
+
+[PASS] SPLINE OK: max_kappa=0.680369, min_kappa=0.00466892, limit=4.28571
+SPLINE PASSED!!!! from (16,4) to (17,2)
+
+[PASS] SPLINE OK: max_kappa=0.467812, min_kappa=0.0073741, limit=4.28571
+SPLINE PASSED!!!! from (16,4) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.229323, min_kappa=0.0102112, limit=4.28571
+SPLINE PASSED!!!! from (16,4) to (17,4)
+
+[PASS] SPLINE OK: max_kappa=0.05151, min_kappa=0.00259997, limit=4.28571
+SPLINE PASSED!!!! from (16,4) to (17,5)
+
+[PASS] SPLINE OK: max_kappa=0.305981, min_kappa=0.0125974, limit=4.28571
+SPLINE PASSED!!!! from (16,4) to (17,6)
+
+[PASS] SPLINE OK: max_kappa=0.857688, min_kappa=0.00414525, limit=4.28571
+SPLINE PASSED!!!! from (16,5) to (17,2)
+
+[PASS] SPLINE OK: max_kappa=0.676481, min_kappa=0.00672907, limit=4.28571
+SPLINE PASSED!!!! from (16,5) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.46363, min_kappa=0.00963724, limit=4.28571
+SPLINE PASSED!!!! from (16,5) to (17,4)
+
+[PASS] SPLINE OK: max_kappa=0.224829, min_kappa=0.0126086, limit=4.28571
+SPLINE PASSED!!!! from (16,5) to (17,5)
+
+[PASS] SPLINE OK: max_kappa=0.0514643, min_kappa=0.00257189, limit=4.28571
+SPLINE PASSED!!!! from (16,5) to (17,6)
+
+[PASS] SPLINE OK: max_kappa=0.854428, min_kappa=0.00605958, limit=4.28571
+SPLINE PASSED!!!! from (16,6) to (17,3)
+
+[PASS] SPLINE OK: max_kappa=0.672986, min_kappa=0.0088925, limit=4.28571
+SPLINE PASSED!!!! from (16,6) to (17,4)
+
+[PASS] SPLINE OK: max_kappa=0.459865, min_kappa=0.0120104, limit=4.28571
+SPLINE PASSED!!!! from (16,6) to (17,5)
+
+[PASS] SPLINE OK: max_kappa=0.225589, min_kappa=0.0127226, limit=4.28571
+SPLINE PASSED!!!! from (16,6) to (17,6)
+
+[PASS] SPLINE OK: max_kappa=2.87389, min_kappa=0.0673704, limit=4.28571
+SPLINE PASSED!!!! from (17,0) to (18,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (6.83418,0.438164), kappa=-4.54643, max_allowed=4.28571
+SPLINE REJECTED from (17,0) to (18,1)
+
+[PASS] SPLINE OK: max_kappa=0.0908795, min_kappa=0.0568878, limit=4.28571
+SPLINE PASSED!!!! from (17,1) to (18,0)
+
+[PASS] SPLINE OK: max_kappa=3.02459, min_kappa=0.104135, limit=4.28571
+SPLINE PASSED!!!! from (17,1) to (18,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (6.82329,0.238461), kappa=-4.57677, max_allowed=4.28571
+SPLINE REJECTED from (17,1) to (18,2)
+
+[PASS] SPLINE OK: max_kappa=0.307589, min_kappa=0.00971105, limit=4.28571
+SPLINE PASSED!!!! from (17,2) to (18,1)
+
+[PASS] SPLINE OK: max_kappa=3.16875, min_kappa=0.138183, limit=4.28571
+SPLINE PASSED!!!! from (17,2) to (18,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (6.81239,0.0387583), kappa=-4.60688, max_allowed=4.28571
+SPLINE REJECTED from (17,2) to (18,3)
+
+[PASS] SPLINE OK: max_kappa=0.550619, min_kappa=0.0141597, limit=4.28571
+SPLINE PASSED!!!! from (17,3) to (18,2)
+
+[PASS] SPLINE OK: max_kappa=3.30633, min_kappa=0.169527, limit=4.28571
+SPLINE PASSED!!!! from (17,3) to (18,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (6.80149,-0.160945), kappa=-4.63665, max_allowed=4.28571
+SPLINE REJECTED from (17,3) to (18,4)
+
+[PASS] SPLINE OK: max_kappa=0.785925, min_kappa=0.0172551, limit=4.28571
+SPLINE PASSED!!!! from (17,4) to (18,3)
+
+[PASS] SPLINE OK: max_kappa=3.43735, min_kappa=0.198196, limit=4.28571
+SPLINE PASSED!!!! from (17,4) to (18,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (6.7906,-0.360648), kappa=-4.57177, max_allowed=4.28571
+SPLINE REJECTED from (17,4) to (18,5)
+
+[PASS] SPLINE OK: max_kappa=1.01345, min_kappa=0.0473222, limit=4.28571
+SPLINE PASSED!!!! from (17,5) to (18,4)
+
+[PASS] SPLINE OK: max_kappa=3.38502, min_kappa=0.190004, limit=4.28571
+SPLINE PASSED!!!! from (17,5) to (18,5)
+
+[PASS] SPLINE OK: max_kappa=3.96743, min_kappa=0.0290102, limit=4.28571
+SPLINE PASSED!!!! from (17,5) to (18,6)
+
+[PASS] SPLINE OK: max_kappa=1.00674, min_kappa=0.0493784, limit=4.28571
+SPLINE PASSED!!!! from (17,6) to (18,5)
+
+[PASS] SPLINE OK: max_kappa=2.33573, min_kappa=0.0460971, limit=4.28571
+SPLINE PASSED!!!! from (17,6) to (18,6)
+
+[PASS] SPLINE OK: max_kappa=1.61574, min_kappa=0.0271772, limit=4.28571
+SPLINE PASSED!!!! from (18,0) to (19,0)
+
+[PASS] SPLINE OK: max_kappa=2.2802, min_kappa=0.17253, limit=4.28571
+SPLINE PASSED!!!! from (18,0) to (19,1)
+
+[PASS] SPLINE OK: max_kappa=3.71386, min_kappa=0.0199452, limit=4.28571
+SPLINE PASSED!!!! from (18,1) to (19,0)
+
+[PASS] SPLINE OK: max_kappa=0.974467, min_kappa=0.0436318, limit=4.28571
+SPLINE PASSED!!!! from (18,1) to (19,1)
+
+[PASS] SPLINE OK: max_kappa=2.86946, min_kappa=0.235399, limit=4.28571
+SPLINE PASSED!!!! from (18,1) to (19,2)
+
+[PASS] SPLINE OK: max_kappa=3.02574, min_kappa=0.048473, limit=4.28571
+SPLINE PASSED!!!! from (18,2) to (19,1)
+
+[PASS] SPLINE OK: max_kappa=0.370819, min_kappa=0.0686507, limit=4.28571
+SPLINE PASSED!!!! from (18,2) to (19,2)
+
+[PASS] SPLINE OK: max_kappa=3.40021, min_kappa=0.243919, limit=4.28571
+SPLINE PASSED!!!! from (18,2) to (19,3)
+
+[PASS] SPLINE OK: max_kappa=2.40529, min_kappa=0.126829, limit=4.28571
+SPLINE PASSED!!!! from (18,3) to (19,2)
+
+[PASS] SPLINE OK: max_kappa=0.812026, min_kappa=0.0036519, limit=4.28571
+SPLINE PASSED!!!! from (18,3) to (19,3)
+
+[PASS] SPLINE OK: max_kappa=3.87062, min_kappa=0.251687, limit=4.28571
+SPLINE PASSED!!!! from (18,3) to (19,4)
+
+[PASS] SPLINE OK: max_kappa=1.81169, min_kappa=0.0933395, limit=4.28571
+SPLINE PASSED!!!! from (18,4) to (19,3)
+
+[PASS] SPLINE OK: max_kappa=1.5012, min_kappa=0.0588966, limit=4.28571
+SPLINE PASSED!!!! from (18,4) to (19,4)
+
+[PASS] SPLINE OK: max_kappa=3.84379, min_kappa=0.276196, limit=4.28571
+SPLINE PASSED!!!! from (18,4) to (19,5)
+
+[PASS] SPLINE OK: max_kappa=1.43381, min_kappa=0.0808862, limit=4.28571
+SPLINE PASSED!!!! from (18,5) to (19,4)
+
+[PASS] SPLINE OK: max_kappa=1.49812, min_kappa=0.0716042, limit=4.28571
+SPLINE PASSED!!!! from (18,5) to (19,5)
+
+[PASS] SPLINE OK: max_kappa=1.90443, min_kappa=0.0821162, limit=4.28571
+SPLINE PASSED!!!! from (18,5) to (19,6)
+
+[PASS] SPLINE OK: max_kappa=2.34671, min_kappa=0.0889075, limit=4.28571
+SPLINE PASSED!!!! from (18,6) to (19,5)
+
+[PASS] SPLINE OK: max_kappa=1.61767, min_kappa=0.03977, limit=4.28571
+SPLINE PASSED!!!! from (18,6) to (19,6)
+
+[PASS] SPLINE OK: max_kappa=3.13534, min_kappa=0.0272843, limit=4.28571
+SPLINE PASSED!!!! from (19,0) to (20,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.0493,0.390568), kappa=-5.69865, max_allowed=4.28571
+SPLINE REJECTED from (19,0) to (20,1)
+
+[PASS] SPLINE OK: max_kappa=0.568872, min_kappa=0.0122883, limit=4.28571
+SPLINE PASSED!!!! from (19,1) to (20,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.06577,0.191247), kappa=-4.35068, max_allowed=4.28571
+SPLINE REJECTED from (19,1) to (20,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.06577,0.191247), kappa=-6.48782, max_allowed=4.28571
+SPLINE REJECTED from (19,1) to (20,2)
+
+[PASS] SPLINE OK: max_kappa=1.9852, min_kappa=0.122488, limit=4.28571
+SPLINE PASSED!!!! from (19,2) to (20,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.08223,-0.00807443), kappa=-5.45081, max_allowed=4.28571
+SPLINE REJECTED from (19,2) to (20,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.08223,-0.00807443), kappa=-6.43369, max_allowed=4.28571
+SPLINE REJECTED from (19,2) to (20,3)
+
+[PASS] SPLINE OK: max_kappa=4.03221, min_kappa=0.168144, limit=4.28571
+SPLINE PASSED!!!! from (19,3) to (20,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.09869,-0.207396), kappa=-5.53692, max_allowed=4.28571
+SPLINE REJECTED from (19,3) to (20,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.09869,-0.207396), kappa=-5.81313, max_allowed=4.28571
+SPLINE REJECTED from (19,3) to (20,4)
+
+[PASS] SPLINE OK: max_kappa=4.0929, min_kappa=0.274378, limit=4.28571
+SPLINE PASSED!!!! from (19,4) to (20,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.11516,-0.406717), kappa=-4.9798, max_allowed=4.28571
+SPLINE REJECTED from (19,4) to (20,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.11516,-0.406717), kappa=-5.19073, max_allowed=4.28571
+SPLINE REJECTED from (19,4) to (20,5)
+
+[PASS] SPLINE OK: max_kappa=2.77905, min_kappa=0.0378284, limit=4.28571
+SPLINE PASSED!!!! from (19,5) to (20,4)
+
+[PASS] SPLINE OK: max_kappa=4.04889, min_kappa=0.162641, limit=4.28571
+SPLINE PASSED!!!! from (19,5) to (20,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.13162,-0.606038), kappa=-4.37844, max_allowed=4.28571
+SPLINE REJECTED from (19,5) to (20,6)
+
+[PASS] SPLINE OK: max_kappa=0.50682, min_kappa=0.243572, limit=4.28571
+SPLINE PASSED!!!! from (19,6) to (20,5)
+
+[PASS] SPLINE OK: max_kappa=1.22018, min_kappa=0.0646835, limit=4.28571
+SPLINE PASSED!!!! from (19,6) to (20,6)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.03363,0.230892), kappa=4.87379, max_allowed=4.28571
+SPLINE REJECTED from (20,0) to (21,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.58448,0.276432), kappa=-4.55394, max_allowed=4.28571
+SPLINE REJECTED from (20,0) to (21,1)
+
+[PASS] SPLINE OK: max_kappa=3.22257, min_kappa=0.174555, limit=4.28571
+SPLINE PASSED!!!! from (20,1) to (21,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.63682,0.0834023), kappa=-4.36604, max_allowed=4.28571
+SPLINE REJECTED from (20,1) to (21,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.63682,0.0834023), kappa=-5.25211, max_allowed=4.28571
+SPLINE REJECTED from (20,1) to (21,2)
+
+[PASS] SPLINE OK: max_kappa=3.56213, min_kappa=0.144358, limit=4.28571
+SPLINE PASSED!!!! from (20,2) to (21,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.68916,-0.109627), kappa=-5.13814, max_allowed=4.28571
+SPLINE REJECTED from (20,2) to (21,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.68916,-0.109627), kappa=-5.61797, max_allowed=4.28571
+SPLINE REJECTED from (20,2) to (21,3)
+
+[PASS] SPLINE OK: max_kappa=3.32315, min_kappa=0.192857, limit=4.28571
+SPLINE PASSED!!!! from (20,3) to (21,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.7415,-0.302656), kappa=-4.46504, max_allowed=4.28571
+SPLINE REJECTED from (20,3) to (21,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.7415,-0.302656), kappa=-5.00624, max_allowed=4.28571
+SPLINE REJECTED from (20,3) to (21,4)
+
+[PASS] SPLINE OK: max_kappa=2.65148, min_kappa=0.0924495, limit=4.28571
+SPLINE PASSED!!!! from (20,4) to (21,3)
+
+[PASS] SPLINE OK: max_kappa=4.19564, min_kappa=0.15388, limit=4.28571
+SPLINE PASSED!!!! from (20,4) to (21,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.72679,-0.533867), kappa=5.62549, max_allowed=4.28571
+SPLINE REJECTED from (20,4) to (21,5)
+
+[PASS] SPLINE OK: max_kappa=2.1939, min_kappa=0.0152484, limit=4.28571
+SPLINE PASSED!!!! from (20,5) to (21,4)
+
+[PASS] SPLINE OK: max_kappa=3.4996, min_kappa=0.150989, limit=4.28571
+SPLINE PASSED!!!! from (20,5) to (21,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.86097,-0.694295), kappa=4.7649, max_allowed=4.28571
+SPLINE REJECTED from (20,5) to (21,6)
+
+[PASS] SPLINE OK: max_kappa=1.92097, min_kappa=0.48167, limit=4.28571
+SPLINE PASSED!!!! from (20,6) to (21,5)
+
+REJECTED (OUT OF BOUNDS): Spline from 9.24553,-0.873837 is out of bounds.
+SPLINE REJECTED from (20,6) to (21,6)
+
+REJECTED (OUT OF BOUNDS): Spline from 9.15308,-0.893903 is out of bounds.
+SPLINE REJECTED from (20,6) to (21,7)
+
+[PASS] SPLINE OK: max_kappa=1.72056, min_kappa=0.386214, limit=4.28571
+SPLINE PASSED!!!! from (21,0) to (22,0)
+
+[PASS] SPLINE OK: max_kappa=1.71451, min_kappa=0.0635141, limit=4.28571
+SPLINE PASSED!!!! from (21,0) to (22,1)
+
+[PASS] SPLINE OK: max_kappa=4.01172, min_kappa=0.0773733, limit=4.28571
+SPLINE PASSED!!!! from (21,1) to (22,0)
+
+[PASS] SPLINE OK: max_kappa=2.16952, min_kappa=0.0574822, limit=4.28571
+SPLINE PASSED!!!! from (21,1) to (22,1)
+
+[PASS] SPLINE OK: max_kappa=1.16144, min_kappa=0.0565952, limit=4.28571
+SPLINE PASSED!!!! from (21,1) to (22,2)
+
+[PASS] SPLINE OK: max_kappa=3.56164, min_kappa=0.133892, limit=4.28571
+SPLINE PASSED!!!! from (21,2) to (22,1)
+
+[PASS] SPLINE OK: max_kappa=1.37919, min_kappa=0.0565644, limit=4.28571
+SPLINE PASSED!!!! from (21,2) to (22,2)
+
+[PASS] SPLINE OK: max_kappa=1.61436, min_kappa=0.0645625, limit=4.28571
+SPLINE PASSED!!!! from (21,2) to (22,3)
+
+[PASS] SPLINE OK: max_kappa=2.53729, min_kappa=0.0676919, limit=4.28571
+SPLINE PASSED!!!! from (21,3) to (22,2)
+
+[PASS] SPLINE OK: max_kappa=0.506089, min_kappa=0.023312, limit=4.28571
+SPLINE PASSED!!!! from (21,3) to (22,3)
+
+[PASS] SPLINE OK: max_kappa=1.97663, min_kappa=0.0188576, limit=4.28571
+SPLINE PASSED!!!! from (21,3) to (22,4)
+
+[PASS] SPLINE OK: max_kappa=1.49156, min_kappa=0.125575, limit=4.28571
+SPLINE PASSED!!!! from (21,4) to (22,3)
+
+[PASS] SPLINE OK: max_kappa=0.71384, min_kappa=0.0164379, limit=4.28571
+SPLINE PASSED!!!! from (21,4) to (22,4)
+
+[PASS] SPLINE OK: max_kappa=2.25639, min_kappa=0.0211507, limit=4.28571
+SPLINE PASSED!!!! from (21,4) to (22,5)
+
+[PASS] SPLINE OK: max_kappa=0.680141, min_kappa=0.00585954, limit=4.28571
+SPLINE PASSED!!!! from (21,5) to (22,4)
+
+[PASS] SPLINE OK: max_kappa=1.27615, min_kappa=0.0804682, limit=4.28571
+SPLINE PASSED!!!! from (21,5) to (22,5)
+
+[PASS] SPLINE OK: max_kappa=2.4624, min_kappa=0.054545, limit=4.28571
+SPLINE PASSED!!!! from (21,5) to (22,6)
+
+[PASS] SPLINE OK: max_kappa=0.425839, min_kappa=0.0381354, limit=4.28571
+SPLINE PASSED!!!! from (21,6) to (22,5)
+
+[PASS] SPLINE OK: max_kappa=1.6989, min_kappa=0.034364, limit=4.28571
+SPLINE PASSED!!!! from (21,6) to (22,6)
+
+[PASS] SPLINE OK: max_kappa=1.41022, min_kappa=0.043605, limit=4.28571
+SPLINE PASSED!!!! from (21,7) to (22,4)
+
+[PASS] SPLINE OK: max_kappa=0.508973, min_kappa=0.0146817, limit=4.28571
+SPLINE PASSED!!!! from (21,7) to (22,5)
+
+[PASS] SPLINE OK: max_kappa=0.993037, min_kappa=0.0346601, limit=4.28571
+SPLINE PASSED!!!! from (21,7) to (22,6)
+
+[PASS] SPLINE OK: max_kappa=3.33102, min_kappa=0.273333, limit=4.28571
+SPLINE PASSED!!!! from (22,0) to (23,0)
+
+[PASS] SPLINE OK: max_kappa=0.965786, min_kappa=0.00301373, limit=4.28571
+SPLINE PASSED!!!! from (22,0) to (23,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.52837,0.685425), kappa=6.29139, max_allowed=4.28571
+SPLINE REJECTED from (22,1) to (23,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.52837,0.685425), kappa=5.01683, max_allowed=4.28571
+SPLINE REJECTED from (22,1) to (23,1)
+
+[PASS] SPLINE OK: max_kappa=1.9631, min_kappa=0.00731011, limit=4.28571
+SPLINE PASSED!!!! from (22,1) to (23,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.71926,0.62576), kappa=5.99718, max_allowed=4.28571
+SPLINE REJECTED from (22,2) to (23,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.71926,0.62576), kappa=4.7769, max_allowed=4.28571
+SPLINE REJECTED from (22,2) to (23,2)
+
+[PASS] SPLINE OK: max_kappa=2.12323, min_kappa=0.0410967, limit=4.28571
+SPLINE PASSED!!!! from (22,2) to (23,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.91015,0.566095), kappa=5.36159, max_allowed=4.28571
+SPLINE REJECTED from (22,3) to (23,2)
+
+[PASS] SPLINE OK: max_kappa=3.96507, min_kappa=0.126547, limit=4.28571
+SPLINE PASSED!!!! from (22,3) to (23,3)
+
+[PASS] SPLINE OK: max_kappa=1.25817, min_kappa=0.0409285, limit=4.28571
+SPLINE PASSED!!!! from (22,3) to (23,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (10.101,0.506429), kappa=4.68182, max_allowed=4.28571
+SPLINE REJECTED from (22,4) to (23,3)
+
+[PASS] SPLINE OK: max_kappa=2.99179, min_kappa=0.0155507, limit=4.28571
+SPLINE PASSED!!!! from (22,4) to (23,4)
+
+[PASS] SPLINE OK: max_kappa=0.786039, min_kappa=0.0189506, limit=4.28571
+SPLINE PASSED!!!! from (22,4) to (23,5)
+
+[PASS] SPLINE OK: max_kappa=3.98431, min_kappa=0.109149, limit=4.28571
+SPLINE PASSED!!!! from (22,5) to (23,4)
+
+[PASS] SPLINE OK: max_kappa=1.40715, min_kappa=0.108758, limit=4.28571
+SPLINE PASSED!!!! from (22,5) to (23,5)
+
+[PASS] SPLINE OK: max_kappa=2.23398, min_kappa=0.0337939, limit=4.28571
+SPLINE PASSED!!!! from (22,5) to (23,6)
+
+[PASS] SPLINE OK: max_kappa=2.41799, min_kappa=0.0451956, limit=4.28571
+SPLINE PASSED!!!! from (22,6) to (23,5)
+
+[PASS] SPLINE OK: max_kappa=0.469384, min_kappa=0.000163074, limit=4.28571
+SPLINE PASSED!!!! from (22,6) to (23,6)
+
+[PASS] SPLINE OK: max_kappa=0.390489, min_kappa=0.0262882, limit=4.28571
+SPLINE PASSED!!!! from (23,0) to (24,0)
+
+[PASS] SPLINE OK: max_kappa=2.75342, min_kappa=0.0497404, limit=4.28571
+SPLINE PASSED!!!! from (23,0) to (24,1)
+
+[PASS] SPLINE OK: max_kappa=3.68939, min_kappa=0.160164, limit=4.28571
+SPLINE PASSED!!!! from (23,1) to (24,0)
+
+[PASS] SPLINE OK: max_kappa=0.954909, min_kappa=0.0368673, limit=4.28571
+SPLINE PASSED!!!! from (23,1) to (24,1)
+
+[PASS] SPLINE OK: max_kappa=2.26063, min_kappa=0.13774, limit=4.28571
+SPLINE PASSED!!!! from (23,1) to (24,2)
+
+[PASS] SPLINE OK: max_kappa=3.99306, min_kappa=0.21377, limit=4.28571
+SPLINE PASSED!!!! from (23,2) to (24,1)
+
+[PASS] SPLINE OK: max_kappa=1.48307, min_kappa=0.039017, limit=4.28571
+SPLINE PASSED!!!! from (23,2) to (24,2)
+
+[PASS] SPLINE OK: max_kappa=1.79423, min_kappa=0.072827, limit=4.28571
+SPLINE PASSED!!!! from (23,2) to (24,3)
+
+[PASS] SPLINE OK: max_kappa=4.26466, min_kappa=0.255843, limit=4.28571
+SPLINE PASSED!!!! from (23,3) to (24,2)
+
+[PASS] SPLINE OK: max_kappa=1.97388, min_kappa=0.0392243, limit=4.28571
+SPLINE PASSED!!!! from (23,3) to (24,3)
+
+[PASS] SPLINE OK: max_kappa=1.3531, min_kappa=0.0848209, limit=4.28571
+SPLINE PASSED!!!! from (23,3) to (24,4)
+
+[PASS] SPLINE OK: max_kappa=4.16203, min_kappa=0.231532, limit=4.28571
+SPLINE PASSED!!!! from (23,4) to (24,3)
+
+[PASS] SPLINE OK: max_kappa=1.97205, min_kappa=0.00352359, limit=4.28571
+SPLINE PASSED!!!! from (23,4) to (24,4)
+
+[PASS] SPLINE OK: max_kappa=1.26763, min_kappa=0.0614111, limit=4.28571
+SPLINE PASSED!!!! from (23,4) to (24,5)
+
+[PASS] SPLINE OK: max_kappa=3.00292, min_kappa=0.00445854, limit=4.28571
+SPLINE PASSED!!!! from (23,5) to (24,4)
+
+[PASS] SPLINE OK: max_kappa=0.630253, min_kappa=0.00582527, limit=4.28571
+SPLINE PASSED!!!! from (23,5) to (24,5)
+
+[PASS] SPLINE OK: max_kappa=3.67501, min_kappa=0.186369, limit=4.28571
+SPLINE PASSED!!!! from (23,6) to (24,4)
+
+[PASS] SPLINE OK: max_kappa=2.2603, min_kappa=0.0816127, limit=4.28571
+SPLINE PASSED!!!! from (23,6) to (24,5)
+
+[PASS] SPLINE OK: max_kappa=0.817748, min_kappa=0.0271303, limit=4.28571
+SPLINE PASSED!!!! from (24,0) to (25,0)
+
+[PASS] SPLINE OK: max_kappa=3.15374, min_kappa=0.0198773, limit=4.28571
+SPLINE PASSED!!!! from (24,0) to (25,1)
+
+[PASS] SPLINE OK: max_kappa=2.08792, min_kappa=0.0500211, limit=4.28571
+SPLINE PASSED!!!! from (24,1) to (25,0)
+
+[PASS] SPLINE OK: max_kappa=0.753532, min_kappa=0.0555251, limit=4.28571
+SPLINE PASSED!!!! from (24,1) to (25,1)
+
+[PASS] SPLINE OK: max_kappa=3.07598, min_kappa=0.0410781, limit=4.28571
+SPLINE PASSED!!!! from (24,1) to (25,2)
+
+[PASS] SPLINE OK: max_kappa=2.17708, min_kappa=0.0748182, limit=4.28571
+SPLINE PASSED!!!! from (24,2) to (25,1)
+
+[PASS] SPLINE OK: max_kappa=0.68997, min_kappa=0.0367209, limit=4.28571
+SPLINE PASSED!!!! from (24,2) to (25,2)
+
+[PASS] SPLINE OK: max_kappa=2.99894, min_kappa=0.0626919, limit=4.28571
+SPLINE PASSED!!!! from (24,2) to (25,3)
+
+[PASS] SPLINE OK: max_kappa=2.26486, min_kappa=0.0989924, limit=4.28571
+SPLINE PASSED!!!! from (24,3) to (25,2)
+
+[PASS] SPLINE OK: max_kappa=0.627075, min_kappa=0.0093513, limit=4.28571
+SPLINE PASSED!!!! from (24,3) to (25,3)
+
+[PASS] SPLINE OK: max_kappa=2.92266, min_kappa=0.0846918, limit=4.28571
+SPLINE PASSED!!!! from (24,3) to (25,4)
+
+[PASS] SPLINE OK: max_kappa=2.35124, min_kappa=0.12253, limit=4.28571
+SPLINE PASSED!!!! from (24,4) to (25,3)
+
+[PASS] SPLINE OK: max_kappa=0.564856, min_kappa=0.0293536, limit=4.28571
+SPLINE PASSED!!!! from (24,4) to (25,4)
+
+[PASS] SPLINE OK: max_kappa=2.84667, min_kappa=0.106952, limit=4.28571
+SPLINE PASSED!!!! from (24,4) to (25,5)
+
+[PASS] SPLINE OK: max_kappa=2.33303, min_kappa=0.122228, limit=4.28571
+SPLINE PASSED!!!! from (24,5) to (25,4)
+
+[PASS] SPLINE OK: max_kappa=0.558714, min_kappa=0.0277769, limit=4.28571
+SPLINE PASSED!!!! from (24,5) to (25,5)
+
+[PASS] SPLINE OK: max_kappa=0.00870402, min_kappa=0.000624962, limit=4.28571
+SPLINE PASSED!!!! from (25,0) to (26,0)
+
+[PASS] SPLINE OK: max_kappa=0.251082, min_kappa=0.00330568, limit=4.28571
+SPLINE PASSED!!!! from (25,0) to (26,1)
+
+[PASS] SPLINE OK: max_kappa=0.486433, min_kappa=0.0044278, limit=4.28571
+SPLINE PASSED!!!! from (25,0) to (26,2)
+
+[PASS] SPLINE OK: max_kappa=0.704278, min_kappa=0.00523756, limit=4.28571
+SPLINE PASSED!!!! from (25,0) to (26,3)
+
+[PASS] SPLINE OK: max_kappa=0.230287, min_kappa=0.00189828, limit=4.28571
+SPLINE PASSED!!!! from (25,1) to (26,0)
+
+[PASS] SPLINE OK: max_kappa=0.0140507, min_kappa=0.000952239, limit=4.28571
+SPLINE PASSED!!!! from (25,1) to (26,1)
+
+[PASS] SPLINE OK: max_kappa=0.258916, min_kappa=0.00465171, limit=4.28571
+SPLINE PASSED!!!! from (25,1) to (26,2)
+
+[PASS] SPLINE OK: max_kappa=0.496489, min_kappa=0.00570398, limit=4.28571
+SPLINE PASSED!!!! from (25,1) to (26,3)
+
+[PASS] SPLINE OK: max_kappa=0.716092, min_kappa=0.00640135, limit=4.28571
+SPLINE PASSED!!!! from (25,1) to (26,4)
+
+[PASS] SPLINE OK: max_kappa=0.454946, min_kappa=0.00176231, limit=4.28571
+SPLINE PASSED!!!! from (25,2) to (26,0)
+
+[PASS] SPLINE OK: max_kappa=0.23013, min_kappa=0.00323826, limit=4.28571
+SPLINE PASSED!!!! from (25,2) to (26,1)
+
+[PASS] SPLINE OK: max_kappa=0.01945, min_kappa=0.00118387, limit=4.28571
+SPLINE PASSED!!!! from (25,2) to (26,2)
+
+[PASS] SPLINE OK: max_kappa=0.266839, min_kappa=0.00601, limit=4.28571
+SPLINE PASSED!!!! from (25,2) to (26,3)
+
+[PASS] SPLINE OK: max_kappa=0.506662, min_kappa=0.00698903, limit=4.28571
+SPLINE PASSED!!!! from (25,2) to (26,4)
+
+[PASS] SPLINE OK: max_kappa=0.72289, min_kappa=0.00639097, limit=4.28571
+SPLINE PASSED!!!! from (25,2) to (26,5)
+
+[PASS] SPLINE OK: max_kappa=0.659928, min_kappa=0.00158292, limit=4.28571
+SPLINE PASSED!!!! from (25,3) to (26,0)
+
+[PASS] SPLINE OK: max_kappa=0.457044, min_kappa=0.00303207, limit=4.28571
+SPLINE PASSED!!!! from (25,3) to (26,1)
+
+[PASS] SPLINE OK: max_kappa=0.229988, min_kappa=0.00459307, limit=4.28571
+SPLINE PASSED!!!! from (25,3) to (26,2)
+
+[PASS] SPLINE OK: max_kappa=0.0249028, min_kappa=0.00141641, limit=4.28571
+SPLINE PASSED!!!! from (25,3) to (26,3)
+
+[PASS] SPLINE OK: max_kappa=0.274853, min_kappa=0.00738067, limit=4.28571
+SPLINE PASSED!!!! from (25,3) to (26,4)
+
+[PASS] SPLINE OK: max_kappa=0.511526, min_kappa=0.00698364, limit=4.28571
+SPLINE PASSED!!!! from (25,3) to (26,5)
+
+[PASS] SPLINE OK: max_kappa=0.663895, min_kappa=0.0027467, limit=4.28571
+SPLINE PASSED!!!! from (25,4) to (26,1)
+
+[PASS] SPLINE OK: max_kappa=0.459191, min_kappa=0.00431565, limit=4.28571
+SPLINE PASSED!!!! from (25,4) to (26,2)
+
+[PASS] SPLINE OK: max_kappa=0.229861, min_kappa=0.00596292, limit=4.28571
+SPLINE PASSED!!!! from (25,4) to (26,3)
+
+[PASS] SPLINE OK: max_kappa=0.0304097, min_kappa=0.00164983, limit=4.28571
+SPLINE PASSED!!!! from (25,4) to (26,4)
+
+[PASS] SPLINE OK: max_kappa=0.277345, min_kappa=0.00737896, limit=4.28571
+SPLINE PASSED!!!! from (25,4) to (26,5)
+
+[PASS] SPLINE OK: max_kappa=0.668081, min_kappa=0.00395646, limit=4.28571
+SPLINE PASSED!!!! from (25,5) to (26,2)
+
+[PASS] SPLINE OK: max_kappa=0.461542, min_kappa=0.00565083, limit=4.28571
+SPLINE PASSED!!!! from (25,5) to (26,3)
+
+[PASS] SPLINE OK: max_kappa=0.229912, min_kappa=0.00738797, limit=4.28571
+SPLINE PASSED!!!! from (25,5) to (26,4)
+
+[PASS] SPLINE OK: max_kappa=0.0302007, min_kappa=0.00150976, limit=4.28571
+SPLINE PASSED!!!! from (25,5) to (26,5)
+
+[PASS] SPLINE OK: max_kappa=0.024557, min_kappa=0.0172516, limit=4.28571
+SPLINE PASSED!!!! from (26,0) to (27,0)
+
+[PASS] SPLINE OK: max_kappa=0.695787, min_kappa=0.0463714, limit=4.28571
+SPLINE PASSED!!!! from (26,0) to (27,1)
+
+[PASS] SPLINE OK: max_kappa=1.28776, min_kappa=0.0621712, limit=4.28571
+SPLINE PASSED!!!! from (26,0) to (27,2)
+
+[PASS] SPLINE OK: max_kappa=0.558265, min_kappa=0.0177844, limit=4.28571
+SPLINE PASSED!!!! from (26,1) to (27,0)
+
+[PASS] SPLINE OK: max_kappa=0.141709, min_kappa=0.00836224, limit=4.28571
+SPLINE PASSED!!!! from (26,1) to (27,1)
+
+[PASS] SPLINE OK: max_kappa=0.796439, min_kappa=0.0692839, limit=4.28571
+SPLINE PASSED!!!! from (26,1) to (27,2)
+
+[PASS] SPLINE OK: max_kappa=1.36813, min_kappa=0.0803595, limit=4.28571
+SPLINE PASSED!!!! from (26,1) to (27,3)
+
+[PASS] SPLINE OK: max_kappa=1.02296, min_kappa=0.0138446, limit=4.28571
+SPLINE PASSED!!!! from (26,2) to (27,0)
+
+[PASS] SPLINE OK: max_kappa=0.483333, min_kappa=0.042516, limit=4.28571
+SPLINE PASSED!!!! from (26,2) to (27,1)
+
+[PASS] SPLINE OK: max_kappa=0.256284, min_kappa=0.00242373, limit=4.28571
+SPLINE PASSED!!!! from (26,2) to (27,2)
+
+[PASS] SPLINE OK: max_kappa=0.893952, min_kappa=0.0615387, limit=4.28571
+SPLINE PASSED!!!! from (26,2) to (27,3)
+
+[PASS] SPLINE OK: max_kappa=1.44514, min_kappa=0.0971149, limit=4.28571
+SPLINE PASSED!!!! from (26,2) to (27,4)
+
+[PASS] SPLINE OK: max_kappa=0.94296, min_kappa=0.0360477, limit=4.28571
+SPLINE PASSED!!!! from (26,3) to (27,1)
+
+[PASS] SPLINE OK: max_kappa=0.410047, min_kappa=0.000698, limit=4.28571
+SPLINE PASSED!!!! from (26,3) to (27,2)
+
+[PASS] SPLINE OK: max_kappa=0.368149, min_kappa=0.0128597, limit=4.28571
+SPLINE PASSED!!!! from (26,3) to (27,3)
+
+[PASS] SPLINE OK: max_kappa=0.988236, min_kappa=0.0531357, limit=4.28571
+SPLINE PASSED!!!! from (26,3) to (27,4)
+
+[PASS] SPLINE OK: max_kappa=1.42855, min_kappa=0.0947091, limit=4.28571
+SPLINE PASSED!!!! from (26,3) to (27,5)
+
+[PASS] SPLINE OK: max_kappa=0.864633, min_kappa=0.0586814, limit=4.28571
+SPLINE PASSED!!!! from (26,4) to (27,2)
+
+[PASS] SPLINE OK: max_kappa=0.338429, min_kappa=0.00628949, limit=4.28571
+SPLINE PASSED!!!! from (26,4) to (27,3)
+
+[PASS] SPLINE OK: max_kappa=0.477178, min_kappa=0.0228901, limit=4.28571
+SPLINE PASSED!!!! from (26,4) to (27,4)
+
+[PASS] SPLINE OK: max_kappa=0.979475, min_kappa=0.0549993, limit=4.28571
+SPLINE PASSED!!!! from (26,4) to (27,5)
+
+[PASS] SPLINE OK: max_kappa=0.795589, min_kappa=0.0527196, limit=4.28571
+SPLINE PASSED!!!! from (26,5) to (27,3)
+
+[PASS] SPLINE OK: max_kappa=0.276608, min_kappa=0.00788509, limit=4.28571
+SPLINE PASSED!!!! from (26,5) to (27,4)
+
+[PASS] SPLINE OK: max_kappa=0.473974, min_kappa=0.0231984, limit=4.28571
+SPLINE PASSED!!!! from (26,5) to (27,5)
+
+[PASS] SPLINE OK: max_kappa=2.25123, min_kappa=0.0889938, limit=4.28571
+SPLINE PASSED!!!! from (27,0) to (28,0)
+
+[PASS] SPLINE OK: max_kappa=1.98541, min_kappa=0.0886349, limit=4.28571
+SPLINE PASSED!!!! from (27,0) to (28,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.52388,6.21072), kappa=4.29294, max_allowed=4.28571
+SPLINE REJECTED from (27,1) to (28,0)
+
+[PASS] SPLINE OK: max_kappa=1.32797, min_kappa=0.0246947, limit=4.28571
+SPLINE PASSED!!!! from (27,1) to (28,1)
+
+[PASS] SPLINE OK: max_kappa=2.72051, min_kappa=0.184646, limit=4.28571
+SPLINE PASSED!!!! from (27,1) to (28,2)
+
+[PASS] SPLINE OK: max_kappa=3.61708, min_kappa=0.0283012, limit=4.28571
+SPLINE PASSED!!!! from (27,2) to (28,1)
+
+[PASS] SPLINE OK: max_kappa=0.623988, min_kappa=0.0442113, limit=4.28571
+SPLINE PASSED!!!! from (27,2) to (28,2)
+
+[PASS] SPLINE OK: max_kappa=3.38699, min_kappa=0.25897, limit=4.28571
+SPLINE PASSED!!!! from (27,2) to (28,3)
+
+[PASS] SPLINE OK: max_kappa=2.85085, min_kappa=0.0555711, limit=4.28571
+SPLINE PASSED!!!! from (27,3) to (28,2)
+
+[PASS] SPLINE OK: max_kappa=0.546723, min_kappa=0.0160207, limit=4.28571
+SPLINE PASSED!!!! from (27,3) to (28,3)
+
+[PASS] SPLINE OK: max_kappa=3.97981, min_kappa=0.295632, limit=4.28571
+SPLINE PASSED!!!! from (27,3) to (28,4)
+
+[PASS] SPLINE OK: max_kappa=2.16879, min_kappa=0.151822, limit=4.28571
+SPLINE PASSED!!!! from (27,4) to (28,3)
+
+[PASS] SPLINE OK: max_kappa=1.37819, min_kappa=0.0555018, limit=4.28571
+SPLINE PASSED!!!! from (27,4) to (28,4)
+
+[PASS] SPLINE OK: max_kappa=3.97042, min_kappa=0.251831, limit=4.28571
+SPLINE PASSED!!!! from (27,4) to (28,5)
+
+[PASS] SPLINE OK: max_kappa=1.73423, min_kappa=0.030636, limit=4.28571
+SPLINE PASSED!!!! from (27,5) to (28,4)
+
+[PASS] SPLINE OK: max_kappa=1.37572, min_kappa=0.0664826, limit=4.28571
+SPLINE PASSED!!!! from (27,5) to (28,5)
+
+[PASS] SPLINE OK: max_kappa=3.47109, min_kappa=0.270264, limit=4.28571
+SPLINE PASSED!!!! from (28,0) to (29,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.19905,6.77426), kappa=-5.21891, max_allowed=4.28571
+SPLINE REJECTED from (28,0) to (29,1)
+
+[PASS] SPLINE OK: max_kappa=0.295266, min_kappa=0.0133816, limit=4.28571
+SPLINE PASSED!!!! from (28,1) to (29,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.54629,7.32616), kappa=4.81306, max_allowed=4.28571
+SPLINE REJECTED from (28,1) to (29,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.39809,6.79384), kappa=-6.02863, max_allowed=4.28571
+SPLINE REJECTED from (28,1) to (29,2)
+
+[PASS] SPLINE OK: max_kappa=2.37487, min_kappa=0.0317638, limit=4.28571
+SPLINE PASSED!!!! from (28,2) to (29,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.59713,6.81342), kappa=-5.20781, max_allowed=4.28571
+SPLINE REJECTED from (28,2) to (29,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.59713,6.81342), kappa=-6.16456, max_allowed=4.28571
+SPLINE REJECTED from (28,2) to (29,3)
+
+[PASS] SPLINE OK: max_kappa=4.08376, min_kappa=0.151189, limit=4.28571
+SPLINE PASSED!!!! from (28,3) to (29,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.79617,6.83301), kappa=-5.46757, max_allowed=4.28571
+SPLINE REJECTED from (28,3) to (29,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.79617,6.83301), kappa=-5.44063, max_allowed=4.28571
+SPLINE REJECTED from (28,3) to (29,4)
+
+[PASS] SPLINE OK: max_kappa=4.21583, min_kappa=0.277885, limit=4.28571
+SPLINE PASSED!!!! from (28,4) to (29,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.9952,6.85259), kappa=-4.7516, max_allowed=4.28571
+SPLINE REJECTED from (28,4) to (29,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.9952,6.85259), kappa=-4.70329, max_allowed=4.28571
+SPLINE REJECTED from (28,4) to (29,5)
+
+[PASS] SPLINE OK: max_kappa=2.50994, min_kappa=0.0892959, limit=4.28571
+SPLINE PASSED!!!! from (28,5) to (29,4)
+
+[PASS] SPLINE OK: max_kappa=3.61439, min_kappa=0.130773, limit=4.28571
+SPLINE PASSED!!!! from (28,5) to (29,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.37255,7.82452), kappa=4.73646, max_allowed=4.28571
+SPLINE REJECTED from (29,0) to (30,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.33651,7.33358), kappa=-5.03464, max_allowed=4.28571
+SPLINE REJECTED from (29,0) to (30,1)
+
+[PASS] SPLINE OK: max_kappa=3.37476, min_kappa=0.187689, limit=4.28571
+SPLINE PASSED!!!! from (29,1) to (30,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.53061,7.38181), kappa=-4.60029, max_allowed=4.28571
+SPLINE REJECTED from (29,1) to (30,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.53061,7.38181), kappa=-5.6113, max_allowed=4.28571
+SPLINE REJECTED from (29,1) to (30,2)
+
+[PASS] SPLINE OK: max_kappa=3.8003, min_kappa=0.2316, limit=4.28571
+SPLINE PASSED!!!! from (29,2) to (30,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.72471,7.43003), kappa=-5.28564, max_allowed=4.28571
+SPLINE REJECTED from (29,2) to (30,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.72471,7.43003), kappa=-5.88976, max_allowed=4.28571
+SPLINE REJECTED from (29,2) to (30,3)
+
+[PASS] SPLINE OK: max_kappa=3.49149, min_kappa=0.217472, limit=4.28571
+SPLINE PASSED!!!! from (29,3) to (30,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.91881,7.47826), kappa=-4.73644, max_allowed=4.28571
+SPLINE REJECTED from (29,3) to (30,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.91881,7.47826), kappa=-5.36544, max_allowed=4.28571
+SPLINE REJECTED from (29,3) to (30,4)
+
+[PASS] SPLINE OK: max_kappa=2.45878, min_kappa=0.0411711, limit=4.28571
+SPLINE PASSED!!!! from (29,4) to (30,3)
+
+[PASS] SPLINE OK: max_kappa=3.99998, min_kappa=0.0892326, limit=4.28571
+SPLINE PASSED!!!! from (29,4) to (30,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (10.2239,8.37057), kappa=5.34036, max_allowed=4.28571
+SPLINE REJECTED from (29,4) to (30,5)
+
+[PASS] SPLINE OK: max_kappa=1.70405, min_kappa=0.629543, limit=4.28571
+SPLINE PASSED!!!! from (29,5) to (30,4)
+
+[PASS] SPLINE OK: max_kappa=2.93691, min_kappa=0.114676, limit=4.28571
+SPLINE PASSED!!!! from (29,5) to (30,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.97457,8.27488), kappa=4.75864, max_allowed=4.28571
+SPLINE REJECTED from (30,0) to (31,0)
+
+[PASS] SPLINE OK: max_kappa=3.14525, min_kappa=0.114669, limit=4.28571
+SPLINE PASSED!!!! from (30,0) to (31,1)
+
+[PASS] SPLINE OK: max_kappa=2.67876, min_kappa=0.26468, limit=4.28571
+SPLINE PASSED!!!! from (30,1) to (31,0)
+
+[PASS] SPLINE OK: max_kappa=0.538103, min_kappa=0.0267513, limit=4.28571
+SPLINE PASSED!!!! from (30,1) to (31,1)
+
+[PASS] SPLINE OK: max_kappa=3.04258, min_kappa=0.226968, limit=4.28571
+SPLINE PASSED!!!! from (30,1) to (31,2)
+
+[PASS] SPLINE OK: max_kappa=1.60032, min_kappa=0.104049, limit=4.28571
+SPLINE PASSED!!!! from (30,2) to (31,1)
+
+[PASS] SPLINE OK: max_kappa=1.16453, min_kappa=0.0863232, limit=4.28571
+SPLINE PASSED!!!! from (30,2) to (31,2)
+
+[PASS] SPLINE OK: max_kappa=3.00673, min_kappa=0.151748, limit=4.28571
+SPLINE PASSED!!!! from (30,2) to (31,3)
+
+[PASS] SPLINE OK: max_kappa=0.855217, min_kappa=0.007996, limit=4.28571
+SPLINE PASSED!!!! from (30,3) to (31,2)
+
+[PASS] SPLINE OK: max_kappa=1.61044, min_kappa=0.107518, limit=4.28571
+SPLINE PASSED!!!! from (30,3) to (31,3)
+
+[PASS] SPLINE OK: max_kappa=3.04932, min_kappa=0.0862072, limit=4.28571
+SPLINE PASSED!!!! from (30,3) to (31,4)
+
+[PASS] SPLINE OK: max_kappa=0.37519, min_kappa=0.319837, limit=4.28571
+SPLINE PASSED!!!! from (30,4) to (31,3)
+
+[PASS] SPLINE OK: max_kappa=1.9272, min_kappa=0.116872, limit=4.28571
+SPLINE PASSED!!!! from (30,4) to (31,4)
+
+[PASS] SPLINE OK: max_kappa=3.24656, min_kappa=0.0447415, limit=4.28571
+SPLINE PASSED!!!! from (30,4) to (31,5)
+
+[PASS] SPLINE OK: max_kappa=0.938287, min_kappa=0.0219925, limit=4.28571
+SPLINE PASSED!!!! from (30,5) to (31,4)
+
+[PASS] SPLINE OK: max_kappa=2.14599, min_kappa=0.117435, limit=4.28571
+SPLINE PASSED!!!! from (30,5) to (31,5)
+
+[PASS] SPLINE OK: max_kappa=0.606311, min_kappa=0.0393683, limit=4.28571
+SPLINE PASSED!!!! from (31,0) to (32,0)
+
+[PASS] SPLINE OK: max_kappa=4.18754, min_kappa=0.165586, limit=4.28571
+SPLINE PASSED!!!! from (31,0) to (32,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.9582,8.46698), kappa=5.65249, max_allowed=4.28571
+SPLINE REJECTED from (31,1) to (32,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.9582,8.46698), kappa=4.49766, max_allowed=4.28571
+SPLINE REJECTED from (31,1) to (32,1)
+
+[PASS] SPLINE OK: max_kappa=1.89732, min_kappa=0.0280393, limit=4.28571
+SPLINE PASSED!!!! from (31,1) to (32,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (9.04757,8.6459), kappa=4.86125, max_allowed=4.28571
+SPLINE REJECTED from (31,2) to (32,1)
+
+[PASS] SPLINE OK: max_kappa=3.57685, min_kappa=0.241592, limit=4.28571
+SPLINE PASSED!!!! from (31,2) to (32,2)
+
+[PASS] SPLINE OK: max_kappa=1.36563, min_kappa=0.0934677, limit=4.28571
+SPLINE PASSED!!!! from (31,2) to (32,3)
+
+[PASS] SPLINE OK: max_kappa=4.10401, min_kappa=0.0570067, limit=4.28571
+SPLINE PASSED!!!! from (31,3) to (32,2)
+
+[PASS] SPLINE OK: max_kappa=2.95323, min_kappa=0.0741473, limit=4.28571
+SPLINE PASSED!!!! from (31,3) to (32,3)
+
+[PASS] SPLINE OK: max_kappa=0.394641, min_kappa=0.0189086, limit=4.28571
+SPLINE PASSED!!!! from (31,3) to (32,4)
+
+[PASS] SPLINE OK: max_kappa=3.6774, min_kappa=0.149696, limit=4.28571
+SPLINE PASSED!!!! from (31,4) to (32,3)
+
+[PASS] SPLINE OK: max_kappa=1.2494, min_kappa=0.0043726, limit=4.28571
+SPLINE PASSED!!!! from (31,4) to (32,4)
+
+[PASS] SPLINE OK: max_kappa=1.67761, min_kappa=0.0320453, limit=4.28571
+SPLINE PASSED!!!! from (31,4) to (32,5)
+
+[PASS] SPLINE OK: max_kappa=2.16895, min_kappa=0.121189, limit=4.28571
+SPLINE PASSED!!!! from (31,5) to (32,4)
+
+[PASS] SPLINE OK: max_kappa=0.24569, min_kappa=0.00714121, limit=4.28571
+SPLINE PASSED!!!! from (31,5) to (32,5)
+
+[PASS] SPLINE OK: max_kappa=2.46086, min_kappa=0.0852873, limit=4.28571
+SPLINE PASSED!!!! from (32,0) to (33,0)
+
+[PASS] SPLINE OK: max_kappa=1.18373, min_kappa=0.0353023, limit=4.28571
+SPLINE PASSED!!!! from (32,0) to (33,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.3655,8.44783), kappa=4.97527, max_allowed=4.28571
+SPLINE REJECTED from (32,1) to (33,0)
+
+[PASS] SPLINE OK: max_kappa=3.11426, min_kappa=0.0635039, limit=4.28571
+SPLINE PASSED!!!! from (32,1) to (33,1)
+
+[PASS] SPLINE OK: max_kappa=0.031, min_kappa=0.00218743, limit=4.28571
+SPLINE PASSED!!!! from (32,1) to (33,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.39131,8.64616), kappa=5.35569, max_allowed=4.28571
+SPLINE REJECTED from (32,2) to (33,1)
+
+[PASS] SPLINE OK: max_kappa=3.83339, min_kappa=0.175243, limit=4.28571
+SPLINE PASSED!!!! from (32,2) to (33,2)
+
+[PASS] SPLINE OK: max_kappa=1.05575, min_kappa=0.00927893, limit=4.28571
+SPLINE PASSED!!!! from (32,2) to (33,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.41712,8.84449), kappa=5.63682, max_allowed=4.28571
+SPLINE REJECTED from (32,3) to (33,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.41712,8.84449), kappa=4.43826, max_allowed=4.28571
+SPLINE REJECTED from (32,3) to (33,3)
+
+[PASS] SPLINE OK: max_kappa=2.01911, min_kappa=0.0304046, limit=4.28571
+SPLINE PASSED!!!! from (32,3) to (33,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (8.44292,9.04282), kappa=4.84182, max_allowed=4.28571
+SPLINE REJECTED from (32,4) to (33,3)
+
+[PASS] SPLINE OK: max_kappa=3.34408, min_kappa=0.00371776, limit=4.28571
+SPLINE PASSED!!!! from (32,4) to (33,4)
+
+[PASS] SPLINE OK: max_kappa=0.785542, min_kappa=0.00486401, limit=4.28571
+SPLINE PASSED!!!! from (32,4) to (33,5)
+
+[PASS] SPLINE OK: max_kappa=4.18004, min_kappa=0.153984, limit=4.28571
+SPLINE PASSED!!!! from (32,5) to (33,4)
+
+[PASS] SPLINE OK: max_kappa=2.57948, min_kappa=0.178705, limit=4.28571
+SPLINE PASSED!!!! from (32,5) to (33,5)
+
+[PASS] SPLINE OK: max_kappa=1.97134, min_kappa=0.0632195, limit=4.28571
+SPLINE PASSED!!!! from (33,0) to (34,0)
+
+[PASS] SPLINE OK: max_kappa=3.98164, min_kappa=0.0315231, limit=4.28571
+SPLINE PASSED!!!! from (33,0) to (34,1)
+
+[PASS] SPLINE OK: max_kappa=1.58801, min_kappa=0.131664, limit=4.28571
+SPLINE PASSED!!!! from (33,1) to (34,0)
+
+[PASS] SPLINE OK: max_kappa=1.74228, min_kappa=0.112968, limit=4.28571
+SPLINE PASSED!!!! from (33,1) to (34,1)
+
+[PASS] SPLINE OK: max_kappa=3.75606, min_kappa=0.0650498, limit=4.28571
+SPLINE PASSED!!!! from (33,1) to (34,2)
+
+[PASS] SPLINE OK: max_kappa=1.8528, min_kappa=0.14415, limit=4.28571
+SPLINE PASSED!!!! from (33,2) to (34,1)
+
+[PASS] SPLINE OK: max_kappa=1.51812, min_kappa=0.100705, limit=4.28571
+SPLINE PASSED!!!! from (33,2) to (34,2)
+
+[PASS] SPLINE OK: max_kappa=3.53397, min_kappa=0.100982, limit=4.28571
+SPLINE PASSED!!!! from (33,2) to (34,3)
+
+[PASS] SPLINE OK: max_kappa=2.10915, min_kappa=0.136992, limit=4.28571
+SPLINE PASSED!!!! from (33,3) to (34,2)
+
+[PASS] SPLINE OK: max_kappa=1.29883, min_kappa=0.000285392, limit=4.28571
+SPLINE PASSED!!!! from (33,3) to (34,3)
+
+[PASS] SPLINE OK: max_kappa=3.31541, min_kappa=0.139095, limit=4.28571
+SPLINE PASSED!!!! from (33,3) to (34,4)
+
+[PASS] SPLINE OK: max_kappa=2.3568, min_kappa=0.130365, limit=4.28571
+SPLINE PASSED!!!! from (33,4) to (34,3)
+
+[PASS] SPLINE OK: max_kappa=1.08438, min_kappa=0.06002, limit=4.28571
+SPLINE PASSED!!!! from (33,4) to (34,4)
+
+[PASS] SPLINE OK: max_kappa=3.10044, min_kappa=0.179121, limit=4.28571
+SPLINE PASSED!!!! from (33,4) to (34,5)
+
+[PASS] SPLINE OK: max_kappa=2.35278, min_kappa=0.148333, limit=4.28571
+SPLINE PASSED!!!! from (33,5) to (34,4)
+
+[PASS] SPLINE OK: max_kappa=1.00025, min_kappa=0.0491463, limit=4.28571
+SPLINE PASSED!!!! from (33,5) to (34,5)
+
+[PASS] SPLINE OK: max_kappa=0.39313, min_kappa=0.00279219, limit=4.28571
+SPLINE PASSED!!!! from (34,0) to (35,0)
+
+[PASS] SPLINE OK: max_kappa=2.60282, min_kappa=0.00454833, limit=4.28571
+SPLINE PASSED!!!! from (34,0) to (35,1)
+
+[PASS] SPLINE OK: max_kappa=2.08097, min_kappa=0.0138167, limit=4.28571
+SPLINE PASSED!!!! from (34,1) to (35,0)
+
+[PASS] SPLINE OK: max_kappa=0.381719, min_kappa=0.0188021, limit=4.28571
+SPLINE PASSED!!!! from (34,1) to (35,1)
+
+[PASS] SPLINE OK: max_kappa=2.60122, min_kappa=0.0171312, limit=4.28571
+SPLINE PASSED!!!! from (34,1) to (35,2)
+
+[PASS] SPLINE OK: max_kappa=2.13327, min_kappa=0.0277959, limit=4.28571
+SPLINE PASSED!!!! from (34,2) to (35,1)
+
+[PASS] SPLINE OK: max_kappa=0.37026, min_kappa=0.0320344, limit=4.28571
+SPLINE PASSED!!!! from (34,2) to (35,2)
+
+[PASS] SPLINE OK: max_kappa=2.59963, min_kappa=0.0298474, limit=4.28571
+SPLINE PASSED!!!! from (34,2) to (35,3)
+
+[PASS] SPLINE OK: max_kappa=2.18567, min_kappa=0.0417371, limit=4.28571
+SPLINE PASSED!!!! from (34,3) to (35,2)
+
+[PASS] SPLINE OK: max_kappa=0.358754, min_kappa=0.0103093, limit=4.28571
+SPLINE PASSED!!!! from (34,3) to (35,3)
+
+[PASS] SPLINE OK: max_kappa=2.59804, min_kappa=0.0426956, limit=4.28571
+SPLINE PASSED!!!! from (34,3) to (35,4)
+
+[PASS] SPLINE OK: max_kappa=2.23815, min_kappa=0.0556367, limit=4.28571
+SPLINE PASSED!!!! from (34,4) to (35,3)
+
+[PASS] SPLINE OK: max_kappa=0.347207, min_kappa=0.0115337, limit=4.28571
+SPLINE PASSED!!!! from (34,4) to (35,4)
+
+[PASS] SPLINE OK: max_kappa=2.58587, min_kappa=0.0533276, limit=4.28571
+SPLINE PASSED!!!! from (34,4) to (35,5)
+
+[PASS] SPLINE OK: max_kappa=2.29071, min_kappa=0.069491, limit=4.28571
+SPLINE PASSED!!!! from (34,5) to (35,4)
+
+[PASS] SPLINE OK: max_kappa=0.323372, min_kappa=0.0161362, limit=4.28571
+SPLINE PASSED!!!! from (34,5) to (35,5)
+
+[PASS] SPLINE OK: max_kappa=0.0269155, min_kappa=0.00101408, limit=4.28571
+SPLINE PASSED!!!! from (35,0) to (36,0)
+
+[PASS] SPLINE OK: max_kappa=0.230335, min_kappa=0.00105487, limit=4.28571
+SPLINE PASSED!!!! from (35,0) to (36,1)
+
+[PASS] SPLINE OK: max_kappa=0.476679, min_kappa=0.00293916, limit=4.28571
+SPLINE PASSED!!!! from (35,0) to (36,2)
+
+[PASS] SPLINE OK: max_kappa=0.701147, min_kappa=0.00445235, limit=4.28571
+SPLINE PASSED!!!! from (35,0) to (36,3)
+
+[PASS] SPLINE OK: max_kappa=0.273274, min_kappa=0.00192754, limit=4.28571
+SPLINE PASSED!!!! from (35,1) to (36,0)
+
+[PASS] SPLINE OK: max_kappa=0.0169404, min_kappa=0.000115916, limit=4.28571
+SPLINE PASSED!!!! from (35,1) to (36,1)
+
+[PASS] SPLINE OK: max_kappa=0.241429, min_kappa=0.00216846, limit=4.28571
+SPLINE PASSED!!!! from (35,1) to (36,2)
+
+[PASS] SPLINE OK: max_kappa=0.488385, min_kappa=0.00398844, limit=4.28571
+SPLINE PASSED!!!! from (35,1) to (36,3)
+
+[PASS] SPLINE OK: max_kappa=0.713137, min_kappa=0.00540094, limit=4.28571
+SPLINE PASSED!!!! from (35,1) to (36,4)
+
+[PASS] SPLINE OK: max_kappa=0.507785, min_kappa=0.00269839, limit=4.28571
+SPLINE PASSED!!!! from (35,2) to (36,0)
+
+[PASS] SPLINE OK: max_kappa=0.264105, min_kappa=0.000824766, limit=4.28571
+SPLINE PASSED!!!! from (35,2) to (36,1)
+
+[PASS] SPLINE OK: max_kappa=0.00896303, min_kappa=0.000292083, limit=4.28571
+SPLINE PASSED!!!! from (35,2) to (36,2)
+
+[PASS] SPLINE OK: max_kappa=0.252562, min_kappa=0.00328362, limit=4.28571
+SPLINE PASSED!!!! from (35,2) to (36,3)
+
+[PASS] SPLINE OK: max_kappa=0.500125, min_kappa=0.00503628, limit=4.28571
+SPLINE PASSED!!!! from (35,2) to (36,4)
+
+[PASS] SPLINE OK: max_kappa=0.725156, min_kappa=0.00634544, limit=4.28571
+SPLINE PASSED!!!! from (35,2) to (36,5)
+
+[PASS] SPLINE OK: max_kappa=0.720237, min_kappa=0.00326332, limit=4.28571
+SPLINE PASSED!!!! from (35,3) to (36,0)
+
+[PASS] SPLINE OK: max_kappa=0.499745, min_kappa=0.00166316, limit=4.28571
+SPLINE PASSED!!!! from (35,3) to (36,1)
+
+[PASS] SPLINE OK: max_kappa=0.25547, min_kappa=0.000284763, limit=4.28571
+SPLINE PASSED!!!! from (35,3) to (36,2)
+
+[PASS] SPLINE OK: max_kappa=0.00382369, min_kappa=0.000954986, limit=4.28571
+SPLINE PASSED!!!! from (35,3) to (36,3)
+
+[PASS] SPLINE OK: max_kappa=0.263734, min_kappa=0.00440022, limit=4.28571
+SPLINE PASSED!!!! from (35,3) to (36,4)
+
+[PASS] SPLINE OK: max_kappa=0.511901, min_kappa=0.00608252, limit=4.28571
+SPLINE PASSED!!!! from (35,3) to (36,5)
+
+[PASS] SPLINE OK: max_kappa=0.71332, min_kappa=0.00232446, limit=4.28571
+SPLINE PASSED!!!! from (35,4) to (36,1)
+
+[PASS] SPLINE OK: max_kappa=0.491669, min_kappa=0.000619715, limit=4.28571
+SPLINE PASSED!!!! from (35,4) to (36,2)
+
+[PASS] SPLINE OK: max_kappa=0.248464, min_kappa=0.00140096, limit=4.28571
+SPLINE PASSED!!!! from (35,4) to (36,3)
+
+[PASS] SPLINE OK: max_kappa=0.014149, min_kappa=0.000713977, limit=4.28571
+SPLINE PASSED!!!! from (35,4) to (36,4)
+
+[PASS] SPLINE OK: max_kappa=0.274944, min_kappa=0.00551811, limit=4.28571
+SPLINE PASSED!!!! from (35,4) to (36,5)
+
+[PASS] SPLINE OK: max_kappa=0.708224, min_kappa=0.000565098, limit=4.28571
+SPLINE PASSED!!!! from (35,5) to (36,2)
+
+[PASS] SPLINE OK: max_kappa=0.488127, min_kappa=0.00132297, limit=4.28571
+SPLINE PASSED!!!! from (35,5) to (36,3)
+
+[PASS] SPLINE OK: max_kappa=0.245249, min_kappa=0.00346926, limit=4.28571
+SPLINE PASSED!!!! from (35,5) to (36,4)
+
+[PASS] SPLINE OK: max_kappa=0.0225827, min_kappa=0.00112902, limit=4.28571
+SPLINE PASSED!!!! from (35,5) to (36,5)
+
+[PASS] SPLINE OK: max_kappa=0.0577604, min_kappa=0.0015661, limit=4.28571
+SPLINE PASSED!!!! from (36,0) to (37,0)
+
+[PASS] SPLINE OK: max_kappa=0.190073, min_kappa=0.00307177, limit=4.28571
+SPLINE PASSED!!!! from (36,0) to (37,1)
+
+[PASS] SPLINE OK: max_kappa=0.426915, min_kappa=0.00437881, limit=4.28571
+SPLINE PASSED!!!! from (36,0) to (37,2)
+
+[PASS] SPLINE OK: max_kappa=0.645484, min_kappa=0.00536581, limit=4.28571
+SPLINE PASSED!!!! from (36,0) to (37,3)
+
+[PASS] SPLINE OK: max_kappa=0.285909, min_kappa=0.000458369, limit=4.28571
+SPLINE PASSED!!!! from (36,1) to (37,0)
+
+[PASS] SPLINE OK: max_kappa=0.0466191, min_kappa=0.00106457, limit=4.28571
+SPLINE PASSED!!!! from (36,1) to (37,1)
+
+[PASS] SPLINE OK: max_kappa=0.200491, min_kappa=0.0025728, limit=4.28571
+SPLINE PASSED!!!! from (36,1) to (37,2)
+
+[PASS] SPLINE OK: max_kappa=0.437437, min_kappa=0.00389695, limit=4.28571
+SPLINE PASSED!!!! from (36,1) to (37,3)
+
+[PASS] SPLINE OK: max_kappa=0.655924, min_kappa=0.00491301, limit=4.28571
+SPLINE PASSED!!!! from (36,1) to (37,4)
+
+[PASS] SPLINE OK: max_kappa=0.503577, min_kappa=0.00229617, limit=4.28571
+SPLINE PASSED!!!! from (36,2) to (37,0)
+
+[PASS] SPLINE OK: max_kappa=0.276185, min_kappa=0.00094955, limit=4.28571
+SPLINE PASSED!!!! from (36,2) to (37,1)
+
+[PASS] SPLINE OK: max_kappa=0.0354622, min_kappa=0.000562071, limit=4.28571
+SPLINE PASSED!!!! from (36,2) to (37,2)
+
+[PASS] SPLINE OK: max_kappa=0.210921, min_kappa=0.00207414, limit=4.28571
+SPLINE PASSED!!!! from (36,2) to (37,3)
+
+[PASS] SPLINE OK: max_kappa=0.447968, min_kappa=0.00341661, limit=4.28571
+SPLINE PASSED!!!! from (36,2) to (37,4)
+
+[PASS] SPLINE OK: max_kappa=0.660681, min_kappa=0.0031419, limit=4.28571
+SPLINE PASSED!!!! from (36,2) to (37,5)
+
+[PASS] SPLINE OK: max_kappa=0.69904, min_kappa=0.0037983, limit=4.28571
+SPLINE PASSED!!!! from (36,3) to (37,0)
+
+[PASS] SPLINE OK: max_kappa=0.494376, min_kappa=0.00276552, limit=4.28571
+SPLINE PASSED!!!! from (36,3) to (37,1)
+
+[PASS] SPLINE OK: max_kappa=0.266446, min_kappa=0.0014428, limit=4.28571
+SPLINE PASSED!!!! from (36,3) to (37,2)
+
+[PASS] SPLINE OK: max_kappa=0.0242901, min_kappa=5.86833e-05, limit=4.28571
+SPLINE PASSED!!!! from (36,3) to (37,3)
+
+[PASS] SPLINE OK: max_kappa=0.221362, min_kappa=0.00157588, limit=4.28571
+SPLINE PASSED!!!! from (36,3) to (37,4)
+
+[PASS] SPLINE OK: max_kappa=0.45255, min_kappa=0.00149809, limit=4.28571
+SPLINE PASSED!!!! from (36,3) to (37,5)
+
+[PASS] SPLINE OK: max_kappa=0.690427, min_kappa=0.00423695, limit=4.28571
+SPLINE PASSED!!!! from (36,4) to (37,1)
+
+[PASS] SPLINE OK: max_kappa=0.485157, min_kappa=0.00323783, limit=4.28571
+SPLINE PASSED!!!! from (36,4) to (37,2)
+
+[PASS] SPLINE OK: max_kappa=0.256691, min_kappa=0.00193805, limit=4.28571
+SPLINE PASSED!!!! from (36,4) to (37,3)
+
+[PASS] SPLINE OK: max_kappa=0.0139939, min_kappa=0.000445503, limit=4.28571
+SPLINE PASSED!!!! from (36,4) to (37,4)
+
+[PASS] SPLINE OK: max_kappa=0.226575, min_kappa=0.000439177, limit=4.28571
+SPLINE PASSED!!!! from (36,4) to (37,5)
+
+[PASS] SPLINE OK: max_kappa=0.681796, min_kappa=0.00467917, limit=4.28571
+SPLINE PASSED!!!! from (36,5) to (37,2)
+
+[PASS] SPLINE OK: max_kappa=0.475923, min_kappa=0.00371303, limit=4.28571
+SPLINE PASSED!!!! from (36,5) to (37,3)
+
+[PASS] SPLINE OK: max_kappa=0.246922, min_kappa=0.00243521, limit=4.28571
+SPLINE PASSED!!!! from (36,5) to (37,4)
+
+[PASS] SPLINE OK: max_kappa=0.00996484, min_kappa=0.000498232, limit=4.28571
+SPLINE PASSED!!!! from (36,5) to (37,5)
+
+[PASS] SPLINE OK: max_kappa=0.0789318, min_kappa=0.00341306, limit=4.28571
+SPLINE PASSED!!!! from (37,0) to (38,0)
+
+[PASS] SPLINE OK: max_kappa=0.191114, min_kappa=0.00865014, limit=4.28571
+SPLINE PASSED!!!! from (37,0) to (38,1)
+
+[PASS] SPLINE OK: max_kappa=0.431226, min_kappa=0.00675886, limit=4.28571
+SPLINE PASSED!!!! from (37,0) to (38,2)
+
+[PASS] SPLINE OK: max_kappa=0.651467, min_kappa=0.00485076, limit=4.28571
+SPLINE PASSED!!!! from (37,0) to (38,3)
+
+[PASS] SPLINE OK: max_kappa=0.318576, min_kappa=0.011514, limit=4.28571
+SPLINE PASSED!!!! from (37,1) to (38,0)
+
+[PASS] SPLINE OK: max_kappa=0.0694454, min_kappa=0.00153423, limit=4.28571
+SPLINE PASSED!!!! from (37,1) to (38,1)
+
+[PASS] SPLINE OK: max_kappa=0.200216, min_kappa=0.00862853, limit=4.28571
+SPLINE PASSED!!!! from (37,1) to (38,2)
+
+[PASS] SPLINE OK: max_kappa=0.439842, min_kappa=0.00673305, limit=4.28571
+SPLINE PASSED!!!! from (37,1) to (38,3)
+
+[PASS] SPLINE OK: max_kappa=0.659515, min_kappa=0.00482571, limit=4.28571
+SPLINE PASSED!!!! from (37,1) to (38,4)
+
+[PASS] SPLINE OK: max_kappa=0.543028, min_kappa=0.0122066, limit=4.28571
+SPLINE PASSED!!!! from (37,2) to (38,0)
+
+[PASS] SPLINE OK: max_kappa=0.30892, min_kappa=0.0115154, limit=4.28571
+SPLINE PASSED!!!! from (37,2) to (38,1)
+
+[PASS] SPLINE OK: max_kappa=0.0599698, min_kappa=0.000342866, limit=4.28571
+SPLINE PASSED!!!! from (37,2) to (38,2)
+
+[PASS] SPLINE OK: max_kappa=0.209304, min_kappa=0.0086066, limit=4.28571
+SPLINE PASSED!!!! from (37,2) to (38,3)
+
+[PASS] SPLINE OK: max_kappa=0.448443, min_kappa=0.00670705, limit=4.28571
+SPLINE PASSED!!!! from (37,2) to (38,4)
+
+[PASS] SPLINE OK: max_kappa=0.664503, min_kappa=0.00616052, limit=4.28571
+SPLINE PASSED!!!! from (37,2) to (38,5)
+
+[PASS] SPLINE OK: max_kappa=0.743291, min_kappa=0.0123749, limit=4.28571
+SPLINE PASSED!!!! from (37,3) to (38,0)
+
+[PASS] SPLINE OK: max_kappa=0.533382, min_kappa=0.0122235, limit=4.28571
+SPLINE PASSED!!!! from (37,3) to (38,1)
+
+[PASS] SPLINE OK: max_kappa=0.299273, min_kappa=0.0115163, limit=4.28571
+SPLINE PASSED!!!! from (37,3) to (38,2)
+
+[PASS] SPLINE OK: max_kappa=0.0505053, min_kappa=0.00221809, limit=4.28571
+SPLINE PASSED!!!! from (37,3) to (38,3)
+
+[PASS] SPLINE OK: max_kappa=0.218378, min_kappa=0.00858434, limit=4.28571
+SPLINE PASSED!!!! from (37,3) to (38,4)
+
+[PASS] SPLINE OK: max_kappa=0.453933, min_kappa=0.00815775, limit=4.28571
+SPLINE PASSED!!!! from (37,3) to (38,5)
+
+[PASS] SPLINE OK: max_kappa=0.733826, min_kappa=0.012407, limit=4.28571
+SPLINE PASSED!!!! from (37,4) to (38,1)
+
+[PASS] SPLINE OK: max_kappa=0.52374, min_kappa=0.0122398, limit=4.28571
+SPLINE PASSED!!!! from (37,4) to (38,2)
+
+[PASS] SPLINE OK: max_kappa=0.289634, min_kappa=0.0115166, limit=4.28571
+SPLINE PASSED!!!! from (37,4) to (38,3)
+
+[PASS] SPLINE OK: max_kappa=0.0410518, min_kappa=0.00206654, limit=4.28571
+SPLINE PASSED!!!! from (37,4) to (38,4)
+
+[PASS] SPLINE OK: max_kappa=0.224312, min_kappa=0.0101109, limit=4.28571
+SPLINE PASSED!!!! from (37,4) to (38,5)
+
+[PASS] SPLINE OK: max_kappa=0.727351, min_kappa=0.0111227, limit=4.28571
+SPLINE PASSED!!!! from (37,5) to (38,2)
+
+[PASS] SPLINE OK: max_kappa=0.517155, min_kappa=0.0108155, limit=4.28571
+SPLINE PASSED!!!! from (37,5) to (38,3)
+
+[PASS] SPLINE OK: max_kappa=0.283098, min_kappa=0.00999111, limit=4.28571
+SPLINE PASSED!!!! from (37,5) to (38,4)
+
+[PASS] SPLINE OK: max_kappa=0.0409843, min_kappa=0.00204852, limit=4.28571
+SPLINE PASSED!!!! from (37,5) to (38,5)
+
+[PASS] SPLINE OK: max_kappa=0.0261388, min_kappa=0.00170504, limit=4.28571
+SPLINE PASSED!!!! from (38,0) to (39,0)
+
+[PASS] SPLINE OK: max_kappa=0.236334, min_kappa=0.00374821, limit=4.28571
+SPLINE PASSED!!!! from (38,0) to (39,1)
+
+[PASS] SPLINE OK: max_kappa=0.47224, min_kappa=0.00128919, limit=4.28571
+SPLINE PASSED!!!! from (38,0) to (39,2)
+
+[PASS] SPLINE OK: max_kappa=0.685741, min_kappa=0.000880396, limit=4.28571
+SPLINE PASSED!!!! from (38,0) to (39,3)
+
+[PASS] SPLINE OK: max_kappa=0.27994, min_kappa=0.00452844, limit=4.28571
+SPLINE PASSED!!!! from (38,1) to (39,0)
+
+[PASS] SPLINE OK: max_kappa=0.0245279, min_kappa=0.00219768, limit=4.28571
+SPLINE PASSED!!!! from (38,1) to (39,1)
+
+[PASS] SPLINE OK: max_kappa=0.229592, min_kappa=0.000223844, limit=4.28571
+SPLINE PASSED!!!! from (38,1) to (39,2)
+
+[PASS] SPLINE OK: max_kappa=0.469569, min_kappa=0.00246232, limit=4.28571
+SPLINE PASSED!!!! from (38,1) to (39,3)
+
+[PASS] SPLINE OK: max_kappa=0.684903, min_kappa=0.00430986, limit=4.28571
+SPLINE PASSED!!!! from (38,1) to (39,4)
+
+[PASS] SPLINE OK: max_kappa=0.520555, min_kappa=0.00277129, limit=4.28571
+SPLINE PASSED!!!! from (38,2) to (39,0)
+
+[PASS] SPLINE OK: max_kappa=0.277587, min_kappa=0.000568282, limit=4.28571
+SPLINE PASSED!!!! from (38,2) to (39,1)
+
+[PASS] SPLINE OK: max_kappa=0.0266051, min_kappa=0.00184156, limit=4.28571
+SPLINE PASSED!!!! from (38,2) to (39,2)
+
+[PASS] SPLINE OK: max_kappa=0.230363, min_kappa=0.00418611, limit=4.28571
+SPLINE PASSED!!!! from (38,2) to (39,3)
+
+[PASS] SPLINE OK: max_kappa=0.4695, min_kappa=0.0062079, limit=4.28571
+SPLINE PASSED!!!! from (38,2) to (39,4)
+
+[PASS] SPLINE OK: max_kappa=0.688707, min_kappa=0.00566607, limit=4.28571
+SPLINE PASSED!!!! from (38,2) to (39,5)
+
+[PASS] SPLINE OK: max_kappa=0.737278, min_kappa=0.00116525, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,0)
+
+[PASS] SPLINE OK: max_kappa=0.519552, min_kappa=0.000952192, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,1)
+
+[PASS] SPLINE OK: max_kappa=0.282019, min_kappa=0.00337747, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,2)
+
+[PASS] SPLINE OK: max_kappa=0.033057, min_kappa=0.00043081, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,3)
+
+[PASS] SPLINE OK: max_kappa=0.23113, min_kappa=0.0081383, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,4)
+
+[PASS] SPLINE OK: max_kappa=0.474168, min_kappa=0.00768781, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,5)
+
+[PASS] SPLINE OK: max_kappa=0.724558, min_kappa=0.00372961, limit=4.28571
+SPLINE PASSED!!!! from (38,3) to (39,6)
+
+[PASS] SPLINE OK: max_kappa=0.738508, min_kappa=0.00221766, limit=4.28571
+SPLINE PASSED!!!! from (38,4) to (39,1)
+
+[PASS] SPLINE OK: max_kappa=0.524132, min_kappa=0.00466121, limit=4.28571
+SPLINE PASSED!!!! from (38,4) to (39,2)
+
+[PASS] SPLINE OK: max_kappa=0.287569, min_kappa=0.00730857, limit=4.28571
+SPLINE PASSED!!!! from (38,4) to (39,3)
+
+[PASS] SPLINE OK: max_kappa=0.0394882, min_kappa=0.00195866, limit=4.28571
+SPLINE PASSED!!!! from (38,4) to (39,4)
+
+[PASS] SPLINE OK: max_kappa=0.236694, min_kappa=0.00970105, limit=4.28571
+SPLINE PASSED!!!! from (38,4) to (39,5)
+
+[PASS] SPLINE OK: max_kappa=0.509068, min_kappa=0.00261703, limit=4.28571
+SPLINE PASSED!!!! from (38,4) to (39,6)
+
+[PASS] SPLINE OK: max_kappa=0.745203, min_kappa=0.00423068, limit=4.28571
+SPLINE PASSED!!!! from (38,5) to (39,2)
+
+[PASS] SPLINE OK: max_kappa=0.531857, min_kappa=0.00686624, limit=4.28571
+SPLINE PASSED!!!! from (38,5) to (39,3)
+
+[PASS] SPLINE OK: max_kappa=0.296299, min_kappa=0.00964708, limit=4.28571
+SPLINE PASSED!!!! from (38,5) to (39,4)
+
+[PASS] SPLINE OK: max_kappa=0.0394701, min_kappa=0.00197292, limit=4.28571
+SPLINE PASSED!!!! from (38,5) to (39,5)
+
+[PASS] SPLINE OK: max_kappa=0.266746, min_kappa=0.00278009, limit=4.28571
+SPLINE PASSED!!!! from (38,5) to (39,6)
+
+[PASS] SPLINE OK: max_kappa=0.0566379, min_kappa=0.0001344, limit=4.28571
+SPLINE PASSED!!!! from (39,0) to (40,0)
+
+[PASS] SPLINE OK: max_kappa=0.291423, min_kappa=0.00230452, limit=4.28571
+SPLINE PASSED!!!! from (39,0) to (40,1)
+
+[PASS] SPLINE OK: max_kappa=0.511514, min_kappa=0.00445237, limit=4.28571
+SPLINE PASSED!!!! from (39,0) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.707967, min_kappa=0.00614418, limit=4.28571
+SPLINE PASSED!!!! from (39,0) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.197153, min_kappa=0.0024531, limit=4.28571
+SPLINE PASSED!!!! from (39,1) to (40,0)
+
+[PASS] SPLINE OK: max_kappa=0.0420237, min_kappa=2.8636e-05, limit=4.28571
+SPLINE PASSED!!!! from (39,1) to (40,1)
+
+[PASS] SPLINE OK: max_kappa=0.277394, min_kappa=0.00246887, limit=4.28571
+SPLINE PASSED!!!! from (39,1) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.497996, min_kappa=0.00461977, limit=4.28571
+SPLINE PASSED!!!! from (39,1) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.69511, min_kappa=0.00631481, limit=4.28571
+SPLINE PASSED!!!! from (39,1) to (40,4)
+
+[PASS] SPLINE OK: max_kappa=0.442815, min_kappa=0.00454426, limit=4.28571
+SPLINE PASSED!!!! from (39,2) to (40,0)
+
+[PASS] SPLINE OK: max_kappa=0.211593, min_kappa=0.00228881, limit=4.28571
+SPLINE PASSED!!!! from (39,2) to (40,1)
+
+[PASS] SPLINE OK: max_kappa=0.027669, min_kappa=0.000191864, limit=4.28571
+SPLINE PASSED!!!! from (39,2) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.26335, min_kappa=0.0026337, limit=4.28571
+SPLINE PASSED!!!! from (39,2) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.484457, min_kappa=0.00478795, limit=4.28571
+SPLINE PASSED!!!! from (39,2) to (40,4)
+
+[PASS] SPLINE OK: max_kappa=0.687025, min_kappa=0.00436635, limit=4.28571
+SPLINE PASSED!!!! from (39,2) to (40,5)
+
+[PASS] SPLINE OK: max_kappa=0.669463, min_kappa=0.00619817, limit=4.28571
+SPLINE PASSED!!!! from (39,3) to (40,0)
+
+[PASS] SPLINE OK: max_kappa=0.457102, min_kappa=0.00437703, limit=4.28571
+SPLINE PASSED!!!! from (39,3) to (40,1)
+
+[PASS] SPLINE OK: max_kappa=0.226036, min_kappa=0.00212469, limit=4.28571
+SPLINE PASSED!!!! from (39,3) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.0133054, min_kappa=0.00035523, limit=4.28571
+SPLINE PASSED!!!! from (39,3) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.249291, min_kappa=0.00279897, limit=4.28571
+SPLINE PASSED!!!! from (39,3) to (40,4)
+
+[PASS] SPLINE OK: max_kappa=0.475804, min_kappa=0.00263748, limit=4.28571
+SPLINE PASSED!!!! from (39,3) to (40,5)
+
+[PASS] SPLINE OK: max_kappa=0.683362, min_kappa=0.00602766, limit=4.28571
+SPLINE PASSED!!!! from (39,4) to (40,1)
+
+[PASS] SPLINE OK: max_kappa=0.471384, min_kappa=0.00421032, limit=4.28571
+SPLINE PASSED!!!! from (39,4) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.240481, min_kappa=0.00196079, limit=4.28571
+SPLINE PASSED!!!! from (39,4) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.00210418, min_kappa=0.000115515, limit=4.28571
+SPLINE PASSED!!!! from (39,4) to (40,4)
+
+[PASS] SPLINE OK: max_kappa=0.2402, min_kappa=0.000507288, limit=4.28571
+SPLINE PASSED!!!! from (39,4) to (40,5)
+
+[PASS] SPLINE OK: max_kappa=0.688599, min_kappa=0.00386038, limit=4.28571
+SPLINE PASSED!!!! from (39,5) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.476594, min_kappa=0.00185968, limit=4.28571
+SPLINE PASSED!!!! from (39,5) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.246631, min_kappa=0.000510452, limit=4.28571
+SPLINE PASSED!!!! from (39,5) to (40,4)
+
+[PASS] SPLINE OK: max_kappa=0.00207533, min_kappa=0.000103766, limit=4.28571
+SPLINE PASSED!!!! from (39,5) to (40,5)
+
+[PASS] SPLINE OK: max_kappa=0.848475, min_kappa=0.00611146, limit=4.28571
+SPLINE PASSED!!!! from (39,6) to (40,2)
+
+[PASS] SPLINE OK: max_kappa=0.666246, min_kappa=0.00899823, limit=4.28571
+SPLINE PASSED!!!! from (39,6) to (40,3)
+
+[PASS] SPLINE OK: max_kappa=0.458267, min_kappa=0.0121268, limit=4.28571
+SPLINE PASSED!!!! from (39,6) to (40,4)
+
+[PASS] SPLINE OK: max_kappa=0.222004, min_kappa=0.0127439, limit=4.28571
+SPLINE PASSED!!!! from (39,6) to (40,5)
+
+[PASS] SPLINE OK: max_kappa=0.0638421, min_kappa=0.0011469, limit=4.28571
+SPLINE PASSED!!!! from (40,0) to (41,0)
+
+[PASS] SPLINE OK: max_kappa=0.299891, min_kappa=3.93724e-05, limit=4.28571
+SPLINE PASSED!!!! from (40,0) to (41,1)
+
+[PASS] SPLINE OK: max_kappa=0.525035, min_kappa=0.000973936, limit=4.28571
+SPLINE PASSED!!!! from (40,0) to (41,2)
+
+[PASS] SPLINE OK: max_kappa=0.72795, min_kappa=0.0018055, limit=4.28571
+SPLINE PASSED!!!! from (40,0) to (41,3)
+
+[PASS] SPLINE OK: max_kappa=0.191609, min_kappa=0.00361456, limit=4.28571
+SPLINE PASSED!!!! from (40,1) to (41,0)
+
+[PASS] SPLINE OK: max_kappa=0.0547004, min_kappa=0.00254704, limit=4.28571
+SPLINE PASSED!!!! from (40,1) to (41,1)
+
+[PASS] SPLINE OK: max_kappa=0.291988, min_kappa=0.0014005, limit=4.28571
+SPLINE PASSED!!!! from (40,1) to (41,2)
+
+[PASS] SPLINE OK: max_kappa=0.516391, min_kappa=0.000300374, limit=4.28571
+SPLINE PASSED!!!! from (40,1) to (41,3)
+
+[PASS] SPLINE OK: max_kappa=0.72005, min_kappa=0.000651383, limit=4.28571
+SPLINE PASSED!!!! from (40,1) to (41,4)
+
+[PASS] SPLINE OK: max_kappa=0.436821, min_kappa=0.00580401, limit=4.28571
+SPLINE PASSED!!!! from (40,2) to (41,0)
+
+[PASS] SPLINE OK: max_kappa=0.204717, min_kappa=0.00500205, limit=4.28571
+SPLINE PASSED!!!! from (40,2) to (41,1)
+
+[PASS] SPLINE OK: max_kappa=0.0455143, min_kappa=0.00395469, limit=4.28571
+SPLINE PASSED!!!! from (40,2) to (41,2)
+
+[PASS] SPLINE OK: max_kappa=0.284049, min_kappa=0.00277227, limit=4.28571
+SPLINE PASSED!!!! from (40,2) to (41,3)
+
+[PASS] SPLINE OK: max_kappa=0.509692, min_kappa=0.00158723, limit=4.28571
+SPLINE PASSED!!!! from (40,2) to (41,4)
+
+[PASS] SPLINE OK: max_kappa=0.717196, min_kappa=0.00144427, limit=4.28571
+SPLINE PASSED!!!! from (40,2) to (41,5)
+
+[PASS] SPLINE OK: max_kappa=0.663014, min_kappa=0.0074989, limit=4.28571
+SPLINE PASSED!!!! from (40,3) to (41,0)
+
+[PASS] SPLINE OK: max_kappa=0.450784, min_kappa=0.00711755, limit=4.28571
+SPLINE PASSED!!!! from (40,3) to (41,1)
+
+[PASS] SPLINE OK: max_kappa=0.217884, min_kappa=0.00639278, limit=4.28571
+SPLINE PASSED!!!! from (40,3) to (41,2)
+
+[PASS] SPLINE OK: max_kappa=0.0362834, min_kappa=0.000811942, limit=4.28571
+SPLINE PASSED!!!! from (40,3) to (41,3)
+
+[PASS] SPLINE OK: max_kappa=0.276073, min_kappa=0.00415454, limit=4.28571
+SPLINE PASSED!!!! from (40,3) to (41,4)
+
+[PASS] SPLINE OK: max_kappa=0.507227, min_kappa=0.00390901, limit=4.28571
+SPLINE PASSED!!!! from (40,3) to (41,5)
+
+[PASS] SPLINE OK: max_kappa=0.677446, min_kappa=0.00869, limit=4.28571
+SPLINE PASSED!!!! from (40,4) to (41,1)
+
+[PASS] SPLINE OK: max_kappa=0.464802, min_kappa=0.00842974, limit=4.28571
+SPLINE PASSED!!!! from (40,4) to (41,2)
+
+[PASS] SPLINE OK: max_kappa=0.231111, min_kappa=0.00778649, limit=4.28571
+SPLINE PASSED!!!! from (40,4) to (41,3)
+
+[PASS] SPLINE OK: max_kappa=0.0270076, min_kappa=0.00129352, limit=4.28571
+SPLINE PASSED!!!! from (40,4) to (41,4)
+
+[PASS] SPLINE OK: max_kappa=0.272476, min_kappa=0.00663758, limit=4.28571
+SPLINE PASSED!!!! from (40,4) to (41,5)
+
+[PASS] SPLINE OK: max_kappa=0.68266, min_kappa=0.00773707, limit=4.28571
+SPLINE PASSED!!!! from (40,5) to (41,2)
+
+[PASS] SPLINE OK: max_kappa=0.469141, min_kappa=0.00739587, limit=4.28571
+SPLINE PASSED!!!! from (40,5) to (41,3)
+
+[PASS] SPLINE OK: max_kappa=0.234363, min_kappa=0.00669927, limit=4.28571
+SPLINE PASSED!!!! from (40,5) to (41,4)
+
+[PASS] SPLINE OK: max_kappa=0.0272368, min_kappa=0.00136164, limit=4.28571
+SPLINE PASSED!!!! from (40,5) to (41,5)
+
+[PASS] SPLINE OK: max_kappa=0.016061, min_kappa=0.000381088, limit=4.28571
+SPLINE PASSED!!!! from (41,0) to (42,0)
+
+[PASS] SPLINE OK: max_kappa=0.258663, min_kappa=0.00340869, limit=4.28571
+SPLINE PASSED!!!! from (41,0) to (42,1)
+
+[PASS] SPLINE OK: max_kappa=0.493615, min_kappa=0.0010686, limit=4.28571
+SPLINE PASSED!!!! from (41,0) to (42,2)
+
+[PASS] SPLINE OK: max_kappa=0.712688, min_kappa=0.000992495, limit=4.28571
+SPLINE PASSED!!!! from (41,0) to (42,3)
+
+[PASS] SPLINE OK: max_kappa=0.233877, min_kappa=0.00460427, limit=4.28571
+SPLINE PASSED!!!! from (41,1) to (42,0)
+
+[PASS] SPLINE OK: max_kappa=0.0161131, min_kappa=0.000366282, limit=4.28571
+SPLINE PASSED!!!! from (41,1) to (42,1)
+
+[PASS] SPLINE OK: max_kappa=0.260599, min_kappa=5.2579e-05, limit=4.28571
+SPLINE PASSED!!!! from (41,1) to (42,2)
+
+[PASS] SPLINE OK: max_kappa=0.501638, min_kappa=0.00211142, limit=4.28571
+SPLINE PASSED!!!! from (41,1) to (42,3)
+
+[PASS] SPLINE OK: max_kappa=0.723957, min_kappa=0.0038958, limit=4.28571
+SPLINE PASSED!!!! from (41,1) to (42,4)
+
+[PASS] SPLINE OK: max_kappa=0.460957, min_kappa=0.00333916, limit=4.28571
+SPLINE PASSED!!!! from (41,2) to (42,0)
+
+[PASS] SPLINE OK: max_kappa=0.228913, min_kappa=0.0012577, limit=4.28571
+SPLINE PASSED!!!! from (41,2) to (42,1)
+
+[PASS] SPLINE OK: max_kappa=0.0182643, min_kappa=0.00105027, limit=4.28571
+SPLINE PASSED!!!! from (41,2) to (42,2)
+
+[PASS] SPLINE OK: max_kappa=0.269229, min_kappa=0.00332549, limit=4.28571
+SPLINE PASSED!!!! from (41,2) to (42,3)
+
+[PASS] SPLINE OK: max_kappa=0.511895, min_kappa=0.0053067, limit=4.28571
+SPLINE PASSED!!!! from (41,2) to (42,4)
+
+[PASS] SPLINE OK: max_kappa=0.735298, min_kappa=0.00680669, limit=4.28571
+SPLINE PASSED!!!! from (41,2) to (42,5)
+
+[PASS] SPLINE OK: max_kappa=0.667494, min_kappa=0.00212474, limit=4.28571
+SPLINE PASSED!!!! from (41,3) to (42,0)
+
+[PASS] SPLINE OK: max_kappa=0.457867, min_kappa=0.000167961, limit=4.28571
+SPLINE PASSED!!!! from (41,3) to (42,1)
+
+[PASS] SPLINE OK: max_kappa=0.228159, min_kappa=0.00211657, limit=4.28571
+SPLINE PASSED!!!! from (41,3) to (42,2)
+
+[PASS] SPLINE OK: max_kappa=0.0252272, min_kappa=0.00036349, limit=4.28571
+SPLINE PASSED!!!! from (41,3) to (42,3)
+
+[PASS] SPLINE OK: max_kappa=0.27803, min_kappa=0.00672547, limit=4.28571
+SPLINE PASSED!!!! from (41,3) to (42,4)
+
+[PASS] SPLINE OK: max_kappa=0.522225, min_kappa=0.00851709, limit=4.28571
+SPLINE PASSED!!!! from (41,3) to (42,5)
+
+[PASS] SPLINE OK: max_kappa=0.667699, min_kappa=0.000781822, limit=4.28571
+SPLINE PASSED!!!! from (41,4) to (42,1)
+
+[PASS] SPLINE OK: max_kappa=0.46088, min_kappa=0.00302942, limit=4.28571
+SPLINE PASSED!!!! from (41,4) to (42,2)
+
+[PASS] SPLINE OK: max_kappa=0.229948, min_kappa=0.00551863, limit=4.28571
+SPLINE PASSED!!!! from (41,4) to (42,3)
+
+[PASS] SPLINE OK: max_kappa=0.0322418, min_kappa=0.00170823, limit=4.28571
+SPLINE PASSED!!!! from (41,4) to (42,4)
+
+[PASS] SPLINE OK: max_kappa=0.286896, min_kappa=0.0101473, limit=4.28571
+SPLINE PASSED!!!! from (41,4) to (42,5)
+
+[PASS] SPLINE OK: max_kappa=0.66824, min_kappa=0.00277504, limit=4.28571
+SPLINE PASSED!!!! from (41,5) to (42,2)
+
+[PASS] SPLINE OK: max_kappa=0.460012, min_kappa=0.00522655, limit=4.28571
+SPLINE PASSED!!!! from (41,5) to (42,3)
+
+[PASS] SPLINE OK: max_kappa=0.227355, min_kappa=0.00785803, limit=4.28571
+SPLINE PASSED!!!! from (41,5) to (42,4)
+
+[PASS] SPLINE OK: max_kappa=0.0415424, min_kappa=0.0020764, limit=4.28571
+SPLINE PASSED!!!! from (41,5) to (42,5)
+
+[PASS] SPLINE OK: max_kappa=0.096179, min_kappa=0.00549638, limit=4.28571
+SPLINE PASSED!!!! from (42,0) to (43,0)
+
+[PASS] SPLINE OK: max_kappa=0.233903, min_kappa=0.0142772, limit=4.28571
+SPLINE PASSED!!!! from (42,0) to (43,1)
+
+[PASS] SPLINE OK: max_kappa=0.550488, min_kappa=0.0317551, limit=4.28571
+SPLINE PASSED!!!! from (42,0) to (43,2)
+
+[PASS] SPLINE OK: max_kappa=0.836983, min_kappa=0.0445468, limit=4.28571
+SPLINE PASSED!!!! from (42,0) to (43,3)
+
+[PASS] SPLINE OK: max_kappa=0.335155, min_kappa=0.00759394, limit=4.28571
+SPLINE PASSED!!!! from (42,1) to (43,0)
+
+[PASS] SPLINE OK: max_kappa=0.0349772, min_kappa=0.00170732, limit=4.28571
+SPLINE PASSED!!!! from (42,1) to (43,1)
+
+[PASS] SPLINE OK: max_kappa=0.315805, min_kappa=0.0248975, limit=4.28571
+SPLINE PASSED!!!! from (42,1) to (43,2)
+
+[PASS] SPLINE OK: max_kappa=0.626484, min_kappa=0.0468692, limit=4.28571
+SPLINE PASSED!!!! from (42,1) to (43,3)
+
+[PASS] SPLINE OK: max_kappa=0.905143, min_kappa=0.0570706, limit=4.28571
+SPLINE PASSED!!!! from (42,1) to (43,4)
+
+[PASS] SPLINE OK: max_kappa=0.555135, min_kappa=0.00921523, limit=4.28571
+SPLINE PASSED!!!! from (42,2) to (43,0)
+
+[PASS] SPLINE OK: max_kappa=0.268291, min_kappa=0.00941359, limit=4.28571
+SPLINE PASSED!!!! from (42,2) to (43,1)
+
+[PASS] SPLINE OK: max_kappa=0.073702, min_kappa=0.00291637, limit=4.28571
+SPLINE PASSED!!!! from (42,2) to (43,2)
+
+[PASS] SPLINE OK: max_kappa=0.396394, min_kappa=0.0206075, limit=4.28571
+SPLINE PASSED!!!! from (42,2) to (43,3)
+
+[PASS] SPLINE OK: max_kappa=0.700659, min_kappa=0.0579679, limit=4.28571
+SPLINE PASSED!!!! from (42,2) to (43,4)
+
+[PASS] SPLINE OK: max_kappa=0.971073, min_kappa=0.0685987, limit=4.28571
+SPLINE PASSED!!!! from (42,2) to (43,5)
+
+[PASS] SPLINE OK: max_kappa=0.74806, min_kappa=0.010277, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,0)
+
+[PASS] SPLINE OK: max_kappa=0.48421, min_kappa=0.00668168, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,1)
+
+[PASS] SPLINE OK: max_kappa=0.217158, min_kappa=0.0113104, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,2)
+
+[PASS] SPLINE OK: max_kappa=0.157393, min_kappa=0.00238377, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,3)
+
+[PASS] SPLINE OK: max_kappa=0.475518, min_kappa=0.0164951, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,4)
+
+[PASS] SPLINE OK: max_kappa=0.77288, min_kappa=0.0534437, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,5)
+
+[PASS] SPLINE OK: max_kappa=0.704067, min_kappa=0.00902452, limit=4.28571
+SPLINE PASSED!!!! from (42,3) to (43,6)
+
+[PASS] SPLINE OK: max_kappa=0.674939, min_kappa=0.00412039, limit=4.28571
+SPLINE PASSED!!!! from (42,4) to (43,1)
+
+[PASS] SPLINE OK: max_kappa=0.432414, min_kappa=0.02297, limit=4.28571
+SPLINE PASSED!!!! from (42,4) to (43,2)
+
+[PASS] SPLINE OK: max_kappa=0.166532, min_kappa=0.00518854, limit=4.28571
+SPLINE PASSED!!!! from (42,4) to (43,3)
+
+[PASS] SPLINE OK: max_kappa=0.240031, min_kappa=0.0067967, limit=4.28571
+SPLINE PASSED!!!! from (42,4) to (43,4)
+
+[PASS] SPLINE OK: max_kappa=0.55303, min_kappa=0.0126009, limit=4.28571
+SPLINE PASSED!!!! from (42,4) to (43,5)
+
+[PASS] SPLINE OK: max_kappa=0.491712, min_kappa=0.00763979, limit=4.28571
+SPLINE PASSED!!!! from (42,4) to (43,6)
+
+[PASS] SPLINE OK: max_kappa=0.62324, min_kappa=0.0191144, limit=4.28571
+SPLINE PASSED!!!! from (42,5) to (43,2)
+
+[PASS] SPLINE OK: max_kappa=0.381106, min_kappa=0.0273035, limit=4.28571
+SPLINE PASSED!!!! from (42,5) to (43,3)
+
+[PASS] SPLINE OK: max_kappa=0.11646, min_kappa=0.00565619, limit=4.28571
+SPLINE PASSED!!!! from (42,5) to (43,4)
+
+[PASS] SPLINE OK: max_kappa=0.321453, min_kappa=0.0157353, limit=4.28571
+SPLINE PASSED!!!! from (42,5) to (43,5)
+
+[PASS] SPLINE OK: max_kappa=0.263036, min_kappa=0.00574988, limit=4.28571
+SPLINE PASSED!!!! from (42,5) to (43,6)
+
+[PASS] SPLINE OK: max_kappa=2.51289, min_kappa=0.00935378, limit=4.28571
+SPLINE PASSED!!!! from (43,0) to (44,0)
+
+[PASS] SPLINE OK: max_kappa=1.64773, min_kappa=0.138218, limit=4.28571
+SPLINE PASSED!!!! from (43,0) to (44,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.1539,8.51581), kappa=4.55913, max_allowed=4.28571
+SPLINE REJECTED from (43,1) to (44,0)
+
+[PASS] SPLINE OK: max_kappa=1.79312, min_kappa=0.0643569, limit=4.28571
+SPLINE PASSED!!!! from (43,1) to (44,1)
+
+[PASS] SPLINE OK: max_kappa=2.28878, min_kappa=0.195232, limit=4.28571
+SPLINE PASSED!!!! from (43,1) to (44,2)
+
+[PASS] SPLINE OK: max_kappa=3.89337, min_kappa=0.00343416, limit=4.28571
+SPLINE PASSED!!!! from (43,2) to (44,1)
+
+[PASS] SPLINE OK: max_kappa=1.12611, min_kappa=0.05487, limit=4.28571
+SPLINE PASSED!!!! from (43,2) to (44,2)
+
+[PASS] SPLINE OK: max_kappa=2.88067, min_kappa=0.230418, limit=4.28571
+SPLINE PASSED!!!! from (43,2) to (44,3)
+
+[PASS] SPLINE OK: max_kappa=3.23299, min_kappa=0.0492575, limit=4.28571
+SPLINE PASSED!!!! from (43,3) to (44,2)
+
+[PASS] SPLINE OK: max_kappa=0.491641, min_kappa=0.00857845, limit=4.28571
+SPLINE PASSED!!!! from (43,3) to (44,3)
+
+[PASS] SPLINE OK: max_kappa=3.42126, min_kappa=0.261153, limit=4.28571
+SPLINE PASSED!!!! from (43,3) to (44,4)
+
+[PASS] SPLINE OK: max_kappa=2.59963, min_kappa=0.10989, limit=4.28571
+SPLINE PASSED!!!! from (43,4) to (44,3)
+
+[PASS] SPLINE OK: max_kappa=0.67506, min_kappa=0.0329968, limit=4.28571
+SPLINE PASSED!!!! from (43,4) to (44,4)
+
+[PASS] SPLINE OK: max_kappa=3.90872, min_kappa=0.287539, limit=4.28571
+SPLINE PASSED!!!! from (43,4) to (44,5)
+
+[PASS] SPLINE OK: max_kappa=1.98685, min_kappa=0.16647, limit=4.28571
+SPLINE PASSED!!!! from (43,5) to (44,4)
+
+[PASS] SPLINE OK: max_kappa=1.3679, min_kappa=0.0661653, limit=4.28571
+SPLINE PASSED!!!! from (43,5) to (44,5)
+
+[PASS] SPLINE OK: max_kappa=3.79398, min_kappa=0.225332, limit=4.28571
+SPLINE PASSED!!!! from (43,6) to (44,4)
+
+[PASS] SPLINE OK: max_kappa=2.48635, min_kappa=0.112321, limit=4.28571
+SPLINE PASSED!!!! from (43,6) to (44,5)
+
+[PASS] SPLINE OK: max_kappa=2.10123, min_kappa=0.178809, limit=4.28571
+SPLINE PASSED!!!! from (44,0) to (45,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7219,8.19381), kappa=-4.73336, max_allowed=4.28571
+SPLINE REJECTED from (44,0) to (45,1)
+
+[PASS] SPLINE OK: max_kappa=1.97921, min_kappa=0.041876, limit=4.28571
+SPLINE PASSED!!!! from (44,1) to (45,0)
+
+[PASS] SPLINE OK: max_kappa=3.47728, min_kappa=0.092706, limit=4.28571
+SPLINE PASSED!!!! from (44,1) to (45,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7349,8.39339), kappa=-5.52657, max_allowed=4.28571
+SPLINE REJECTED from (44,1) to (45,2)
+
+[PASS] SPLINE OK: max_kappa=0.380343, min_kappa=0.0255549, limit=4.28571
+SPLINE PASSED!!!! from (44,2) to (45,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7479,8.59297), kappa=-4.36044, max_allowed=4.28571
+SPLINE REJECTED from (44,2) to (45,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7479,8.59297), kappa=-6.23123, max_allowed=4.28571
+SPLINE REJECTED from (44,2) to (45,3)
+
+[PASS] SPLINE OK: max_kappa=2.32739, min_kappa=0.16195, limit=4.28571
+SPLINE PASSED!!!! from (44,3) to (45,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7608,8.79255), kappa=-5.31337, max_allowed=4.28571
+SPLINE REJECTED from (44,3) to (45,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7608,8.79255), kappa=-5.47816, max_allowed=4.28571
+SPLINE REJECTED from (44,3) to (45,4)
+
+[PASS] SPLINE OK: max_kappa=3.99609, min_kappa=0.205524, limit=4.28571
+SPLINE PASSED!!!! from (44,4) to (45,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7738,8.99213), kappa=-4.57149, max_allowed=4.28571
+SPLINE REJECTED from (44,4) to (45,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-11.7738,8.99213), kappa=-4.71181, max_allowed=4.28571
+SPLINE REJECTED from (44,4) to (45,5)
+
+[PASS] SPLINE OK: max_kappa=2.63136, min_kappa=0.0828354, limit=4.28571
+SPLINE PASSED!!!! from (44,5) to (45,4)
+
+[PASS] SPLINE OK: max_kappa=3.8613, min_kappa=0.199519, limit=4.28571
+SPLINE PASSED!!!! from (44,5) to (45,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.7782,8.37807), kappa=4.73418, max_allowed=4.28571
+SPLINE REJECTED from (45,0) to (46,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.8196,8.5594), kappa=4.99636, max_allowed=4.28571
+SPLINE REJECTED from (45,0) to (46,1)
+
+[PASS] SPLINE OK: max_kappa=2.16176, min_kappa=0.288865, limit=4.28571
+SPLINE PASSED!!!! from (45,1) to (46,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.8831,8.54819), kappa=4.54595, max_allowed=4.28571
+SPLINE REJECTED from (45,1) to (46,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.9218,8.73121), kappa=4.69845, max_allowed=4.28571
+SPLINE REJECTED from (45,1) to (46,2)
+
+[PASS] SPLINE OK: max_kappa=2.58878, min_kappa=0.154004, limit=4.28571
+SPLINE PASSED!!!! from (45,2) to (46,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.989,8.71969), kappa=4.71367, max_allowed=4.28571
+SPLINE REJECTED from (45,2) to (46,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.3436,8.73122), kappa=-4.7621, max_allowed=4.28571
+SPLINE REJECTED from (45,2) to (46,3)
+
+[PASS] SPLINE OK: max_kappa=3.20273, min_kappa=0.166277, limit=4.28571
+SPLINE PASSED!!!! from (45,3) to (46,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.386,8.92668), kappa=-4.51743, max_allowed=4.28571
+SPLINE REJECTED from (45,3) to (46,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-12.386,8.92668), kappa=-5.13964, max_allowed=4.28571
+SPLINE REJECTED from (45,3) to (46,4)
+
+[PASS] SPLINE OK: max_kappa=2.33384, min_kappa=0.080989, limit=4.28571
+SPLINE PASSED!!!! from (45,4) to (46,3)
+
+[PASS] SPLINE OK: max_kappa=3.86911, min_kappa=0.0943925, limit=4.28571
+SPLINE PASSED!!!! from (45,4) to (46,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.3077,9.23696), kappa=5.26357, max_allowed=4.28571
+SPLINE REJECTED from (45,4) to (46,5)
+
+[PASS] SPLINE OK: max_kappa=1.73501, min_kappa=0.407584, limit=4.28571
+SPLINE PASSED!!!! from (45,5) to (46,4)
+
+[PASS] SPLINE OK: max_kappa=2.98717, min_kappa=0.0609468, limit=4.28571
+SPLINE PASSED!!!! from (45,5) to (46,5)
+
+[PASS] SPLINE OK: max_kappa=4.18672, min_kappa=0.100908, limit=4.28571
+SPLINE PASSED!!!! from (45,5) to (46,6)
+
+[PASS] SPLINE OK: max_kappa=1.57722, min_kappa=0.077962, limit=4.28571
+SPLINE PASSED!!!! from (46,0) to (47,0)
+
+[PASS] SPLINE OK: max_kappa=3.69989, min_kappa=0.208051, limit=4.28571
+SPLINE PASSED!!!! from (46,0) to (47,1)
+
+[PASS] SPLINE OK: max_kappa=2.33196, min_kappa=0.113923, limit=4.28571
+SPLINE PASSED!!!! from (46,1) to (47,0)
+
+[PASS] SPLINE OK: max_kappa=1.09888, min_kappa=0.0537506, limit=4.28571
+SPLINE PASSED!!!! from (46,1) to (47,1)
+
+[PASS] SPLINE OK: max_kappa=3.37707, min_kappa=0.192538, limit=4.28571
+SPLINE PASSED!!!! from (46,1) to (47,2)
+
+[PASS] SPLINE OK: max_kappa=1.53001, min_kappa=0.0702203, limit=4.28571
+SPLINE PASSED!!!! from (46,2) to (47,1)
+
+[PASS] SPLINE OK: max_kappa=1.61183, min_kappa=0.102509, limit=4.28571
+SPLINE PASSED!!!! from (46,2) to (47,2)
+
+[PASS] SPLINE OK: max_kappa=3.28522, min_kappa=0.128138, limit=4.28571
+SPLINE PASSED!!!! from (46,2) to (47,3)
+
+[PASS] SPLINE OK: max_kappa=0.660959, min_kappa=0.00203115, limit=4.28571
+SPLINE PASSED!!!! from (46,3) to (47,2)
+
+[PASS] SPLINE OK: max_kappa=1.99517, min_kappa=0.0877161, limit=4.28571
+SPLINE PASSED!!!! from (46,3) to (47,3)
+
+[PASS] SPLINE OK: max_kappa=3.44633, min_kappa=0.0927606, limit=4.28571
+SPLINE PASSED!!!! from (46,3) to (47,4)
+
+[PASS] SPLINE OK: max_kappa=0.713127, min_kappa=0.0312237, limit=4.28571
+SPLINE PASSED!!!! from (46,4) to (47,3)
+
+[PASS] SPLINE OK: max_kappa=2.2722, min_kappa=0.0681287, limit=4.28571
+SPLINE PASSED!!!! from (46,4) to (47,4)
+
+[PASS] SPLINE OK: max_kappa=3.67047, min_kappa=0.0748558, limit=4.28571
+SPLINE PASSED!!!! from (46,4) to (47,5)
+
+[PASS] SPLINE OK: max_kappa=1.28653, min_kappa=0.0646441, limit=4.28571
+SPLINE PASSED!!!! from (46,5) to (47,4)
+
+[PASS] SPLINE OK: max_kappa=2.51446, min_kappa=0.0467373, limit=4.28571
+SPLINE PASSED!!!! from (46,5) to (47,5)
+
+[PASS] SPLINE OK: max_kappa=0.455514, min_kappa=0.276081, limit=4.28571
+SPLINE PASSED!!!! from (46,6) to (47,4)
+
+[PASS] SPLINE OK: max_kappa=1.70132, min_kappa=0.045064, limit=4.28571
+SPLINE PASSED!!!! from (46,6) to (47,5)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.2314,7.97682), kappa=6.46582, max_allowed=4.28571
+SPLINE REJECTED from (47,0) to (48,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.2314,7.97682), kappa=4.97575, max_allowed=4.28571
+SPLINE REJECTED from (47,0) to (48,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4149,8.05638), kappa=5.9868, max_allowed=4.28571
+SPLINE REJECTED from (47,1) to (48,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4149,8.05638), kappa=5.95768, max_allowed=4.28571
+SPLINE REJECTED from (47,1) to (48,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4149,8.05638), kappa=4.55189, max_allowed=4.28571
+SPLINE REJECTED from (47,1) to (48,2)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.5984,8.13593), kappa=5.47894, max_allowed=4.28571
+SPLINE REJECTED from (47,2) to (48,1)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.5984,8.13593), kappa=5.08402, max_allowed=4.28571
+SPLINE REJECTED from (47,2) to (48,2)
+
+[PASS] SPLINE OK: max_kappa=3.53711, min_kappa=0.115447, limit=4.28571
+SPLINE PASSED!!!! from (47,2) to (48,3)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.7819,8.21549), kappa=4.84829, max_allowed=4.28571
+SPLINE REJECTED from (47,3) to (48,2)
+
+[PASS] SPLINE OK: max_kappa=4.24032, min_kappa=0.027025, limit=4.28571
+SPLINE PASSED!!!! from (47,3) to (48,3)
+
+[PASS] SPLINE OK: max_kappa=2.54495, min_kappa=0.0433496, limit=4.28571
+SPLINE PASSED!!!! from (47,3) to (48,4)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.6112,7.54665), kappa=-4.46547, max_allowed=4.28571
+SPLINE REJECTED from (47,4) to (48,3)
+
+[PASS] SPLINE OK: max_kappa=3.46653, min_kappa=0.145828, limit=4.28571
+SPLINE PASSED!!!! from (47,4) to (48,4)
+
+[PASS] SPLINE OK: max_kappa=0.518905, min_kappa=0.00924291, limit=4.28571
+SPLINE PASSED!!!! from (47,4) to (48,5)
+
+[PASS] SPLINE OK: max_kappa=3.78153, min_kappa=0.18392, limit=4.28571
+SPLINE PASSED!!!! from (47,5) to (48,4)
+
+[PASS] SPLINE OK: max_kappa=1.33975, min_kappa=0.0605519, limit=4.28571
+SPLINE PASSED!!!! from (47,5) to (48,5)
+
+[PASS] SPLINE OK: max_kappa=3.07132, min_kappa=0.252578, limit=4.28571
+SPLINE PASSED!!!! from (48,0) to (49,0)
+
+REJECTED (EXCESSIVE CURVATURE): Point (-13.4878,6.82258), kappa=4.38783, max_allowed=4.28571
+SPLINE REJECTED from (48,0) to (49,1)
+
+[PASS] SPLINE OK: max_kappa=1.02381, min_kappa=0.0292661, limit=4.28571
+SPLINE PASSED!!!! from (48,1) to (49,0)
+
+[PASS] SPLINE OK: max_kappa=2.4943, min_kappa=0.129475, limit=4.28571
+SPLINE PASSED!!!! from (48,1) to (49,1)
+
+[PASS] SPLINE OK: max_kappa=3.86978, min_kappa=0.145715, limit=4.28571
+SPLINE PASSED!!!! from (48,1) to (49,2)
+
+[PASS] SPLINE OK: max_kappa=1.45846, min_kappa=0.00710185, limit=4.28571
+SPLINE PASSED!!!! from (48,2) to (49,1)
+
+[PASS] SPLINE OK: max_kappa=1.95053, min_kappa=0.00531016, limit=4.28571
+SPLINE PASSED!!!! from (48,2) to (49,2)
+
+[PASS] SPLINE OK: max_kappa=3.36795, min_kappa=0.172508, limit=4.28571
+SPLINE PASSED!!!! from (48,2) to (49,3)
+
+[PASS] SPLINE OK: max_kappa=1.85805, min_kappa=0.123756, limit=4.28571
+SPLINE PASSED!!!! from (48,3) to (49,2)
+
+[PASS] SPLINE OK: max_kappa=1.438, min_kappa=0.09625, limit=4.28571
+SPLINE PASSED!!!! from (48,3) to (49,3)
+
+[PASS] SPLINE OK: max_kappa=3.05188, min_kappa=0.232763, limit=4.28571
+SPLINE PASSED!!!! from (48,3) to (49,4)
+
+[PASS] SPLINE OK: max_kappa=1.91239, min_kappa=0.0302695, limit=4.28571
+SPLINE PASSED!!!! from (48,4) to (49,3)
+
+[PASS] SPLINE OK: max_kappa=1.32186, min_kappa=0.0638173, limit=4.28571
+SPLINE PASSED!!!! from (48,4) to (49,4)
+
+[PASS] SPLINE OK: max_kappa=3.50553, min_kappa=0.162416, limit=4.28571
+SPLINE PASSED!!!! from (48,4) to (49,5)
+
+[PASS] SPLINE OK: max_kappa=0.325605, min_kappa=0.094607, limit=4.28571
+SPLINE PASSED!!!! from (48,5) to (49,4)
+
+[PASS] SPLINE OK: max_kappa=3.04107, min_kappa=0.0103783, limit=4.28571
+SPLINE PASSED!!!! from (48,5) to (49,5)
+
+[PASS] SPLINE OK: max_kappa=1.3453, min_kappa=0.0357587, limit=4.28571
+SPLINE PASSED!!!! from (49,0) to (50,0)
+
+[PASS] SPLINE OK: max_kappa=1.71978, min_kappa=0.149256, limit=4.28571
+SPLINE PASSED!!!! from (49,0) to (50,1)
+
+[PASS] SPLINE OK: max_kappa=3.59552, min_kappa=0.16658, limit=4.28571
+SPLINE PASSED!!!! from (49,1) to (50,0)
+
+[PASS] SPLINE OK: max_kappa=1.62253, min_kappa=0.0699453, limit=4.28571
+SPLINE PASSED!!!! from (49,1) to (50,1)
+
+[PASS] SPLINE OK: max_kappa=1.42812, min_kappa=0.0753134, limit=4.28571
+SPLINE PASSED!!!! from (49,1) to (50,2)
+
+[PASS] SPLINE OK: max_kappa=3.78386, min_kappa=0.17059, limit=4.28571
+SPLINE PASSED!!!! from (49,2) to (50,1)
+
+[PASS] SPLINE OK: max_kappa=1.89249, min_kappa=0.102884, limit=4.28571
+SPLINE PASSED!!!! from (49,2) to (50,2)
+
+[PASS] SPLINE OK: max_kappa=1.1406, min_kappa=0.00329547, limit=4.28571
+SPLINE PASSED!!!! from (49,2) to (50,3)
+
+[PASS] SPLINE OK: max_kappa=3.96474, min_kappa=0.173287, limit=4.28571
+SPLINE PASSED!!!! from (49,3) to (50,2)
+
+[PASS] SPLINE OK: max_kappa=2.15494, min_kappa=0.134448, limit=4.28571
+SPLINE PASSED!!!! from (49,3) to (50,3)
+
+[PASS] SPLINE OK: max_kappa=0.857281, min_kappa=0.0457871, limit=4.28571
+SPLINE PASSED!!!! from (49,3) to (50,4)
+
+[PASS] SPLINE OK: max_kappa=3.9801, min_kappa=0.147228, limit=4.28571
+SPLINE PASSED!!!! from (49,4) to (50,3)
+
+[PASS] SPLINE OK: max_kappa=2.19782, min_kappa=0.186172, limit=4.28571
+SPLINE PASSED!!!! from (49,4) to (50,4)
+
+[PASS] SPLINE OK: max_kappa=0.839993, min_kappa=0.0414517, limit=4.28571
+SPLINE PASSED!!!! from (49,4) to (50,5)
+
+[PASS] SPLINE OK: max_kappa=3.33963, min_kappa=0.00966618, limit=4.28571
+SPLINE PASSED!!!! from (49,5) to (50,4)
+
+[PASS] SPLINE OK: max_kappa=1.33523, min_kappa=0.0139282, limit=4.28571
+SPLINE PASSED!!!! from (49,5) to (50,5)
+
+[PASS] SPLINE OK: max_kappa=1.27986, min_kappa=0.0666346, limit=4.28571
+SPLINE PASSED!!!! from (50,0) to (0,0)
+
+[PASS] SPLINE OK: max_kappa=0.335827, min_kappa=0.0115599, limit=4.28571
+SPLINE PASSED!!!! from (50,0) to (0,1)
+
+[PASS] SPLINE OK: max_kappa=2.29837, min_kappa=0.0952794, limit=4.28571
+SPLINE PASSED!!!! from (50,1) to (0,0)
+
+[PASS] SPLINE OK: max_kappa=1.3156, min_kappa=0.111755, limit=4.28571
+SPLINE PASSED!!!! from (50,1) to (0,1)
+
+[PASS] SPLINE OK: max_kappa=0.247672, min_kappa=0.00643899, limit=4.28571
+SPLINE PASSED!!!! from (50,1) to (0,2)
+
+[PASS] SPLINE OK: max_kappa=2.34594, min_kappa=0.0698743, limit=4.28571
+SPLINE PASSED!!!! from (50,2) to (0,1)
+
+[PASS] SPLINE OK: max_kappa=1.35215, min_kappa=0.0844673, limit=4.28571
+SPLINE PASSED!!!! from (50,2) to (0,2)
+
+[PASS] SPLINE OK: max_kappa=0.158238, min_kappa=0.0118461, limit=4.28571
+SPLINE PASSED!!!! from (50,2) to (0,3)
+
+[PASS] SPLINE OK: max_kappa=2.39434, min_kappa=0.0448766, limit=4.28571
+SPLINE PASSED!!!! from (50,3) to (0,2)
+
+[PASS] SPLINE OK: max_kappa=1.38943, min_kappa=0.0518835, limit=4.28571
+SPLINE PASSED!!!! from (50,3) to (0,3)
+
+[PASS] SPLINE OK: max_kappa=0.0675214, min_kappa=0.0305791, limit=4.28571
+SPLINE PASSED!!!! from (50,3) to (0,4)
+
+[PASS] SPLINE OK: max_kappa=2.4435, min_kappa=0.0203346, limit=4.28571
+SPLINE PASSED!!!! from (50,4) to (0,3)
+
+[PASS] SPLINE OK: max_kappa=1.4274, min_kappa=0.0193062, limit=4.28571
+SPLINE PASSED!!!! from (50,4) to (0,4)
+
+[PASS] SPLINE OK: max_kappa=0.0496896, min_kappa=0.00223089, limit=4.28571
+SPLINE PASSED!!!! from (50,4) to (0,5)
+
+[PASS] SPLINE OK: max_kappa=2.44316, min_kappa=0.0144135, limit=4.28571
+SPLINE PASSED!!!! from (50,5) to (0,4)
+
+[PASS] SPLINE OK: max_kappa=1.41213, min_kappa=0.011248, limit=4.28571
+SPLINE PASSED!!!! from (50,5) to (0,5)
+
+[PASS] SPLINE OK: max_kappa=0.0507724, min_kappa=0.0025384, limit=4.28571
+SPLINE PASSED!!!! from (50,5) to (0,6)
+
+
+--- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---
+(0,0): 0 -> 1 -> 2 -> 3 -> NULL
+(0,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(0,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(0,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(0,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(0,5): 2 -> 3 -> 4 -> 5 -> NULL
+(0,6): 2 -> 3 -> 4 -> 5 -> NULL
+(1,0): 0 -> 1 -> NULL
+(1,1): 0 -> 1 -> 2 -> NULL
+(1,2): 1 -> 2 -> 3 -> NULL
+(1,3): 2 -> 3 -> 4 -> NULL
+(1,4): 3 -> 4 -> 5 -> NULL
+(1,5): 4 -> 5 -> NULL
+(2,0): 0 -> NULL
+(2,1): 0 -> 1 -> NULL
+(2,2): 1 -> 2 -> NULL
+(2,3): 2 -> 3 -> NULL
+(2,4): 3 -> 4 -> 5 -> NULL
+(2,5): 4 -> 5 -> NULL
+(3,0): 0 -> NULL
+(3,1): 0 -> 1 -> NULL
+(3,2): 1 -> 2 -> NULL
+(3,3): 2 -> 3 -> NULL
+(3,4): 3 -> 4 -> 5 -> NULL
+(3,5): 4 -> 5 -> NULL
+(4,5): 4 -> NULL
+(5,0): 1 -> NULL
+(5,1): 1 -> 2 -> NULL
+(5,2): 1 -> 2 -> 3 -> NULL
+(5,3): 2 -> 3 -> 4 -> NULL
+(5,4): 3 -> 4 -> 5 -> NULL
+(5,5): 3 -> 4 -> 5 -> NULL
+(6,0): 0 -> NULL
+(6,1): 0 -> 1 -> 2 -> NULL
+(6,2): 2 -> 3 -> NULL
+(6,3): 3 -> 4 -> NULL
+(6,4): 3 -> 4 -> 5 -> NULL
+(6,5): 4 -> 5 -> NULL
+(7,0): 0 -> 1 -> NULL
+(7,1): 1 -> 2 -> NULL
+(7,2): 2 -> 3 -> NULL
+(7,3): 3 -> 4 -> NULL
+(7,4): 4 -> 5 -> NULL
+(7,5): 4 -> 5 -> NULL
+(8,0): 0 -> 1 -> NULL
+(8,1): 0 -> 1 -> 2 -> NULL
+(8,2): 1 -> 2 -> 3 -> NULL
+(8,3): 2 -> 3 -> 4 -> NULL
+(8,4): 3 -> 4 -> 5 -> NULL
+(8,5): 4 -> 5 -> NULL
+(9,0): 0 -> 1 -> 2 -> 3 -> NULL
+(9,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(9,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(9,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(9,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(9,5): 2 -> 3 -> 4 -> 5 -> NULL
+(10,0): 0 -> 1 -> 2 -> 3 -> NULL
+(10,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(10,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(10,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(10,4): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(10,5): 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(11,0): 0 -> 1 -> 2 -> 3 -> NULL
+(11,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(11,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(11,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(11,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(11,5): 2 -> 3 -> 4 -> 5 -> NULL
+(11,6): 2 -> 3 -> 4 -> 5 -> NULL
+(12,0): 0 -> 1 -> 2 -> 3 -> NULL
+(12,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(12,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(12,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(12,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(12,5): 2 -> 3 -> 4 -> 5 -> NULL
+(13,0): 0 -> 1 -> 2 -> 3 -> NULL
+(13,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(13,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(13,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(13,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(13,5): 2 -> 3 -> 4 -> 5 -> NULL
+(14,0): 0 -> 1 -> 2 -> 3 -> NULL
+(14,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(14,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(14,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(14,4): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(14,5): 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(15,0): 0 -> 1 -> 2 -> 3 -> NULL
+(15,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(15,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(15,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(15,4): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(15,5): 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(15,6): 3 -> 4 -> 5 -> NULL
+(16,0): 0 -> 1 -> 2 -> 3 -> NULL
+(16,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(16,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(16,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(16,4): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(16,5): 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(16,6): 3 -> 4 -> 5 -> 6 -> NULL
+(17,0): 0 -> NULL
+(17,1): 0 -> 1 -> NULL
+(17,2): 1 -> 2 -> NULL
+(17,3): 2 -> 3 -> NULL
+(17,4): 3 -> 4 -> NULL
+(17,5): 4 -> 5 -> 6 -> NULL
+(17,6): 5 -> 6 -> NULL
+(18,0): 0 -> 1 -> NULL
+(18,1): 0 -> 1 -> 2 -> NULL
+(18,2): 1 -> 2 -> 3 -> NULL
+(18,3): 2 -> 3 -> 4 -> NULL
+(18,4): 3 -> 4 -> 5 -> NULL
+(18,5): 4 -> 5 -> 6 -> NULL
+(18,6): 5 -> 6 -> NULL
+(19,0): 0 -> NULL
+(19,1): 0 -> NULL
+(19,2): 1 -> NULL
+(19,3): 2 -> NULL
+(19,4): 3 -> NULL
+(19,5): 4 -> 5 -> NULL
+(19,6): 5 -> 6 -> NULL
+(20,1): 0 -> NULL
+(20,2): 1 -> NULL
+(20,3): 2 -> NULL
+(20,4): 3 -> 4 -> NULL
+(20,5): 4 -> 5 -> NULL
+(20,6): 5 -> NULL
+(21,0): 0 -> 1 -> NULL
+(21,1): 0 -> 1 -> 2 -> NULL
+(21,2): 1 -> 2 -> 3 -> NULL
+(21,3): 2 -> 3 -> 4 -> NULL
+(21,4): 3 -> 4 -> 5 -> NULL
+(21,5): 4 -> 5 -> 6 -> NULL
+(21,6): 5 -> 6 -> NULL
+(21,7): 4 -> 5 -> 6 -> NULL
+(22,0): 0 -> 1 -> NULL
+(22,1): 2 -> NULL
+(22,2): 3 -> NULL
+(22,3): 3 -> 4 -> NULL
+(22,4): 4 -> 5 -> NULL
+(22,5): 4 -> 5 -> 6 -> NULL
+(22,6): 5 -> 6 -> NULL
+(23,0): 0 -> 1 -> NULL
+(23,1): 0 -> 1 -> 2 -> NULL
+(23,2): 1 -> 2 -> 3 -> NULL
+(23,3): 2 -> 3 -> 4 -> NULL
+(23,4): 3 -> 4 -> 5 -> NULL
+(23,5): 4 -> 5 -> NULL
+(23,6): 4 -> 5 -> NULL
+(24,0): 0 -> 1 -> NULL
+(24,1): 0 -> 1 -> 2 -> NULL
+(24,2): 1 -> 2 -> 3 -> NULL
+(24,3): 2 -> 3 -> 4 -> NULL
+(24,4): 3 -> 4 -> 5 -> NULL
+(24,5): 4 -> 5 -> NULL
+(25,0): 0 -> 1 -> 2 -> 3 -> NULL
+(25,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(25,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(25,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(25,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(25,5): 2 -> 3 -> 4 -> 5 -> NULL
+(26,0): 0 -> 1 -> 2 -> NULL
+(26,1): 0 -> 1 -> 2 -> 3 -> NULL
+(26,2): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(26,3): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(26,4): 2 -> 3 -> 4 -> 5 -> NULL
+(26,5): 3 -> 4 -> 5 -> NULL
+(27,0): 0 -> 1 -> NULL
+(27,1): 1 -> 2 -> NULL
+(27,2): 1 -> 2 -> 3 -> NULL
+(27,3): 2 -> 3 -> 4 -> NULL
+(27,4): 3 -> 4 -> 5 -> NULL
+(27,5): 4 -> 5 -> NULL
+(28,0): 0 -> NULL
+(28,1): 0 -> NULL
+(28,2): 1 -> NULL
+(28,3): 2 -> NULL
+(28,4): 3 -> NULL
+(28,5): 4 -> 5 -> NULL
+(29,1): 0 -> NULL
+(29,2): 1 -> NULL
+(29,3): 2 -> NULL
+(29,4): 3 -> 4 -> NULL
+(29,5): 4 -> 5 -> NULL
+(30,0): 1 -> NULL
+(30,1): 0 -> 1 -> 2 -> NULL
+(30,2): 1 -> 2 -> 3 -> NULL
+(30,3): 2 -> 3 -> 4 -> NULL
+(30,4): 3 -> 4 -> 5 -> NULL
+(30,5): 4 -> 5 -> NULL
+(31,0): 0 -> 1 -> NULL
+(31,1): 2 -> NULL
+(31,2): 2 -> 3 -> NULL
+(31,3): 2 -> 3 -> 4 -> NULL
+(31,4): 3 -> 4 -> 5 -> NULL
+(31,5): 4 -> 5 -> NULL
+(32,0): 0 -> 1 -> NULL
+(32,1): 1 -> 2 -> NULL
+(32,2): 2 -> 3 -> NULL
+(32,3): 4 -> NULL
+(32,4): 4 -> 5 -> NULL
+(32,5): 4 -> 5 -> NULL
+(33,0): 0 -> 1 -> NULL
+(33,1): 0 -> 1 -> 2 -> NULL
+(33,2): 1 -> 2 -> 3 -> NULL
+(33,3): 2 -> 3 -> 4 -> NULL
+(33,4): 3 -> 4 -> 5 -> NULL
+(33,5): 4 -> 5 -> NULL
+(34,0): 0 -> 1 -> NULL
+(34,1): 0 -> 1 -> 2 -> NULL
+(34,2): 1 -> 2 -> 3 -> NULL
+(34,3): 2 -> 3 -> 4 -> NULL
+(34,4): 3 -> 4 -> 5 -> NULL
+(34,5): 4 -> 5 -> NULL
+(35,0): 0 -> 1 -> 2 -> 3 -> NULL
+(35,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(35,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(35,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(35,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(35,5): 2 -> 3 -> 4 -> 5 -> NULL
+(36,0): 0 -> 1 -> 2 -> 3 -> NULL
+(36,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(36,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(36,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(36,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(36,5): 2 -> 3 -> 4 -> 5 -> NULL
+(37,0): 0 -> 1 -> 2 -> 3 -> NULL
+(37,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(37,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(37,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(37,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(37,5): 2 -> 3 -> 4 -> 5 -> NULL
+(38,0): 0 -> 1 -> 2 -> 3 -> NULL
+(38,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(38,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(38,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(38,4): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(38,5): 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(39,0): 0 -> 1 -> 2 -> 3 -> NULL
+(39,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(39,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(39,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(39,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(39,5): 2 -> 3 -> 4 -> 5 -> NULL
+(39,6): 2 -> 3 -> 4 -> 5 -> NULL
+(40,0): 0 -> 1 -> 2 -> 3 -> NULL
+(40,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(40,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(40,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(40,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(40,5): 2 -> 3 -> 4 -> 5 -> NULL
+(41,0): 0 -> 1 -> 2 -> 3 -> NULL
+(41,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(41,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(41,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(41,4): 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(41,5): 2 -> 3 -> 4 -> 5 -> NULL
+(42,0): 0 -> 1 -> 2 -> 3 -> NULL
+(42,1): 0 -> 1 -> 2 -> 3 -> 4 -> NULL
+(42,2): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> NULL
+(42,3): 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(42,4): 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(42,5): 2 -> 3 -> 4 -> 5 -> 6 -> NULL
+(43,0): 0 -> 1 -> NULL
+(43,1): 1 -> 2 -> NULL
+(43,2): 1 -> 2 -> 3 -> NULL
+(43,3): 2 -> 3 -> 4 -> NULL
+(43,4): 3 -> 4 -> 5 -> NULL
+(43,5): 4 -> 5 -> NULL
+(43,6): 4 -> 5 -> NULL
+(44,0): 0 -> NULL
+(44,1): 0 -> 1 -> NULL
+(44,2): 1 -> NULL
+(44,3): 2 -> NULL
+(44,4): 3 -> NULL
+(44,5): 4 -> 5 -> NULL
+(45,1): 0 -> NULL
+(45,2): 1 -> NULL
+(45,3): 2 -> NULL
+(45,4): 3 -> 4 -> NULL
+(45,5): 4 -> 5 -> 6 -> NULL
+(46,0): 0 -> 1 -> NULL
+(46,1): 0 -> 1 -> 2 -> NULL
+(46,2): 1 -> 2 -> 3 -> NULL
+(46,3): 2 -> 3 -> 4 -> NULL
+(46,4): 3 -> 4 -> 5 -> NULL
+(46,5): 4 -> 5 -> NULL
+(46,6): 4 -> 5 -> NULL
+(47,2): 3 -> NULL
+(47,3): 3 -> 4 -> NULL
+(47,4): 4 -> 5 -> NULL
+(47,5): 4 -> 5 -> NULL
+(48,0): 0 -> NULL
+(48,1): 0 -> 1 -> 2 -> NULL
+(48,2): 1 -> 2 -> 3 -> NULL
+(48,3): 2 -> 3 -> 4 -> NULL
+(48,4): 3 -> 4 -> 5 -> NULL
+(48,5): 4 -> 5 -> NULL
+(49,0): 0 -> 1 -> NULL
+(49,1): 0 -> 1 -> 2 -> NULL
+(49,2): 1 -> 2 -> 3 -> NULL
+(49,3): 2 -> 3 -> 4 -> NULL
+(49,4): 3 -> 4 -> 5 -> NULL
+(49,5): 4 -> 5 -> NULL
+(50,0): 0 -> 1 -> NULL
+(50,1): 0 -> 1 -> 2 -> NULL
+(50,2): 1 -> 2 -> 3 -> NULL
+(50,3): 2 -> 3 -> 4 -> NULL
+(50,4): 3 -> 4 -> 5 -> NULL
+(50,5): 4 -> 5 -> 6 -> NULL
