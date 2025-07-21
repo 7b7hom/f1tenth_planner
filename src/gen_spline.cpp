@@ -149,7 +149,7 @@ void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolutio
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
         nodesPerLayer[i].resize(num_nodes); // 현재 레이어의 노드 벡터 크기 조정 (NodeMap은 vector<vector<Node>> 이므로 inner vector의 resize)
-
+        // cout << i << "번째 레이어의 노드 개수: " << num_nodes << endl;
         for (int idx = 0; idx < num_nodes; ++idx) { 
             double alpha = start_alpha + idx * lat_resolution; // 현재 노드의 횡방향 오프셋 계산
             Vector2d node_pos = ref_xy + alpha * norm_vec; // 노드의 (x, y) 좌표 계산 (여기서 선언)
@@ -187,72 +187,12 @@ void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolutio
                 psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
                 current_node_instance.psi = normalizeAngle(psi_interp);
             }
+            //current_node_instance.psi = sampling_map[__psi][i];
             
             nodesPerLayer[i][idx] = current_node_instance; // <-- 생성된 노드 인스턴스를 NodeMap에 할당
         }
     }
 }
-
-/*
-// 샘플링된 레이어마다 경로 계획을 위한 Node(차량이 횡방향으로 이동 가능한 위치들) 생성
-void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolution) {
-    const size_t N = sampling_map[__alpha].size();
-    IVector raceline_index_array;
-    Vector2d node_pos;
-    nodesPerLayer.resize(N); 
-
-    for (size_t i = 0; i < N; ++i){ 
-        Node node;
-        node.layer_idx = i; 
-        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
-        raceline_index_array.push_back(raceline_index);
-        
-        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);
-        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);
-        
-        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
-        int node_idx = 0;
-        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
-        nodesPerLayer[i].resize(num_nodes); 
-
-        for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
-            node_pos = ref_xy + alpha * norm_vec;
-            node.node_idx = node_idx;
-            node.x = node_pos.x();
-            node.y = node_pos.y();
-            node.psi = 0.0;
-            node.kappa = 0.0;
-            node.raceline = (node_idx == raceline_index);
-
-            double psi_interp;
-            if (node_idx < raceline_index) {
-                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) {
-                    double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
-                    double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
-                    psi_interp = bl + (p - bl) * node_idx / raceline_index;
-                } else {
-                    psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
-                }
-                node.psi = normalizeAngle(psi_interp);
-            }
-            else if (node_idx == raceline_index) {
-                psi_interp = sampling_map[__psi][i];
-                node.psi = psi_interp;
-            }
-            else {
-                int remain = num_nodes - raceline_index - 1;
-                double t = static_cast<double>(node_idx - raceline_index) / max(remain, 1); 
-                psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
-                node.psi = normalizeAngle(psi_interp);
-            }
-            nodesPerLayer[i][node_idx] = node;
-            ++node_idx;
-        }
-    }
-}
-*/
-// gen_spline.cpp 파일 내, genNode 함수 위에 (또는 다른 spline 관련 함수들과 함께) 추가하세요.
-
 
 
 // 주어진 X, Y 좌표에서 해당 psi (헤딩) 방향을 화살표로 시각화
@@ -470,7 +410,14 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
         }        
     }
 
-    return {coeffs_x_res, coeffs_y_res, M, normvec_normalized_res, ds}; // 각 구간의 실제 길이인 ds 값도 함께 반환
+    SplineResult result;
+    result.coeffs_x = coeffs_x_res;
+    result.coeffs_y = coeffs_y_res;
+    result.M = M;
+    result.normvec_normalized = normvec_normalized_res;
+    result.ds = ds;
+
+    return result;
 }
 
 // spline 평가하여 위치, 헤딩, 곡률 반환
@@ -547,12 +494,13 @@ bool isPointInsideTrackBounds(double x, double y){
     // spline 점의 기준선 법선 방향 횡방향 오프셋 계산
     // -> (x, y) 점이 기준선으로부터 법선 벡터 방향으로 얼마나 떨어져 있는가
     double lateral_offset = (x - ref_x) * norm_x + (y - ref_y) * norm_y; // 법선 벡터 norm_x, norm_y: 기준선에 수직인 방향을 가리키는 단위 벡터
-    cout << "DEBUG OOB: Point(" << x << "," << y << ") RefIdx=" << closest_ref_idx
+    /*cout << "DEBUG OOB: Point(" << x << "," << y << ") RefIdx=" << closest_ref_idx
      << " Offset=" << lateral_offset << " Bounds=[" << -width_left << "," << width_right << "]"
-     << " NormVec=(" << norm_x << "," << norm_y << ")" << endl;
+     << " NormVec=(" << norm_x << "," << norm_y << ")" << endl;*/
 
+    double epsilon = 1e-6;
     // lateral_offset이 트랙의 유효한 횡방향 범위 내에 있는지 직접적으로 확인하는 최종 단계
-    if(lateral_offset >= -width_left && lateral_offset <= width_right){
+    if(lateral_offset >= -width_left - epsilon && lateral_offset <= width_right + epsilon){
         return true;
     }else{
         return false;
@@ -563,9 +511,9 @@ bool isPointInsideTrackBounds(double x, double y){
 bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, double ds_current,
                          const Offline_Params& params){ // const MatrixXd& track_bounds
     // spline 경로 샘플링
-    const int num_samples = 20;
+    const int num_samples = 10;
 
-    double max_allowed_kappa = 4.0 / params.VEH_TURN;
+    double max_allowed_kappa = 30.0 / params.VEH_TURN;
 
     for(int k = 0; k <= num_samples; ++k){
         double t_eval = static_cast<double>(k) / num_samples; // 파라미터 t 값을 균등하게 분할
@@ -586,55 +534,91 @@ bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, 
         }
     }
 
+    if (true) { // 모든 스플라인에 대해 kappa 확인용 로그
+    double max_kappa = 0.0;
+    double min_kappa = 1e9;
+    for (int k = 0; k <= num_samples; ++k) {
+        double t_eval = static_cast<double>(k) / num_samples;
+        SplinePoint sp = evaluateSpline(coeff_x, coeff_y, t_eval, ds_current, true);
+        max_kappa = std::max(max_kappa, std::abs(sp.kappa));
+        min_kappa = std::min(min_kappa, std::abs(sp.kappa));
+    }
+    std::cout << "[PASS] SPLINE OK: max_kappa=" << max_kappa
+              << ", min_kappa=" << min_kappa
+              << ", limit=" << max_allowed_kappa
+              << std::endl;
+    }
+
     return true;
 }
 
-void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params& params){
-    const size_t num_layers = nodesPerLayer.size(); // 총 layer의 개수
+void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params params){
+    const size_t num_layers = nodesPerLayer.size();
 
-    // current_layer_idx에서 next_layer_idx로의 연결 시도
+    // layer 순회
     for(size_t current_layer_idx = 0; current_layer_idx < num_layers; ++current_layer_idx){
-        // 다음 layer의 인덱스 계산
-        size_t next_layer_idx = (current_layer_idx + 1) % num_layers; // 닫힌 트랙에서 마지막 layer 이후 첫 번째 layer로 돌아가게 함.
+        size_t next_layer_idx = (current_layer_idx + 1) % num_layers;
 
-        // 현재 layer와 다음 layer의 node 가져옴.
         const auto& current_nodes_in_layer = nodesPerLayer[current_layer_idx];
         const auto& next_nodes_in_layer = nodesPerLayer[next_layer_idx];
 
-        // 현재 layer의 모든 current_node에 대해 수행
+        // 현재 layer의 node 순회
         for(const auto& current_node : current_nodes_in_layer){
-            for(const auto& next_node : next_nodes_in_layer){
-                MatrixXd spline_path(2, 2);
-                spline_path << current_node.x, current_node.y, next_node.x, next_node.y; // 첫 번째 행: 현재 node의 (x, y) | 두 번째 행: 다음 node의 (x, y)
+            // lat_steps 로직
+            int refDestIdx = current_node.node_idx; // 기준 목적지 인덱스 선정(current_node와 같은 횡방향 인덱스를 가진 다음 layer의 node)
+            refDestIdx = clamp(refDestIdx, 0, static_cast<int>(next_nodes_in_layer.size() - 1));
+            
+            const Node& refEndNode = next_nodes_in_layer[refDestIdx];
 
-                // spline 시작/끝 heading으로 각 node의 psi값 사용
+            // 현재 layer와 다음 layer 기준 노드 사이의 거리 계산
+            double dist_between_layers = (Vector2d(refEndNode.x, refEndNode.y) - Vector2d(current_node.x, current_node.y)).norm();
+
+            double ratio = 0.0;
+            if(params.CURVE_THR > 1e-9){
+                ratio = min(abs(current_node.kappa) / params.CURVE_THR, 2.0); // 현재 노드의 곡률을 CURVE_THR로 정규화
+            }
+            // factor -> 직선보다 곡선에서 더 넓은 노드 탐색을 가능하게 하는 계수
+            double factor = 1.0 / (1.0 + 0.5 * ratio); // 곡률 높을수록 lat_steps 줄이기
+
+            // 곡률이 높고 거리가 멀수록 더 많은 노드를 살펴봄
+            int lat_steps = static_cast<int>(round(factor * dist_between_layers * params.LAT_OFFSET / params.LAT_RESOLUTION));
+
+            lat_steps = min(lat_steps, (int)params.MAX_LAT_STEPS);
+
+            for(int dest_node_idx = max(0, refDestIdx - lat_steps); dest_node_idx <= min(static_cast<int>(next_nodes_in_layer.size() - 1), refDestIdx + lat_steps); ++dest_node_idx){
+                const Node& next_node = next_nodes_in_layer[dest_node_idx];
+
+                MatrixXd spline_path(2, 2);
+                spline_path << current_node.x, current_node.y, next_node.x, next_node.y;
+
                 double psi_s = current_node.psi;
                 double psi_e = next_node.psi;
 
-                // spline 구간의 유클리드 길이
                 VectorXd el_lengths(1);
                 el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
 
                 SplineResult res;
                 try{
-                    // spline_path의 두 점을 연결하는 spline 계수 계산
                     res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
-                }catch(const std::exception& e){
-                    continue; // 유효하지 않을 경우(예외 발생) 건너뜀.
+                }catch(const exception& e){
+                    continue;
                 }
 
-                // spline 유효성 검사
                 if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params)){
                     ITuple src_key(current_node.layer_idx, current_node.node_idx);
-                    graph.addEdge(src_key, next_node.node_idx); // 검사 통과 시 그래프에 edge 추가(src_key: 특정 node를 고유하게 식별하는 key 역할, tuple)
-                }else { // 스플라인이 유효하지 않을 때
+                    graph.addEdge(src_key, next_node.node_idx);
+                    cout << "SPLINE PASSED!!!! from (" << current_node.layer_idx << "," << current_node.node_idx
+                         << ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
+                }else{
                     cout << "SPLINE REJECTED from (" << current_node.layer_idx << "," << current_node.node_idx
-                       << ") to (" << next_node.layer_idx << "," << next_node.node_idx << ")" << endl;
+                         << ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
                 }
             }
+
         }
     }
 }
+
 
 // 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
 void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
@@ -707,7 +691,9 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                     spline_x_pts.push_back(sp.x);
                     spline_y_pts.push_back(sp.y);
                 }
-                if(current_node.layer_idx==0){
+
+                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}});
+                /*if(current_node.layer_idx==0){
                     if(dest_node_idx==0){
                         plt::plot(spline_x_pts, spline_y_pts, {{"color", "yellow"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
                     }else{
@@ -715,7 +701,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                     }
                 }else{
                     plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
-                }
+                }*/
             }
         }
     }

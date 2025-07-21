@@ -33,7 +33,7 @@ struct Offline_Params {
         // [VEHICLE]
         float VEH_WIDTH=0.4;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=4.7;   // vehicle length in m (in order to obtain a safety distance in follow mode)
-        float VEH_TURN=1.0;     // Min turn radius (m); splines below this are excluded. 3.0~6.0
+        float VEH_TURN=7.0;     // Min turn radius (m); splines below this are excluded. 3.0~6.0
 
         // [COST]
         float W_RACELINE=1.0;   // Penalty for path length and lateral offset from raceline, applied per meter
