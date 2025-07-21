@@ -222,16 +222,15 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
 
         // node별 loop (노드 생성 시작)
-        for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
-            // node_alphas.push_back(alpha);
+        // (0,0) error
+        for (int idx = 0; idx < num_nodes; ++idx) {
+            double alpha = start_alpha + idx * lat_resolution;
             // node의 좌표 계산.
             node_pos = ref_xy + alpha * norm_vec;
             // node의 layer내의 인덱스 계산.
             node.node_idx = node_idx;
             node.x = node_pos.x();
-            node.y = node_pos.y();
-            node.psi = 0.0;
-            node.kappa = 0.0;        
+            node.y = node_pos.y();     
             node.raceline = (node_idx == raceline_index);
 
             // psi 보간 처리
@@ -386,6 +385,10 @@ Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& co
     double x = coeff_x(0) + coeff_x(1) * t + coeff_x(2) * t2 + coeff_x(3) * t3;
     double y = coeff_y(0) + coeff_y(1) * t + coeff_y(2) * t2 + coeff_y(3) * t3;
     return Vector2d(x, y);
+}
+
+bool pruneEdges(const SplineResult& spline, const Offline_Params& parans) {
+    if (spline)
 }
 
 
@@ -640,9 +643,11 @@ int main() {
             nodesPerLayer,
             params,
             raceline_index_array);
+
+    // myGraph.printGraph();
     
     // 시각화
     visual(nodesPerLayer, myGraph, params);
-
+    
     return 0;
 }
