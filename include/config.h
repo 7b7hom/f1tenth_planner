@@ -11,11 +11,11 @@ struct Offline_Params {
         float LAT_RESOLUTION=0.16;       // Lateral spacing (m) between nodes along each normal
         float VARIABLE_HEADING=true;    // Determines if node headings are interpolated between boundary and race line angles (else: match race line).
         
-        float LON_STRAIGHT_STEP=2.2;   // Max distance (m) between norm vectors along straights on the reference line
-        float LON_CURVE_STEP=0.6;      // Max norm vector spacing (m) on reference-line curves.
+        float LON_STRAIGHT_STEP=2.0;   // Max distance (m) between norm vectors along straights on the reference line
+        float LON_CURVE_STEP=0.9;      // Max norm vector spacing (m) on reference-line curves.
                                         // NOTE: Set notably higher than base values.
         float CURVE_THR=0.25;          // recommand: 0.15 ~ 0.3
-        float LAT_OFFSET=0.32;
+        float LAT_OFFSET=0.45;
 
         int MAX_LAT_STEPS=3;    // Permitted lateral deviation from the raceline per meter traveled.
         float VIRT_GOAL_N=true;         // Proxy target node per layer. Graph search uses this node directly, skipping iterative checks on adjacent goal-layer nodes.

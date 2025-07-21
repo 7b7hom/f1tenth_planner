@@ -85,9 +85,8 @@ unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
     });
 }
 #if 1
-VectorXd* calcPsiKappa(MatrixXd &coeffs_x,
+VectorXd* calcKappa(MatrixXd &coeffs_x,
                          MatrixXd &coeffs_y,
-                         MatrixXd &spl_coords,
                          VectorXd &t_steps) {
     int N = t_steps.size();
     VectorXd psi(N);
@@ -110,12 +109,6 @@ VectorXd* calcPsiKappa(MatrixXd &coeffs_x,
         (*kappa)(i)= (x_d * y_dd - y_d * x_dd) / denom;
     }
 
-    // psi 각도 정규화
-    for (int i = 0; i < psi.size(); ++i) {
-        while (psi(i) > M_PI) psi(i) -= 2 * M_PI;
-        while (psi(i) < -M_PI) psi(i) += 2 * M_PI;
-    }
-
     return kappa;
 }
 #endif
@@ -125,7 +118,7 @@ VectorXd* interpSplines(MatrixXd &coeffs_x,
                         MatrixXd &coeffs_y,
                         float stepsize_approx,
                         double spline_len = NAN, 
-                        int no_interp_points = 15) {
+                        int no_interp_points = 10) {
     if (coeffs_x.rows() != coeffs_y.rows()) {
         throw invalid_argument("Coefficient matrices must have the same length!");
     }
@@ -149,31 +142,32 @@ VectorXd* interpSplines(MatrixXd &coeffs_x,
             t_steps[i] = i*step;
         }
         // cout << "spline 개수: " << no_splines << endl;
-        MatrixXd* spl_coords = new MatrixXd(no_interp_points, 2);
+        // MatrixXd* spl_coords = new MatrixXd(no_interp_points, 2);
 
-        for (int i = 0; i < no_splines; ++i) {
-            spl_coords->col(0) =
-                coeffs_x(i, 0) * VectorXd::Ones(no_interp_points)
-                + coeffs_x(i, 1) * t_steps
-                + coeffs_x(i, 2) * t_steps.array().pow(2).matrix()
-                + coeffs_x(i, 3) * t_steps.array().pow(3).matrix();
+        // for (int i = 0; i < no_splines; ++i) {
+        //     spl_coords->col(0) =
+        //         coeffs_x(i, 0) * VectorXd::Ones(no_interp_points)
+        //         + coeffs_x(i, 1) * t_steps
+        //         + coeffs_x(i, 2) * t_steps.array().pow(2).matrix()
+        //         + coeffs_x(i, 3) * t_steps.array().pow(3).matrix();
 
-            spl_coords->col(1) =
-                coeffs_y(i, 0) * VectorXd::Ones(no_interp_points)
-                + coeffs_y(i, 1) * t_steps
-                + coeffs_y(i, 2) * t_steps.array().pow(2).matrix()
-                + coeffs_y(i, 3) * t_steps.array().pow(3).matrix();           
-        }
-        spline_len = 0.0;
-        for (int j = 1; j < no_interp_points; ++j) {
-            double dx = (*spl_coords)(j, 0) - (*spl_coords)(j-1, 0);
-            double dy = (*spl_coords)(j, 1) - (*spl_coords)(j-1, 1);
+        //     spl_coords->col(1) =
+        //         coeffs_y(i, 0) * VectorXd::Ones(no_interp_points)
+        //         + coeffs_y(i, 1) * t_steps
+        //         + coeffs_y(i, 2) * t_steps.array().pow(2).matrix()
+        //         + coeffs_y(i, 3) * t_steps.array().pow(3).matrix();           
+        // }
+        // spline_len = 0.0;
+        // for (int j = 1; j < no_interp_points; ++j) {
+        //     double dx = (*spl_coords)(j, 0) - (*spl_coords)(j-1, 0);
+        //     double dy = (*spl_coords)(j, 1) - (*spl_coords)(j-1, 1);
 
-            spline_len +=sqrt(dx*dx + dy*dy);
-        }
+        //     spline_len +=sqrt(dx*dx + dy*dy);
+        // }
         // cout << spline_len << endl; // levine: 0.5~2.5
-        VectorXd* kappa = calcPsiKappa(coeffs_x, coeffs_y, *spl_coords, t_steps);
-        delete spl_coords;
+        
+        // delete spl_coords;
+        VectorXd* kappa = calcKappa(coeffs_x, coeffs_y, t_steps);
 
         return kappa;
     }
@@ -281,10 +275,12 @@ void genEdges(NodeMap &nodesPerLayer,
                 }
         }
     }
+    // visual(edgeList, nodesPerLayer, splineMap, "pink");
     int edge_cnt = 0;
     // layer 개수만큼 loop
     for (size_t i = 0; i < nodesPerLayer.size();++i) {
       int start_layer = i;
+      cout << "start Layer: " << start_layer << endl;
       // start_layer에서의 노드 개수만큼 loop
       for (size_t s = 0; s < nodesPerLayer[start_layer].size(); ++s) {
         IPairVector childNode;
@@ -305,7 +301,6 @@ void genEdges(NodeMap &nodesPerLayer,
                 cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
             }
             
-
             double vel_rl = sampling_map[__vx][i] * min_vel_race;
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
@@ -318,11 +313,12 @@ void genEdges(NodeMap &nodesPerLayer,
                 //     removeFlag = true;
                 //     break; // 더 볼 필요 없음, 바로 탈출
                 // }
-                if (kappa_val > 1.9) {
+                if (kappa_val > 1.8) { // 적절한 파라미터를 찾기 힘들어서 일단 하드코딩으로 돌림. 
                 removeFlag = true;
                 break; // 더 볼 필요 없음, 바로 탈출
+                }
             }
-            }
+            cout << "one spline" << endl;
 
             if (removeFlag) {
                 edgeList.removeEdge(start, child);
@@ -335,28 +331,11 @@ void genEdges(NodeMap &nodesPerLayer,
 
             delete kappa;
             kappa = nullptr;
-
-          
-        //   if (abs((*kappa)(i)) <= 1 / veh_turn && abs((*kappa)(i)) <= 1 / min_turn) {
-        //     delete kappa;
-        //     kappa = nullptr;
-        //     continue;
-        //   }
-        //   else {
-        //     edgeList.removeEdge(start, child);
-        //     auto it = splineMap.find(srcKey);
-        //     if (it != splineMap.end()) {
-        //         splineMap.erase(it);
-        //     }
-        //     cout << "remove!" << endl;
-        //     delete kappa;
-        //     kappa = nullptr;
-        //   }
         }
       }
-      cout << "node loop!" << endl;
+    //   cout << "node loop!" << endl;
     }
-    cout << "the end" << endl;
+    // cout << "the end" << endl;
 
 }
 

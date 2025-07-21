@@ -379,7 +379,7 @@ int main() {
 
     Graph edgeList;
     SplineMap splineMap;
-
+    
     genEdges(nodesPerLayer,
              edgeList,
              splineMap,
@@ -395,9 +395,9 @@ int main() {
 
     // printSplineMapVerbose(splineMap, nodesPerLayer);
     // edgeList.printGraph();
-    cout << "hi2222222" << endl;
+
     // visual process 
-    visual(edgeList, nodesPerLayer, splineMap);
+    visual(edgeList, nodesPerLayer, splineMap, "orange");
 
     return 0;
 }

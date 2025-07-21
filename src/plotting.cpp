@@ -1,4 +1,5 @@
 #include "graph_planner.hpp"
+#include <unordered_set>
 
 void plotHeading(const DVector &x,
                  const DVector &y,
@@ -114,8 +115,8 @@ vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points
     return points;
 }
 
-
-void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
+void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, const string &color) {
+    unordered_set<int> plotted_layers;
     for (const auto& [edge_key, spline] : splineMap) {
         const auto& [startKey, endKey] = edge_key;  
         int start_layer = startKey.first;
@@ -123,10 +124,9 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
         int end_layer = endKey.first;
         int end_idx = endKey.second;
 
-        const Node& startNode = nodesPerLayer[start_layer][start_idx];
-        const Node& endNode = nodesPerLayer[end_layer][end_idx];
+        const Node& startNode = nodesPerLayer.at(start_layer).at(start_idx);
+        const Node& endNode = nodesPerLayer.at(end_layer).at(end_idx);
 
-        // 시각화를 위한 spline 점 위 샘플링
         vector<Vector2d> spline_points = generateSplinePoints(spline);
 
         DVector xs, ys;
@@ -134,7 +134,17 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
             xs.push_back(pt.x());
             ys.push_back(pt.y());
         }
-        plt::plot(xs, ys, {{"color", "orange"}});
+
+        // 선 그리기
+        plt::plot(xs, ys, {{"color", color}});
+
+        // 레이어당 한 번만 텍스트 표시
+        if (plotted_layers.find(start_layer) == plotted_layers.end() && !spline_points.empty()) {
+            const auto& mid_pt = spline_points[spline_points.size() / 2];
+            string layer_label = "L" + std::to_string(start_layer);
+            plt::text(mid_pt.x(), mid_pt.y(), layer_label);
+            plotted_layers.insert(start_layer);
+        }
     }
 
     plt::title("All Spline Paths");
@@ -145,7 +155,7 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
 }
 
 
-void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap) {
+void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color) {
     plt::clf();
 
     DVector x_bound_l = sampling_map[__x_bound_l];
@@ -187,7 +197,7 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
     // 노드마다 psi확인할 수 있는 용도 
     plotHeading(nodesPerLayer);
 
-    plotAllSplines(splineMap, nodesPerLayer);
+    plotAllSplines(splineMap, nodesPerLayer, color);
 
     // plt::title("Track");
     // plt::grid(true);
