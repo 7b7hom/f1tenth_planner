@@ -69,6 +69,10 @@ typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key�
 typedef pair<IPair, IPair> EdgeKey;
 typedef map<EdgeKey, SplineResult> SplineMap;
 
+// nodeMap[layerIdx][nodeIdx]
+// splineMap[layerIdx][nodeIdx] = spline 
+// typedef map<IPair, map<IPair, Spline, myCompare>, myCompare> SplineMap;
+
 #define LayerIdx(pair) (pair.first)
 #define NodeIdx(pair) (pair.second)
 
@@ -79,11 +83,11 @@ private:
 public:
     IPairAdjList adjLists;
     Graph(bool directed = true);
-    void addEdge(IPair srcNodeIdx, IPair destNodeIdx);
+    void addEdge(IPair srcIdx, IPair dstIdx);
     void printGraph();
-    void getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx);
-    void getParentNode(IPair& srcNodeIdx, IPairVector& parent);
-    void removeEdge(IPair& srcNodeIdx, IPair& delNodeIdx);
+    void getChildNodes(IPair& parentIdx, IPairVector& childIdx);
+    void getParentNodes(IPair& childIdx, IPairVector& parentIdx);
+    void removeEdge(IPair& srcIdx, IPair& dstIdx);
 };
 
 extern DMap gtpl_map;

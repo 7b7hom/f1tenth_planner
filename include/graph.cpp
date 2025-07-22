@@ -4,9 +4,9 @@ Graph::Graph(bool directed) {
     isDirected = directed;
 }
 
-void Graph::addEdge(IPair srcNodeIdx, IPair childNodeIdx) {
+void Graph::addEdge(IPair srcIdx, IPair dstIdx) {
     // adjLists[srcKey].push_back(destIdx);
-    adjLists[srcNodeIdx].push_back(childNodeIdx);
+    adjLists[srcIdx].push_back(dstIdx);
 }
 
 void Graph::printGraph() {
@@ -30,27 +30,27 @@ void Graph::printGraph() {
     cout << "spline 개수" << size << endl;
 }
 
-void Graph::getChildIdx(IPair srcNodeIdx, IPairVector& childNodeIdx) {
-    if (adjLists[srcNodeIdx].size() <= 0) 
+void Graph::getChildNodes(IPair& parentIdx, IPairVector& childIdx) {
+    if (adjLists[parentIdx].size() <= 0) 
         throw runtime_error{"Unable to print child node for srcNodeIdx"};
-    for (auto& value : adjLists[srcNodeIdx]) {
-        childNodeIdx.push_back(value);
+    for (auto& value : adjLists[parentIdx]) {
+        childIdx.push_back(value);
         // cout << "("<< value.first << ", " << value.second << ")" << endl;
     }
 }
 // 코드 수정 필요. 제기능은 함.
-void Graph::getParentNode(IPair &srcNodeIdx, IPairVector &parent) {
+void Graph::getParentNodes(IPair& childIdx, IPairVector& parentIdx) {
     for (auto &[key, vec] : adjLists) {
-        if (key.first == (srcNodeIdx.first) - 1) {
+        if (key.first == (childIdx.first) - 1) {
             for (const auto &value : vec) {
-                if (value == srcNodeIdx) parent.push_back(key);
+                if (value == childIdx) parentIdx.push_back(key);
                 }
             }
         }
     }
 
 // adjLists[srcNodeIdx]에서 delNodeIdx만 제거
-void Graph::removeEdge(IPair& srcNodeIdx, IPair& delNodeIdx) {
-    IPairVector& neighbors = adjLists[srcNodeIdx];
-    neighbors.erase(remove(neighbors.begin(), neighbors.end(), delNodeIdx), neighbors.end());
+void Graph::removeEdge(IPair& srcIdx, IPair& dstIdx) {
+    IPairVector& neighbors = adjLists[srcIdx];
+    neighbors.erase(remove(neighbors.begin(), neighbors.end(), dstIdx), neighbors.end());
 }

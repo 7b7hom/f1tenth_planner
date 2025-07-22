@@ -377,11 +377,11 @@ int main() {
     // sampling points' info 
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
 
-    Graph edgeList;
+    Graph graph_wp; // a graph of waypoints
     SplineMap splineMap;
     
     genEdges(nodesPerLayer,
-             edgeList,
+             graph_wp,
              splineMap,
              raceline_index_array,
              params.LAT_OFFSET,
@@ -394,10 +394,10 @@ int main() {
              params.VEH_TURN);
 
     // printSplineMapVerbose(splineMap, nodesPerLayer);
-    // edgeList.printGraph();
+    // g_wp.printGraph();
 
     // visual process 
-    visual(edgeList, nodesPerLayer, splineMap, "orange");
+    visual(graph_wp, nodesPerLayer, splineMap, "orange");
 
     return 0;
 }

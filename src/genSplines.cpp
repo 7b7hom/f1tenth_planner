@@ -84,7 +84,7 @@ unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
         el_lengths,
     });
 }
-#if 1
+
 VectorXd* calcKappa(MatrixXd &coeffs_x,
                          MatrixXd &coeffs_y,
                          VectorXd &t_steps) {
@@ -111,7 +111,6 @@ VectorXd* calcKappa(MatrixXd &coeffs_x,
 
     return kappa;
 }
-#endif
 
 // 단일 스플라인에 대한 spline에 대한 샘플링 
 VectorXd* interpSplines(MatrixXd &coeffs_x,
@@ -185,14 +184,8 @@ VectorXd* interpSplines(MatrixXd &coeffs_x,
     
 }
 
-#if 0
-bool isInsideTrack() {
-
-}
-#endif
-
-void genEdges(NodeMap &nodesPerLayer, 
-              Graph &edgeList,
+void genEdges(NodeMap &nodeMap, 
+              Graph &graph_wp,
               SplineMap &splineMap,
               const IVector &raceline_index_array,
               const float lat_offset,
@@ -208,35 +201,35 @@ void genEdges(NodeMap &nodesPerLayer,
         throw invalid_argument("Too small lateral offset!");
     }
 
-    // cout << nodesPerLayer.size() << endl; 출력: 51
+    // cout << nodeMap.size() << endl; 출력: 51
     // 레이어 별 loop
-    for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
+    for (int layerIdx = 0; layerIdx < nodeMap.size(); ++layerIdx) {
         
-        int start_layer = layerIdx;
-        int end_layer = layerIdx + 1;
+        int srcLayerIdx = layerIdx;
+        int dstLayerIdx = layerIdx + 1;
 
-        // cout << "start_layer:" << start_layer << endl;
-        // cout << "nodesPerLayer.size()" << nodesPerLayer.size() << endl;
+        // cout << "srcLayerIdx:" << srcLayerIdx << endl;
+        // cout << "nodeMap.size()" << nodeMap.size() << endl;
 
-        // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 end_layer 조정 
-        if (end_layer >= nodesPerLayer.size()) {
-            end_layer -= nodesPerLayer.size();
+        // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 dstLayerIdx 조정 
+        if (dstLayerIdx >= nodeMap.size()) {
+            dstLayerIdx -= nodeMap.size();
         }
 
         // start layer 내 노드별 loop
-        for (size_t startIdx = 0; startIdx < nodesPerLayer[start_layer].size(); ++startIdx) {
+        for (size_t srcNodeIdx = 0; srcNodeIdx < nodeMap[srcLayerIdx].size(); ++srcNodeIdx) {
             // 기준 노드
-            Node &startNode = nodesPerLayer[start_layer][startIdx];
+            Node &startNode = nodeMap[srcLayerIdx][srcNodeIdx];
             
-            int refDestIdx = raceline_index_array[end_layer] - (raceline_index_array[start_layer] - startIdx);
-            refDestIdx = max(0, min(refDestIdx, static_cast<int>(nodesPerLayer[end_layer].size() -1)));
-            // refDestIdx = clamp(refDestIdx, 0, static_cast<int>(nodesPerLayer[end_layer].size() - 1));
-            // int refDestIdx = startIdx;
-            // int refDestIdx = raceline_index_array[end_layer];
-            Node &srcEndNode = nodesPerLayer[end_layer][refDestIdx];
+            int refEndNodeIdx = raceline_index_array[dstLayerIdx] - (raceline_index_array[srcLayerIdx] - srcNodeIdx);
+            refEndNodeIdx = max(0, min(refEndNodeIdx, static_cast<int>(nodeMap[dstLayerIdx].size() -1)));
+            // refEndNodeIdx = clamp(refEndNodeIdx, 0, static_cast<int>(nodeMap[dstLayerIdx].size() - 1));
+            // int refEndNodeIdx = srcNodeIdx;
+            // int refEndNodeIdx = raceline_index_array[dstLayerIdx];
+            Node &endNode = nodeMap[dstLayerIdx][refEndNodeIdx];
 
             Vector2d d_start(startNode.x, startNode.y);
-            Vector2d d_end(srcEndNode.x, srcEndNode.y);
+            Vector2d d_end(endNode.x, endNode.y);
 
             // spline 연결할 노드 선정 기준 : lat_steps
             double dist = (d_end - d_start).norm();
@@ -245,13 +238,13 @@ void genEdges(NodeMap &nodesPerLayer,
             double factor = 1.0 + 0.5 * ratio;
             // 커브에서 더 많이 연결(추월 경로를 위하여)
             int lat_steps = round(factor * dist * lat_offset / lat_resolution);
-            // cout << start_layer << "의 " << startIdx << "가 다음 refendNode와의 거리: " << dist << endl;
-            lat_steps = min(lat_steps, max_lat_steps); // srcEndNode 기준 2*lat_steps + 1개의 노드와 연결한다.
-            // cout << startIdx << "번째 노드의 lat_steps" << lat_steps << endl;
+            // cout << srcLayerIdx << "의 " << srcNodeIdx << "가 다음 refendNode와의 거리: " << dist << endl;
+            lat_steps = min(lat_steps, max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
+            // cout << srcNodeIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
-            for (int destIdx = max(0, refDestIdx - lat_steps); 
-                destIdx <= min(static_cast<int>(nodesPerLayer[end_layer].size() - 1), refDestIdx + lat_steps); ++destIdx) {
-                    Node &endNode = nodesPerLayer[end_layer][destIdx];
+            for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
+                endNodeIdx <= min(static_cast<int>(nodeMap[dstLayerIdx].size() - 1), refEndNodeIdx + lat_steps); ++endNodeIdx) {
+                    Node &endNode = nodeMap[dstLayerIdx][endNodeIdx];
                     
                     MatrixXd path(2, 2);
                     path(0,0) = startNode.x;
@@ -261,36 +254,38 @@ void genEdges(NodeMap &nodesPerLayer,
 
                     auto result = calcSplines(path, startNode.psi, endNode.psi);
 
-                    IPair startKey = make_pair(start_layer, startIdx);
-                    IPair endKey = make_pair(end_layer, destIdx);
-                    EdgeKey srcKey= make_pair(startKey, endKey);
+                    IPair startPoint = make_pair(srcLayerIdx, srcNodeIdx);
+                    IPair endPoint = make_pair(dstLayerIdx, endNodeIdx);
+                    EdgeKey srcKey= make_pair(startPoint, endPoint);
                     splineMap[srcKey] = *result;
+                    //splineMap[startPoint][endPoint] = *result
+                    // graph_wp & splineMap
 
                     // graph에 넣는 과정 
-                    edgeList.addEdge(startKey, endKey);
+                    graph_wp.addEdge(startPoint, endPoint);
 
-                    // cout << "startKey:" << startKey.first << ", " << startKey.second << " -> ";
-                    // cout << "endKey:" << endKey.first << ", " << endKey.second << endl;
+                    // cout << "startPoint:" << startPoint.first << ", " << startPoint.second << " -> ";
+                    // cout << "endPoint:" << endPoint.first << ", " << endPoint.second << endl;
                     
                 }
         }
     }
-    // visual(edgeList, nodesPerLayer, splineMap, "pink");
+    // visual(graph_wp, nodeMap, splineMap, "pink");
     int edge_cnt = 0;
     // layer 개수만큼 loop
-    for (size_t i = 0; i < nodesPerLayer.size();++i) {
-      int start_layer = i;
-      cout << "start Layer: " << start_layer << endl;
-      // start_layer에서의 노드 개수만큼 loop
-      for (size_t s = 0; s < nodesPerLayer[start_layer].size(); ++s) {
+    for (size_t i = 0; i < nodeMap.size();++i) {
+      int srcLayerIdx = i;
+      cout << "start Layer: " << srcLayerIdx << endl;
+      // srcLayerIdx에서의 노드 개수만큼 loop
+      for (size_t s = 0; s < nodeMap[srcLayerIdx].size(); ++s) {
         IPairVector childNode;
         IPair start = make_pair(i ,s);
-        edgeList.getChildIdx(start, childNode);
+        graph_wp.getChildNodes(start, childNode);
         // 연결되어있는 child node에 대하여 
         for (auto& child : childNode) {
           edge_cnt++;
           EdgeKey srcKey = make_pair(start, child);
-          // int end_layer = child.first;
+          // int dstLayerIdx = child.first;
           // int e = child.second;
 
           MatrixXd coeffs_x = splineMap[srcKey].coeffs_x;
@@ -321,7 +316,7 @@ void genEdges(NodeMap &nodesPerLayer,
             cout << "one spline" << endl;
 
             if (removeFlag) {
-                edgeList.removeEdge(start, child);
+                graph_wp.removeEdge(start, child);
                 auto it = splineMap.find(srcKey);
                 if (it != splineMap.end()) {
                     splineMap.erase(it);
