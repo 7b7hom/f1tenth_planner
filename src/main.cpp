@@ -302,6 +302,9 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
 
 
 int main() {
+    clock_t s_time, f_time;
+    s_time = clock();
+
     IVector idx_sampling;
     Offline_Params params;
 
@@ -394,11 +397,15 @@ int main() {
              params.MAX_LATERAL_ACCEL,
              params.VEH_TURN);
 
+    f_time = clock();
+
     // printSplineMapVerbose(splineMap, nodesPerLayer);
-    graph_wp.printGraph();
+    // graph_wp.printGraph();
 
     // visual process 
     visual(graph_wp, nodesPerLayer, splineMap, "orange");
+
+    cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
 
     return 0;
 }

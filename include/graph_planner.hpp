@@ -7,6 +7,7 @@
 #include <iomanip>  
 #include <cmath>
 #include <algorithm>
+#include <time.h>
 #include <Eigen/Dense>
 #include "config.h"
 #include "rapidcsv.h"
@@ -88,8 +89,8 @@ public:
     void addEdge(IPair srcIdx, IPair dstIdx);
     void printGraph();
     void getChildNodes(IPair& parentIdx, IPairVector& childIdx);
-    void getParentNodes(IPair& childIdx, IPairVector& parentIdx);
-    void removeEdge(IPair& srcIdx, IPair& dstIdx);
+    void getParentNodes(const IPair& childIdx, IPairVector& parentIdx);
+    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt);
 };
 
 extern DMap gtpl_map;

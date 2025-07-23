@@ -39,7 +39,8 @@ void Graph::getChildNodes(IPair& parentIdx, IPairVector& childIdx) {
     }
 }
 // 코드 수정 필요. 제기능은 함.
-void Graph::getParentNodes(IPair& childIdx, IPairVector& parentIdx) {
+// child의 parent를 찾아서 vector<pair<int, int>> 형태로 반환 
+void Graph::getParentNodes(const IPair& childIdx, IPairVector& parentIdx) {
     for (auto &[key, vec] : adjLists) {
         if (key.first == (childIdx.first) - 1) {
             for (const auto &value : vec) {
@@ -50,9 +51,30 @@ void Graph::getParentNodes(IPair& childIdx, IPairVector& parentIdx) {
     }
 
 // adjLists[srcNodeIdx]에서 delNodeIdx만 제거
-void Graph::removeEdge(IPair& srcIdx, IPair& dstIdx) {
-    IPairVector& neighbors = adjLists[srcIdx];
-    neighbors.erase(remove(neighbors.begin(), neighbors.end(), dstIdx), neighbors.end());
-}
+void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt) {
+    IPairVector& childs = adjLists[srcIdx];
+    childs.erase(remove(childs.begin(), childs.end(), dstIdx), childs.end());
+    remove_cnt++;
+    if (splineMap) {
+        auto it = splineMap->find(srcIdx);
+        if (it != splineMap->end()) {
+            auto& splineList = it->second;
+            auto it2 = splineList.find(dstIdx);
+            if (it2 != splineList.end()) {
+                splineList.erase(it2);
+                if (splineList.empty()) {
+                    splineMap->erase(it);
+                }
+            }
+        }
+    }
 
-// void Graph::
+    if (childs.empty()) {
+        IPairVector parents;
+        getParentNodes(srcIdx, parents);
+
+        for (const auto& parentIdx : parents) {
+            removeEdge(parentIdx, srcIdx, splineMap, remove_cnt);
+        }
+    }
+}

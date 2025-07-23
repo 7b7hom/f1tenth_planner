@@ -184,7 +184,7 @@ VectorXd* interpSplines(MatrixXd &coeffs_x,
     
 }
 
-void genEdges(NodeMap &nodeMap, 
+void genEdges(NodeMap &nodesPerLayer, 
               Graph &graph_wp,
               SplineMap &splineMap,
               const IVector &raceline_index_array,
@@ -201,33 +201,33 @@ void genEdges(NodeMap &nodeMap,
         throw invalid_argument("Too small lateral offset!");
     }
 
-    // cout << nodeMap.size() << endl; 출력: 51
+    // cout << nodesPerLayer.size() << endl; 출력: 51
     // 레이어 별 loop
 
-    for (int layerIdx = 0; layerIdx < nodeMap.size(); ++layerIdx) {
+    for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
         
         int srcLayerIdx = layerIdx;
         int dstLayerIdx = layerIdx + 1;
 
         // cout << "srcLayerIdx:" << srcLayerIdx << endl;
-        // cout << "nodeMap.size()" << nodeMap.size() << endl;
+        // cout << "nodesPerLayer.size()" << nodesPerLayer.size() << endl;
 
         // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 dstLayerIdx 조정 
-        if (dstLayerIdx >= nodeMap.size()) {
-            dstLayerIdx -= nodeMap.size();
+        if (dstLayerIdx >= nodesPerLayer.size()) {
+            dstLayerIdx -= nodesPerLayer.size();
         }
 
         // start layer 내 노드별 loop
-        for (size_t srcNodeIdx = 0; srcNodeIdx < nodeMap[srcLayerIdx].size(); ++srcNodeIdx) {
+        for (size_t srcNodeIdx = 0; srcNodeIdx < nodesPerLayer[srcLayerIdx].size(); ++srcNodeIdx) {
             // 기준 노드
-            Node &startNode = nodeMap[srcLayerIdx][srcNodeIdx];
+            Node& startNode = nodesPerLayer[srcLayerIdx][srcNodeIdx];
             
             int refEndNodeIdx = raceline_index_array[dstLayerIdx] - (raceline_index_array[srcLayerIdx] - srcNodeIdx);
-            refEndNodeIdx = max(0, min(refEndNodeIdx, static_cast<int>(nodeMap[dstLayerIdx].size() -1)));
-            // refEndNodeIdx = clamp(refEndNodeIdx, 0, static_cast<int>(nodeMap[dstLayerIdx].size() - 1));
+            refEndNodeIdx = max(0, min(refEndNodeIdx, static_cast<int>(nodesPerLayer[dstLayerIdx].size() -1)));
+            // refEndNodeIdx = clamp(refEndNodeIdx, 0, static_cast<int>(nodesPerLayer[dstLayerIdx].size() - 1));
             // int refEndNodeIdx = srcNodeIdx;
             // int refEndNodeIdx = raceline_index_array[dstLayerIdx];
-            Node &endNode = nodeMap[dstLayerIdx][refEndNodeIdx];
+            Node& endNode = nodesPerLayer[dstLayerIdx][refEndNodeIdx];
 
             Vector2d d_start(startNode.x, startNode.y);
             Vector2d d_end(endNode.x, endNode.y);
@@ -244,8 +244,8 @@ void genEdges(NodeMap &nodeMap,
             // cout << srcNodeIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
-                endNodeIdx <= min(static_cast<int>(nodeMap[dstLayerIdx].size() - 1), refEndNodeIdx + lat_steps); ++endNodeIdx) {
-                    Node &endNode = nodeMap[dstLayerIdx][endNodeIdx];
+                endNodeIdx <= min(static_cast<int>(nodesPerLayer[dstLayerIdx].size() - 1), refEndNodeIdx + lat_steps); ++endNodeIdx) {
+                    Node& endNode = nodesPerLayer[dstLayerIdx][endNodeIdx];
                     
                     MatrixXd path(2, 2);
                     path(0,0) = startNode.x;
@@ -271,34 +271,32 @@ void genEdges(NodeMap &nodeMap,
                 }
         }
     }
-    // visual(graph_wp, nodeMap, splineMap, "pink");
+
+    // visual(graph_wp, nodesPerLayer, splineMap, "pink");
     int edge_cnt = 0;
     int remove_cnt = 0;
     // layer 개수만큼 loop
-    for (size_t i = 0; i < nodeMap.size();++i) {
-      int srcLayerIdx = i;
+    for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
+      int srcLayerIdx = layer_idx;
     //   cout << "start Layer: " << srcLayerIdx << endl;
       // srcLayerIdx에서의 노드 개수만큼 loop
-      for (size_t s = 0; s < nodeMap[srcLayerIdx].size(); ++s) {
-        IPairVector childNode;
-        IPair start = make_pair(i ,s);
-        graph_wp.getChildNodes(start, childNode);
+      for (size_t node_idx = 0; node_idx < nodesPerLayer[srcLayerIdx].size(); ++node_idx) {
+        IPairVector childNodes;
+        IPair start = make_pair(layer_idx ,node_idx);
+        graph_wp.getChildNodes(start, childNodes);
         // 연결되어있는 child node에 대하여 
-        for (auto& child : childNode) {
+        for (auto& end : childNodes) {
           edge_cnt++;
-        //   EdgeKey srcKey = make_pair(start, child);
-          // int dstLayerIdx = child.first;
-          // int e = child.second;
 
-          MatrixXd coeffs_x = splineMap[start][child].coeffs_x;
-          MatrixXd coeffs_y = splineMap[start][child].coeffs_y;
+          MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
+          MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
 
           VectorXd* kappa = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
             if (kappa == nullptr) {
                 cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
             }
             
-            double vel_rl = sampling_map[__vx][i] * min_vel_race;
+            double vel_rl = sampling_map[__vx][layer_idx] * min_vel_race;
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
             bool removeFlag = false;
@@ -317,21 +315,7 @@ void genEdges(NodeMap &nodeMap,
             }
 
             if (removeFlag) {
-                graph_wp.removeEdge(start, child);
-
-                auto it = splineMap.find(start);
-                if (it != splineMap.end()) {
-                    auto& splineList = it->second;
-                    auto it2 = splineList.find(child);
-                    if (it2 != splineList.end()) {
-                        splineList.erase(it2);
-
-                        if (splineList.empty()) {
-                            splineMap.erase(it);
-                        }
-                    }
-                }
-                remove_cnt++;
+                graph_wp.removeEdge(start, end, &splineMap, remove_cnt);
             }
 
             delete kappa;
