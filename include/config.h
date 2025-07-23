@@ -13,7 +13,7 @@ struct Offline_Params {
         
         float LON_STRAIGHT_STEP=2.0;   // Max distance (m) between norm vectors along straights on the reference line
         float LON_CURVE_STEP=0.9;      // Max norm vector spacing (m) on reference-line curves.
-                                        // NOTE: Set notably higher than base values.
+                                        
         float CURVE_THR=0.25;          // recommand: 0.15 ~ 0.3
         float LAT_OFFSET=0.45;
 

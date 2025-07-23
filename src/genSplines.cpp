@@ -203,6 +203,7 @@ void genEdges(NodeMap &nodeMap,
 
     // cout << nodeMap.size() << endl; 출력: 51
     // 레이어 별 loop
+
     for (int layerIdx = 0; layerIdx < nodeMap.size(); ++layerIdx) {
         
         int srcLayerIdx = layerIdx;
@@ -272,10 +273,11 @@ void genEdges(NodeMap &nodeMap,
     }
     // visual(graph_wp, nodeMap, splineMap, "pink");
     int edge_cnt = 0;
+    int remove_cnt = 0;
     // layer 개수만큼 loop
     for (size_t i = 0; i < nodeMap.size();++i) {
       int srcLayerIdx = i;
-      cout << "start Layer: " << srcLayerIdx << endl;
+    //   cout << "start Layer: " << srcLayerIdx << endl;
       // srcLayerIdx에서의 노드 개수만큼 loop
       for (size_t s = 0; s < nodeMap[srcLayerIdx].size(); ++s) {
         IPairVector childNode;
@@ -303,7 +305,7 @@ void genEdges(NodeMap &nodeMap,
 
             for (int j = 0; j < kappa->size(); ++j) {
                 double kappa_val = abs((*kappa)(j));
-                cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
+                // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
                 // if (kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) {
                 //     removeFlag = true;
                 //     break; // 더 볼 필요 없음, 바로 탈출
@@ -313,7 +315,6 @@ void genEdges(NodeMap &nodeMap,
                 break; // 더 볼 필요 없음, 바로 탈출
                 }
             }
-            cout << "one spline" << endl;
 
             if (removeFlag) {
                 graph_wp.removeEdge(start, child);
@@ -321,7 +322,7 @@ void genEdges(NodeMap &nodeMap,
                 if (it != splineMap.end()) {
                     splineMap.erase(it);
                 }
-                cout << "remove!" << endl;
+                remove_cnt++;
             }
 
             delete kappa;
@@ -330,6 +331,8 @@ void genEdges(NodeMap &nodeMap,
       }
     //   cout << "node loop!" << endl;
     }
+    cout << "Added " << edge_cnt << " splines to the graph!" << endl;
+    cout << "removed " << remove_cnt << " splines due to violation of the specified vehicle's turn radius or velocity aims!" << endl;
     // cout << "the end" << endl;
 
 }

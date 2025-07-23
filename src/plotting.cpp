@@ -138,11 +138,11 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, co
         // 선 그리기
         plt::plot(xs, ys, {{"color", color}});
 
-        // 레이어당 한 번만 텍스트 표시
+        // 레이어 Text 표시
         if (plotted_layers.find(start_layer) == plotted_layers.end() && !spline_points.empty()) {
-            const auto& mid_pt = spline_points[spline_points.size() / 2];
-            string layer_label = "L" + std::to_string(start_layer);
-            plt::text(mid_pt.x(), mid_pt.y(), layer_label);
+            const auto& pos_pt = spline_points[spline_points.size() / 8];
+            string layer_label = "L" + to_string(start_layer);
+            plt::text(pos_pt.x(), pos_pt.y(), layer_label);
             plotted_layers.insert(start_layer);
         }
     }

@@ -394,7 +394,7 @@ int main() {
              params.VEH_TURN);
 
     // printSplineMapVerbose(splineMap, nodesPerLayer);
-    // g_wp.printGraph();
+    graph_wp.printGraph();
 
     // visual process 
     visual(graph_wp, nodesPerLayer, splineMap, "orange");
