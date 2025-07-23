@@ -96,7 +96,7 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
-vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points = 20) {
+vector<Vector2d> generateSplinePoints(const Spline& spline, int num_points = 20) {
     vector<Vector2d> points;
     points.reserve(num_points + 1);
 
@@ -117,15 +117,11 @@ vector<Vector2d> generateSplinePoints(const SplineResult& spline, int num_points
 
 void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, const string &color) {
     unordered_set<int> plotted_layers;
-    for (const auto& [edge_key, spline] : splineMap) {
-        const auto& [startKey, endKey] = edge_key;  
-        int start_layer = startKey.first;
-        int start_idx = startKey.second;
-        int end_layer = endKey.first;
-        int end_idx = endKey.second;
+    for (const auto& [startPoint, endPoints] : splineMap) {
+        for (const auto& [endPoint, spline]: endPoints) {
 
-        const Node& startNode = nodesPerLayer.at(start_layer).at(start_idx);
-        const Node& endNode = nodesPerLayer.at(end_layer).at(end_idx);
+        const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
+        const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
 
         vector<Vector2d> spline_points = generateSplinePoints(spline);
 
@@ -139,11 +135,12 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, co
         plt::plot(xs, ys, {{"color", color}});
 
         // 레이어 Text 표시
-        if (plotted_layers.find(start_layer) == plotted_layers.end() && !spline_points.empty()) {
+        if (plotted_layers.find(startPoint.first) == plotted_layers.end() && !spline_points.empty()) {
             const auto& pos_pt = spline_points[spline_points.size() / 8];
-            string layer_label = "L" + to_string(start_layer);
+            string layer_label = "L" + to_string(startPoint.first);
             plt::text(pos_pt.x(), pos_pt.y(), layer_label);
-            plotted_layers.insert(start_layer);
+            plotted_layers.insert(startPoint.first);
+        }
         }
     }
 

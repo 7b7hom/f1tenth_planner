@@ -48,10 +48,10 @@ struct Node {
 };
 
 // 스플라인 결과
-struct SplineResult {
+struct Spline {
     MatrixXd coeffs_x;          // x 계수
-    MatrixXd coeffs_y;             // y 계수     
-    VectorXd el_lengths;
+    MatrixXd coeffs_y;          // y 계수  
+    VectorXd el_lengths;   
 };
 
 typedef vector<double> DVector;
@@ -66,12 +66,14 @@ typedef vector<vector<Node>> NodeMap;
 typedef pair<int, int> IPair; // <layerIdx, nodeIdx>
 typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vector
 typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
-typedef pair<IPair, IPair> EdgeKey;
-typedef map<EdgeKey, SplineResult> SplineMap;
+
+// typedef pair<IPair, IPair> EdgeKey;
+// typedef map<EdgeKey, SplineResult> SplineMap;
 
 // nodeMap[layerIdx][nodeIdx]
 // splineMap[layerIdx][nodeIdx] = spline 
 // typedef map<IPair, map<IPair, Spline, myCompare>, myCompare> SplineMap;
+typedef map<IPair, map<IPair, Spline>> SplineMap;
 
 #define LayerIdx(pair) (pair.first)
 #define NodeIdx(pair) (pair.second)
@@ -105,7 +107,7 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
 
 //genSplines
-unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
+unique_ptr<Spline> calcSplines(const MatrixXd &path,
                                      double psi_s, 
                                      double psi_e, 
                                      bool use_dist_scaling);

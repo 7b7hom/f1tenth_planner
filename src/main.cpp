@@ -272,15 +272,15 @@ void genNode(NodeMap& nodesPerLayer,
 
 void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
 
-    for (const auto& [edgeKey, spline] : splineMap) {
-        const IPair& startKey = edgeKey.first;
-        const IPair& endKey = edgeKey.second;
+    for (auto& [startPoint, endPoints] : splineMap) {
+        for (auto& [endPoint, spline] : endPoints) {
 
-        const Node& startNode = nodesPerLayer[startKey.first][startKey.second];
-        const Node& endNode = nodesPerLayer[endKey.first][endKey.second];
 
-        cout << "\n(" << startKey.first << ", " << startKey.second << ") --> ("
-                  << endKey.first << ", " << endKey.second << ")\n";
+        const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
+        const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
+
+        cout << "\n(" << startPoint.first << ", " << startPoint.second << ") --> ("
+                  << endPoint.first << ", " << endPoint.second << ")\n";
 
         cout << "  [Start Node] x: " << startNode.x
                   << ", y: " << startNode.y
@@ -296,6 +296,7 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
         cout << spline.coeffs_y << "\n";
 
         cout << "----------------------------------------";
+        }
     }
 }
 

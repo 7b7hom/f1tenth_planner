@@ -1,6 +1,6 @@
 #include "graph_planner.hpp"
 
-unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
+unique_ptr<Spline> calcSplines(const MatrixXd &path,
                                      double psi_s = NAN,
                                      double psi_e = NAN,
                                      bool use_dist_scaling = true) {
@@ -78,7 +78,7 @@ unique_ptr<SplineResult> calcSplines(const MatrixXd &path,
     // cout << coeffs_x.cols() << endl;
 
     // 결과 반환
-    return make_unique<SplineResult>(SplineResult{
+    return make_unique<Spline>(Spline{
         coeffs_x,  // (4, 1)
         coeffs_y,  // (4, 1)
         el_lengths,
@@ -257,8 +257,8 @@ void genEdges(NodeMap &nodeMap,
 
                     IPair startPoint = make_pair(srcLayerIdx, srcNodeIdx);
                     IPair endPoint = make_pair(dstLayerIdx, endNodeIdx);
-                    EdgeKey srcKey= make_pair(startPoint, endPoint);
-                    splineMap[srcKey] = *result;
+                    // EdgeKey srcKey= make_pair(startPoint, endPoint);
+                    splineMap[startPoint][endPoint] = *result;
                     //splineMap[startPoint][endPoint] = *result
                     // graph_wp & splineMap
 
@@ -286,12 +286,12 @@ void genEdges(NodeMap &nodeMap,
         // 연결되어있는 child node에 대하여 
         for (auto& child : childNode) {
           edge_cnt++;
-          EdgeKey srcKey = make_pair(start, child);
+        //   EdgeKey srcKey = make_pair(start, child);
           // int dstLayerIdx = child.first;
           // int e = child.second;
 
-          MatrixXd coeffs_x = splineMap[srcKey].coeffs_x;
-          MatrixXd coeffs_y = splineMap[srcKey].coeffs_y;
+          MatrixXd coeffs_x = splineMap[start][child].coeffs_x;
+          MatrixXd coeffs_y = splineMap[start][child].coeffs_y;
 
           VectorXd* kappa = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
             if (kappa == nullptr) {
@@ -318,9 +318,18 @@ void genEdges(NodeMap &nodeMap,
 
             if (removeFlag) {
                 graph_wp.removeEdge(start, child);
-                auto it = splineMap.find(srcKey);
+
+                auto it = splineMap.find(start);
                 if (it != splineMap.end()) {
-                    splineMap.erase(it);
+                    auto& splineList = it->second;
+                    auto it2 = splineList.find(child);
+                    if (it2 != splineList.end()) {
+                        splineList.erase(it2);
+
+                        if (splineList.empty()) {
+                            splineMap.erase(it);
+                        }
+                    }
                 }
                 remove_cnt++;
             }
