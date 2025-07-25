@@ -54,6 +54,7 @@ struct Node {
 struct Spline {
     MatrixXd coeffs_x;          // x 계수
     MatrixXd coeffs_y;          // y 계수  
+    VectorXd kappa;
     VectorXd el_lengths;   
     double cost;
 };

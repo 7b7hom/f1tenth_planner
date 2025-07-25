@@ -300,20 +300,68 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
     }
 }
 
-#if 0
-void genOfflineCost(SplineMap& splineMap,
+void calcOfflineCost(SplineMap& splineMap,
+                   IVector& raceline_index_array,
                    float w_curv_avg,
                    float w_curv_peak, 
                    float w_length, 
+                   float lat_resolution,
                    float w_raceline, 
                    float w_raceline_sat) {
     if (splineMap.size() <= 0) {
-        throw invalid_argument("SplineMap's Size is zero!!")
+        throw invalid_argument("SplineMap's Size is zero!!");
     }
 
-    for 
+    for (auto& [startPoint, endPoints] : splineMap) {
+        for (auto& [endPoint, spline] : endPoints) {
+            double offline_cost = 0.0;
+            int end_layer = endPoint.first;
+            int end_node = endPoint.second;
+
+            // 디버깅용 
+            // cout << "kappa: ";
+            // for (int i = 0; i < spline.kappa.size(); ++i) cout << spline.kappa[i] << " ";
+            // cout << endl;
+
+            if (end_layer < 0 || end_layer >= raceline_index_array.size())
+            {
+                cerr << "Invalid end_layer index: " << end_layer << endl;
+                continue;
+            }
+
+            if (spline.kappa.size() == 0)
+            {
+                cerr << "Empty kappa in spline!" << endl;
+                continue;
+            }
+
+
+
+            double abs_kappa = spline.kappa.array().abs().sum();
+            double s_length = spline.el_lengths.sum();
+            // cout << "s_length: " << s_length << endl;
+            // average curvature
+            offline_cost += w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
+            // peak curvature
+            double max_min = std::abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
+            offline_cost += w_curv_peak * pow(max_min, 2) * s_length;
+
+            // path length
+            offline_cost += w_length * s_length;
+
+            // raceline cost
+
+
+            double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * lat_resolution;
+            double raceline_cost = std::min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
+
+            offline_cost += raceline_cost;
+
+            spline.cost = offline_cost;
+            cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
+        }   
+    } 
 }
-#endif
 
 int main() {
     clock_t s_time, f_time;
@@ -403,12 +451,14 @@ int main() {
              params.MAX_LATERAL_ACCEL,
              params.VEH_TURN);
 
-    // genOfflineCost(splineMap,
-    //                params.W_CURV_AVG,
-    //                params.W_CURV_PEAK, 
-    //                params.W_LENGTH, 
-    //                params.W_RACELINE, 
-    //                params.W_RACELINE_SAT);
+    calcOfflineCost(splineMap,
+                   raceline_index_array,
+                   params.W_CURV_AVG,
+                   params.W_CURV_PEAK, 
+                   params.W_LENGTH,
+                   params.LAT_RESOLUTION, 
+                   params.W_RACELINE, 
+                   params.W_RACELINE_SAT);
 
     f_time = clock();
 

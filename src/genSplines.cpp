@@ -18,6 +18,7 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
         el_tmp << el_lengths, el_lengths(0);
         el_lengths = el_tmp;
     }
+
     // 도함수 스케일링
     // 인접 구간 간 거리 비율로 스케일링 계수를 만들어 도함수 연속 조건 맞춤
     int no_splines = path.rows() - 1;
@@ -77,11 +78,15 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
     MatrixXd coeffs_y = y_les.transpose();
     // cout << coeffs_x.cols() << endl;
 
+    VectorXd kappa;
+    double cost = 0.0;
     // 결과 반환
     return make_unique<Spline>(Spline{
         coeffs_x,  // (4, 1)
         coeffs_y,  // (4, 1)
+        kappa,
         el_lengths,
+        cost,
     });
 }
 
@@ -254,7 +259,7 @@ void genEdges(NodeMap &nodesPerLayer,
                     path(1,1) = endNode.y;
 
                     auto result = calcSplines(path, startNode.psi, endNode.psi);
-
+                    // cout << "result: " << result->el_lengths.size()  << endl;
                     IPair startPoint = make_pair(srcLayerIdx, srcNodeIdx);
                     IPair endPoint = make_pair(dstLayerIdx, endNodeIdx);
                     // EdgeKey srcKey= make_pair(startPoint, endPoint);
@@ -296,12 +301,12 @@ void genEdges(NodeMap &nodesPerLayer,
             if (kappa == nullptr) {
                 cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
             }
-            
+            splineMap[start][end].kappa = *kappa;
             double vel_rl = sampling_map[__vx][layer_idx] * min_vel_race;
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
             bool tooBigKappa = false;
-
+    
             for (int j = 0; j < kappa->size(); ++j) {
                 double kappa_val = abs((*kappa)(j));
                 // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
