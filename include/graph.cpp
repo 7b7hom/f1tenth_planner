@@ -64,19 +64,15 @@ bool Graph::getParentNodes(const IPair& childIdx, IPairVector& parentIdx, int nu
 
 // adjLists[srcNodeIdx]에서 delNodeIdx만 제거
 void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt, int num_layers) {
-    // 1. srcIdx의 자식 리스트에서 dstIdx를 삭제
+
     IPairVector& childs = adjLists[srcIdx];
-    auto it = std::remove(childs.begin(), childs.end(), dstIdx);
+    auto it = remove(childs.begin(), childs.end(), dstIdx);
     if (it != childs.end()) {
         childs.erase(it, childs.end());
         remove_cnt++;
     } else {
-        // 엣지가 없을 경우 아무것도 하지 않음
         return;
     }
-
-    // 2. splineMap이 있으면 해당 spline도 삭제
-    if (splineMap) {
         auto it = splineMap->find(srcIdx);
         if (it != splineMap->end()) {
             auto& splineList = it->second;
@@ -88,7 +84,6 @@ void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* spli
                 }
             }
         }
-    }
 
     if (childs.empty()) {
         IPairVector parents;
