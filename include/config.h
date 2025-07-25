@@ -15,13 +15,13 @@ struct Offline_Params {
         float LON_CURVE_STEP=0.9;      // Max norm vector spacing (m) on reference-line curves.
                                         
         float CURVE_THR=0.25;          // recommand: 0.15 ~ 0.3
-        float LAT_OFFSET=0.45;
+        float LAT_OFFSET=0.64;
 
         int MAX_LAT_STEPS=3;    // Permitted lateral deviation from the raceline per meter traveled.
         float VIRT_GOAL_N=true;         // Proxy target node per layer. Graph search uses this node directly, skipping iterative checks on adjacent goal-layer nodes.
-        float MIN_VEL_RACE=0.5;        // Minimum allowed speed as % of global race line; splines below this are excluded (set to 0.0 to allow all).
+        float MIN_VEL_RACE=0.0;        // Minimum allowed speed as % of global race line; splines below this are excluded (set to 0.0 to allow all).
         float MAX_LATERAL_ACCEL=4.0;
-        float CLOSURE_DETECTION_DIST=0.1; // If track ends(first, last) are within this distance (m), treat as closed loop.
+        float CLOSURE_DETECTION_DIST=0.5; // If track ends(first, last) are within this distance (m), treat as closed loop.
         
         // [PLANNINGTARGET]
         float VEL_DECREASE_LAT=0.1;     // PLANNING TARGET VELOCITY : % goal speed reduced per meter the goal is offset from the raceline.
@@ -33,9 +33,9 @@ struct Offline_Params {
         float STEPSIZE_APPROX=2.5;  // Spline sampling interval (smaller values improve collision-check accuracy)
 
         // [VEHICLE]
-        float VEH_WIDTH=0.4;    // Vehicle width (m); increase for greater safety margin
+        float VEH_WIDTH=0.6;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=4.7;   // vehicle length in m (in order to obtain a safety distance in follow mode)
-        float VEH_TURN=3.0;     // Min turn radius (m); splines below this are excluded.
+        float VEH_TURN=0.3;     // Min turn radius (m); splines below this are excluded.
 
         // [COST]
         float W_RACELINE=1.0;   // Penalty for path length and lateral offset from raceline, applied per meter

@@ -8,6 +8,8 @@
 #include <cmath>
 #include <algorithm>
 #include <time.h>
+#include <set>
+#include <queue>
 #include <Eigen/Dense>
 #include "config.h"
 #include "rapidcsv.h"
@@ -53,6 +55,7 @@ struct Spline {
     MatrixXd coeffs_x;          // x 계수
     MatrixXd coeffs_y;          // y 계수  
     VectorXd el_lengths;   
+    double cost;
 };
 
 typedef vector<double> DVector;
@@ -82,15 +85,14 @@ typedef map<IPair, map<IPair, Spline>> SplineMap;
 class Graph {
 private:
     bool isDirected;
-
 public:
     IPairAdjList adjLists;
     Graph(bool directed = true);
     void addEdge(IPair srcIdx, IPair dstIdx);
     void printGraph();
-    void getChildNodes(IPair& parentIdx, IPairVector& childIdx);
-    void getParentNodes(const IPair& childIdx, IPairVector& parentIdx);
-    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt);
+    bool getChildNodes(const IPair& parentIdx, IPairVector& childIdx);
+    bool getParentNodes(const IPair& childIdx, IPairVector& parentIdx, int num_layers);
+    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt, int num_layers);
 };
 
 extern DMap gtpl_map;

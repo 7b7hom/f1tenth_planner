@@ -281,6 +281,7 @@ void genEdges(NodeMap &nodesPerLayer,
     //   cout << "start Layer: " << srcLayerIdx << endl;
       // srcLayerIdx에서의 노드 개수만큼 loop
       for (size_t node_idx = 0; node_idx < nodesPerLayer[srcLayerIdx].size(); ++node_idx) {
+        // cout << "node_idx: " << node_idx << endl;
         IPairVector childNodes;
         IPair start = make_pair(layer_idx ,node_idx);
         graph_wp.getChildNodes(start, childNodes);
@@ -299,31 +300,50 @@ void genEdges(NodeMap &nodesPerLayer,
             double vel_rl = sampling_map[__vx][layer_idx] * min_vel_race;
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
-            bool removeFlag = false;
+            bool tooBigKappa = false;
 
             for (int j = 0; j < kappa->size(); ++j) {
                 double kappa_val = abs((*kappa)(j));
                 // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
-                // if (kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) {
-                //     removeFlag = true;
-                //     break; // 더 볼 필요 없음, 바로 탈출
-                // }
-                if (kappa_val > 1.8) { // 적절한 파라미터를 찾기 힘들어서 일단 하드코딩으로 돌림. 
-                removeFlag = true;
-                break; // 더 볼 필요 없음, 바로 탈출
+                if (kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) {
+                 tooBigKappa = true;
+                    break; // 더 볼 필요 없음, 바로 탈출
                 }
             }
 
-            if (removeFlag) {
-                graph_wp.removeEdge(start, end, &splineMap, remove_cnt);
-            }
-
+            if (tooBigKappa) graph_wp.removeEdge(start, end, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
             delete kappa;
             kappa = nullptr;
         }
       }
     //   cout << "node loop!" << endl;
     }
+    
+    for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
+        for (int nodeIdx = 0; nodeIdx < nodesPerLayer[layerIdx].size(); ++nodeIdx) {
+            IPair srcNodeIdx = make_pair(layerIdx, nodeIdx);
+
+            IPairVector parents;
+            bool isParent = graph_wp.getParentNodes(srcNodeIdx, parents, static_cast<int>(nodesPerLayer.size()));
+
+            if (!isParent) {
+                // cout << layerIdx << ", " << nodeIdx << endl;
+                // cout << "-------" << endl;
+                    IPairVector childs;
+                    bool isChild = graph_wp.getChildNodes(srcNodeIdx, childs);
+                    if (isChild) {
+                        // cout << layerIdx << ", " << nodeIdx << endl;
+                        for (auto& child : childs) {
+                            graph_wp.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
+                        }
+                    }
+
+                
+            }
+        }
+    }
+
+    // cout << "---remove 후---" << endl
     cout << "Added " << edge_cnt << " splines to the graph!" << endl;
     cout << "removed " << remove_cnt << " splines due to violation of the specified vehicle's turn radius or velocity aims!" << endl;
     // cout << "the end" << endl;

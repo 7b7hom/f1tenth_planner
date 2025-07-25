@@ -2,6 +2,7 @@
 
 Graph::Graph(bool directed) {
     isDirected = directed;
+    
 }
 
 void Graph::addEdge(IPair srcIdx, IPair dstIdx) {
@@ -30,31 +31,51 @@ void Graph::printGraph() {
     cout << "spline 개수" << size << endl;
 }
 
-void Graph::getChildNodes(IPair& parentIdx, IPairVector& childIdx) {
+bool Graph::getChildNodes(const IPair& parentIdx, IPairVector& childIdx) {
     if (adjLists[parentIdx].size() <= 0) 
-        throw runtime_error{"Unable to print child node for srcNodeIdx"};
+        return false;
     for (auto& value : adjLists[parentIdx]) {
         childIdx.push_back(value);
         // cout << "("<< value.first << ", " << value.second << ")" << endl;
     }
+    return true;
 }
 // 코드 수정 필요. 제기능은 함.
 // child의 parent를 찾아서 vector<pair<int, int>> 형태로 반환 
-void Graph::getParentNodes(const IPair& childIdx, IPairVector& parentIdx) {
+bool Graph::getParentNodes(const IPair& childIdx, IPairVector& parentIdx, int num_layers) {
+    parentIdx.clear();
     for (auto &[key, vec] : adjLists) {
-        if (key.first == (childIdx.first) - 1) {
+        if (childIdx.first == 0) {
+            key.first == childIdx.first + num_layers - 1;
+            for (const auto &value : vec) {
+                if (value == childIdx) parentIdx.push_back(key);
+                }
+        }
+        else if (key.first == (childIdx.first) - 1) {
             for (const auto &value : vec) {
                 if (value == childIdx) parentIdx.push_back(key);
                 }
             }
         }
+    if (parentIdx.empty()) return false;
+
+    return true;
     }
 
 // adjLists[srcNodeIdx]에서 delNodeIdx만 제거
-void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt) {
+void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt, int num_layers) {
+    // 1. srcIdx의 자식 리스트에서 dstIdx를 삭제
     IPairVector& childs = adjLists[srcIdx];
-    childs.erase(remove(childs.begin(), childs.end(), dstIdx), childs.end());
-    remove_cnt++;
+    auto it = std::remove(childs.begin(), childs.end(), dstIdx);
+    if (it != childs.end()) {
+        childs.erase(it, childs.end());
+        remove_cnt++;
+    } else {
+        // 엣지가 없을 경우 아무것도 하지 않음
+        return;
+    }
+
+    // 2. splineMap이 있으면 해당 spline도 삭제
     if (splineMap) {
         auto it = splineMap->find(srcIdx);
         if (it != splineMap->end()) {
@@ -71,10 +92,11 @@ void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* spli
 
     if (childs.empty()) {
         IPairVector parents;
-        getParentNodes(srcIdx, parents);
-
-        for (const auto& parentIdx : parents) {
-            removeEdge(parentIdx, srcIdx, splineMap, remove_cnt);
+        if (getParentNodes(srcIdx, parents, num_layers)) {
+            for (const auto& parentIdx : parents) {
+                removeEdge(parentIdx, srcIdx, splineMap, remove_cnt, num_layers);
+            }
         }
+        
     }
 }

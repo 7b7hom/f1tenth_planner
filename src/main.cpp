@@ -300,6 +300,20 @@ void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLa
     }
 }
 
+#if 0
+void genOfflineCost(SplineMap& splineMap,
+                   float w_curv_avg,
+                   float w_curv_peak, 
+                   float w_length, 
+                   float w_raceline, 
+                   float w_raceline_sat) {
+    if (splineMap.size() <= 0) {
+        throw invalid_argument("SplineMap's Size is zero!!")
+    }
+
+    for 
+}
+#endif
 
 int main() {
     clock_t s_time, f_time;
@@ -371,19 +385,11 @@ int main() {
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
-    // raceline 확인용 
-    // IVector::iterator vec_iter;
-    // for (vec_iter = raceline_index_array.begin(); vec_iter != raceline_index_array.end(); vec_iter++) {
-    //     cout << *vec_iter << endl;
-    // }
-    
-
     // sampling points' info 
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
 
     Graph graph_wp; // a graph of waypoints
     SplineMap splineMap;
-    
     genEdges(nodesPerLayer,
              graph_wp,
              splineMap,
@@ -397,15 +403,21 @@ int main() {
              params.MAX_LATERAL_ACCEL,
              params.VEH_TURN);
 
+    // genOfflineCost(splineMap,
+    //                params.W_CURV_AVG,
+    //                params.W_CURV_PEAK, 
+    //                params.W_LENGTH, 
+    //                params.W_RACELINE, 
+    //                params.W_RACELINE_SAT);
+
     f_time = clock();
 
-    // printSplineMapVerbose(splineMap, nodesPerLayer);
     // graph_wp.printGraph();
 
     // visual process 
-    visual(graph_wp, nodesPerLayer, splineMap, "orange");
-
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+    
+    visual(graph_wp, nodesPerLayer, splineMap, "orange");
 
     return 0;
 }
