@@ -363,6 +363,97 @@ void calcOfflineCost(SplineMap& splineMap,
     } 
 }
 
+bool checkInsideBounds(const MatrixXd& bound_l,const MatrixXd& bound_r,const Vector2d& pos) {
+    MatrixXd centerline = (bound_l + bound_r) / 2;
+
+    // 가장 가까운 segment 인덱스 찾기
+    int closest_idx = -1;
+    double min_dist2 = numeric_limits<double>::max();
+    for (int i = 0; i < centerline.rows() - 1; ++i) {
+        // segment 중심 계산
+        Vector2d mid = (centerline.row(i) + centerline.row(i + 1)) / 2.0;
+        double dist2 = (mid - pos).squaredNorm();
+        if (dist2 < min_dist2) {
+            min_dist2 = dist2;
+            closest_idx = i;
+        }
+    }
+
+    if (closest_idx < 0 || closest_idx >= bound_l.rows() - 1)
+        return false; // 예외 처리
+
+    // bound_l, bound_r, centerline 보간 (선형 보간 10개 지점)
+    int interp_points = 10;
+    MatrixXd bl_interp(interp_points, 2);
+    MatrixXd br_interp(interp_points, 2);
+    MatrixXd center_interp(interp_points, 2);
+
+    for (int i = 0; i < interp_points; ++i) {
+        double t = static_cast<double>(i) / (interp_points - 1);
+        bl_interp.row(i) = (1 - t) * bound_l.row(closest_idx) + t * bound_l.row(closest_idx + 1);
+        br_interp.row(i) = (1 - t) * bound_r.row(closest_idx) + t * bound_r.row(closest_idx + 1);
+        center_interp.row(i) = (1 - t) * centerline.row(closest_idx) + t * centerline.row(closest_idx + 1);
+    }
+
+    // pos에 가장 가까운 center_interp 인덱스 찾기
+    int nearest_idx = -1;
+    double best_dist2 = numeric_limits<double>::max();
+    for (int i = 0; i < interp_points; ++i) {
+        double d2 = (center_interp.row(i) - pos.transpose()).squaredNorm();
+        if (d2 < best_dist2) {
+            best_dist2 = d2;
+            nearest_idx = i;
+        }
+    }
+
+    // bound 사이 거리 (제곱)
+    double d_track2 = (bl_interp.row(nearest_idx) - br_interp.row(nearest_idx)).squaredNorm();
+
+    // 차량에서 각 bound까지 거리 (제곱)
+    double d_bl_2 = (bl_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
+    double d_br_2 = (br_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
+
+    // bound 밖에 있는지 여부 확인
+    bool within_bounds = !(d_bl_2 > d_track2 || d_br_2 > d_track2);
+    return within_bounds;
+}
+
+void getClosestNodes(const NodeMap& nodesPerLayer, IVector& closest_idx, const Vector2d& pos, int limit=1) {
+    int num_nodes = 0;
+    for (const auto& layer : nodesPerLayer) {
+        num_nodes += layer.size();
+    }
+
+    MatrixXd node_xy(num_nodes, 2);
+    int idx = 0;
+
+    for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
+        for (size_t j = 0; j < nodesPerLayer[i].size(); ++j) {
+            const Node& node = nodesPerLayer[i][j];
+            node_xy(idx, 0) = node.x;
+            node_xy(idx, 1) = node.y;
+            ++idx;
+        }
+    }   
+    // pos(2, 1) -> pos.transpose() -> (1, 2)
+    MatrixXd diff = node_xy.rowwise() - pos.transpose();
+    VectorXd dist2 = diff.rowwise().squaredNorm();
+
+    vector<pair<double, int>> dist_idx;
+    for (int i = 0; i < dist2.size(); ++i) {
+        dist_idx.emplace_back(dist2(i), i);
+    }
+
+        nth_element(dist_idx.begin(), dist_idx.begin() + limit, dist_idx.end());
+
+    // 최소 거리 limit개만 선택
+    for (int i = 0; i < limit; ++i) {
+        closest_idx.push_back(dist_idx[i].second);  // index 저장
+        cout << "Closest node's idx: " << dist_idx[i].second << endl;
+    
+}
+}
+
 int main() {
     clock_t s_time, f_time;
     s_time = clock();
@@ -459,6 +550,34 @@ int main() {
                    params.LAT_RESOLUTION, 
                    params.W_RACELINE, 
                    params.W_RACELINE_SAT);
+    // 현재 pos, heading 
+    double dx, dy;
+        
+    dx = sampling_map[__x_raceline][1] - sampling_map[__x_raceline][0];
+    dy = sampling_map[__y_raceline][1] - sampling_map[__y_raceline][0];
+
+    Vector2d pos_est(sampling_map[__x_raceline][0], sampling_map[__y_raceline][0]);
+    double heading_est = atan2(dy, dx) - M_PI_2;
+    float vel_est = 0.0;
+
+    int n = sampling_map[__x_bound_l].size();
+    MatrixXd bound_l(n,2);
+    MatrixXd bound_r(n,2);
+    for (int i = 0; i < n; ++i) {
+        bound_l(i, 0) = sampling_map[__x_bound_l][i];
+        bound_l(i, 1) = sampling_map[__y_bound_l][i];
+
+        bound_r(i, 0) = sampling_map[__x_bound_r][i];
+        bound_r(i, 1) = sampling_map[__y_bound_r][i];
+    }
+
+    // set start pos 
+    if (!checkInsideBounds(bound_l, bound_r, pos_est)) {
+        throw out_of_range("start pos is not in bounds");
+    }
+
+    IVector closest_idx;
+    getClosestNodes(nodesPerLayer, closest_idx, pos_est);
 
     f_time = clock();
 
