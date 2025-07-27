@@ -80,5 +80,6 @@ public:
     void printGraph();
     void getChildIdx(ITuple srcKey, IVector& childIdx);
     void getParentNode(int target_layer, int value, vector<ITuple>& parent);
-    void removeEdge(ITuple& parent, int value);
+    void removeEdge(const ITuple& parent, int value); // const 붙임
+    const TupleMap& getAdjLists() const; 
 };

@@ -39,7 +39,7 @@ void Graph::getParentNode(int target_layer, int value, vector<ITuple>& parent) {
         }
     }
 
-void Graph::removeEdge(ITuple& parent, int value) {
+void Graph::removeEdge(const ITuple& parent, int value) {
     for (auto& [key, vec] : adjLists) {
         if (key == parent) {
             auto it = remove(vec.begin(), vec.end(), value);
@@ -48,4 +48,8 @@ void Graph::removeEdge(ITuple& parent, int value) {
             }
         }
     }
+}
+
+const TupleMap& Graph::getAdjLists() const {
+    return adjLists;
 }

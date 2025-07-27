@@ -256,168 +256,104 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
                          double psi_s = std::numeric_limits<double>::quiet_NaN(), // spline 시작점 heading(NaN이면 헤딩 지정x -> natural spline 조건 따름(2차 미분값 0))
                          double psi_e = std::numeric_limits<double>::quiet_NaN(), // spline 끝점 heading
                          bool use_dist_scaling = true){ // spline의 1차 및 2차 미분 연속성 조건에 거리 스케일링 적용할지 여부(기본값 true -> el_lengths 고려하여 미분값들 스케일링)
-    MatrixXd updated_path = path;
+    
+    bool closed = (path.row(0) - path.bottomRows(1)).norm() < 1e-6;
 
-    // 닫힌 경로 확인(np.all(np.isclose(path[0], path[-1]))와 동일)
-    bool closed = (path.row(0) - path.row(path.rows() - 1)).norm() < 1e-6;
+    int no_splines = path.rows() - 1;
 
-    if (closed){
-        // 닫힌 경로의 경우 path 마지막에 path.row(0) 추가하기 때문에 행 +1, 열 개수 변경 x
-        updated_path.conservativeResize(path.rows() + 1, NoChange);
-        updated_path.row(path.rows()) = path.row(0);
+    VectorXd el_lengths;
+    if(use_dist_scaling && el_lengths_ptr == nullptr){
+        el_lengths = computeEuclideanDistances(path);
+    }else if(el_lengths_ptr){
+
     }
 
-    // 실제 스플라인이 정의될 구간의 개수 저장
-    int no_splines = updated_path.rows() - 1;
-
-    VectorXd ds;
-    if (el_lengths_ptr == nullptr){
-        ds = computeEuclideanDistances(updated_path); // el_lenghts_ptr 주어지지 않았다면 직접 계산
-    }else{
-        ds = *el_lengths_ptr; // el_lengths_ptr 주어졌다면 가리키는 내용(실제 VectorXd 객체)을 ds에 복사
+    if(use_dist_scaling && closed){
+        VectorXd tmp(el_lengths.size() + 1);
+        tmp << el_lengths, el_lengths(0);
+        el_lengths = tmp;
     }
 
-    VectorXd scaling;
-    if(use_dist_scaling){
-        if(closed){
-            VectorXd temp_ds(ds.size() + 1); // 현재 구간 길이 벡터보다 길이가 1 더 긴 임시 벡터 생성
-            temp_ds.head(ds.size()) = ds;
-            temp_ds(ds.size()) = ds(0);
-            ds = temp_ds;
-        }
-        // ds(i) / ds(i+1) -> 현재 구간 길이 / 다음 구간 길이
-        scaling = ds.head(no_splines).cwiseQuotient(ds.tail(no_splines));
-    }else{ // 거리 기반 스케일링 사용 x
-        scaling = VectorXd::Ones(no_splines - 1); // scaling 벡터를 모든 요소가 1인 벡터로 설정
+    VectorXd scaling = VectorXd::Ones(no_splines - 1);
+    if(use_dist_scaling && no_splines > 1){
+        scaling = el_lengths.head(no_splines - 1).array() / el_lengths.segment(1, no_splines - 1).array();
     }
 
-    // M 행렬 및 우변 벡터 초기화
-    MatrixXd M = MatrixXd::Zero(no_splines * 4, no_splines * 4); // 계수 행렬
-    VectorXd b_x = VectorXd::Zero(no_splines * 4); // 연립 선형 방정식 M x coeffs = b에서 결과 값 담는 벡터
-    VectorXd b_y = VectorXd::Zero(no_splines * 4);
+    const int dim = no_splines * 4; 
+    MatrixXd M = MatrixXd::Zero(dim, dim);
+    VectorXd b_x = VectorXd::Zero(dim);
+    VectorXd b_y = VectorXd::Zero(dim);
 
-    // template_M 상수 정의
-    for (int i = 0;i < no_splines; ++i){
-        int j = i * 4; // 현재 spline 계수의 시작 인덱스
-
-        // 위치 제약 조건(p_i(0) = path_i, p_i(1) = path_{i+1})
-        // 현재 spline 구간 i가 시작점 path_i와 끝점 path_{i+1}을 정확히 지나도록 강제
-        M(j, j) = 1; // 현재 spline의 i의 a0 계수에 해당하는 열을 의미
-        b_x(j) = updated_path(i, 0);
-        b_y(j) = updated_path(i, 1);
-
-        // P(1) = a_3+a_2+a_1+a_0
-        M(j + 1, j) = 1; M(j + 1, j + 1) = 1, M(j + 1, j + 2) = 1; M(j + 1, j + 3) = 1;
-        b_x(j + 1) = updated_path(i + 1, 0);
-        b_y(j + 1) = updated_path(i + 1, 1);
-
-        // 연속성 제약 조건(1차 미분, 2차 미분)
-        if(i < no_splines - 1){ //  마지막 spline 구간을 제외한 나머지 구간에 대해 연속성 제약
-            // p_i'(1) = p_{i+1}'(0) -> 1차 미분
-            // p_i'(1) = a_1 + 2a_2 + 3a_3 | p_{i+1}'(0) = a_1'
-            // (a_1 + 2a_2 + 3a_3)_i - (a_1)_i+1 = 0
-            M(j + 2, j + 1) = 1; M(j + 2, j + 2) = 2; M(j + 2, j + 3) = 3;
-            M(j + 2, j + 5) = -scaling(i); // j + 5: 다음 spline 구간 i+1의 a1 계수, scaling(i) 곱해서 미분값 스케일 맞춰줌(방정식에 들어간 - 그대로 행렬에 반영)
-
-            // p_i''(1) = p_{i+1}''(0) -> 2차 미분
-            // p_i''(1) = 2a_2 + 6a_3 | p_{i+1}''(0) = 2a_2'
-            // (2a_2 + 6a_3)_i - (2a_2)_{i+1} = 0
-            M(j + 3, j + 2) = 2; M(j + 3, j + 3) = 6;
-            M(j + 3, j + 6) = -2 * pow(scaling(i), 2); // 제곱 -> 2번 미분에서 각 미분에 스케일링 한 번씩 적용
-        }
-    }
-
-    // 경계 조건 설정(heading) | heading: 1차 미분
-    if(!closed){ // 열린 경로인 경우: 시작/끝점 헤딩 고정 (psi_s, psi_e 주어짐)
-        // ---Heading start point---
-        // spline 시작점의 heading 조건 위해 조건 방정식 좌변 계수 설정
-        // P'(t)=a_1+2a_2t+3a_3t^2 -> P'(0)=a_1
-        // M의 마지막 두 행은 경계 조건을 위한 자리(마지막 spline을 제외하고 1차, 2차 미분 연속성 제약하기 때문)
-        M(no_splines * 4 - 2, 1) = 1;
-
-        // spline 시작점의 물리적 heading 계산하기 위해 첫 번째 spline 구간 길이 가져옴.
-        double el_lengths_s = (el_lengths_ptr == nullptr) ? 1.0 : ds(0); // 길이 정보가 없으면 기본값으로 1.0
-        
-        // b_x, b_y 우변 벡터에 [시작점 헤딩(psi_s) = cos/sin 변환 값 * el_length_s] 설정
-        b_x(no_splines * 4 - 2) = cos(psi_s + M_PI / 2) * el_lengths_s;
-        b_y(no_splines * 4 - 2) = sin(psi_s + M_PI / 2) * el_lengths_s;
-
-
-        // ---Heading end point---
-        // P'(t)=a_1+2a_2t+3a_3t^2 -> P'(1)=a_1+2a_2+3a_3
-        int last_spline_idx_start = 4 * (no_splines - 1);
-        M(no_splines * 4 - 1, last_spline_idx_start) = 0; // a_0
-        M(no_splines * 4 - 1, last_spline_idx_start + 1) = 1; // a_1 
-        M(no_splines * 4 - 1, last_spline_idx_start + 2) = 2; // a_2
-        M(no_splines * 4 - 1, last_spline_idx_start + 3) = 3; // a_3
-
-        double el_lengths_e = (el_lengths_ptr == nullptr) ? 1.0 : ds(no_splines - 1);
-
-        // b_x, b_y 우변 벡터에 [끝점 헤딩(psi_e) = cos/sin 변환 값 * el_length_e] 설정        
-        b_x(no_splines * 4 - 1) = cos(psi_e + M_PI / 2) * el_lengths_e;
-        b_y(no_splines * 4 - 1) = sin(psi_e + M_PI / 2) * el_lengths_e;
-    }else{ // 닫힌 경로인 경우: heading/curvature 주기 조건(첫 spline 시작 = 마지막 spline끝)
-        // Heading 경계 조건
-        // p_0'(0) - p_{last}'(1) = 0
-        // a1_0 - a1_last - 2*a2_last - 3*a3_last = 0
-        M(no_splines * 4 - 2, 1) = 1; // a1_0
-        int last_spline_idx_start = 4 * (no_splines - 1);
-        M(no_splines * 4 - 2, last_spline_idx_start + 1) = -scaling(no_splines - 1);
-        M(no_splines * 4 - 2, last_spline_idx_start + 2) = -2 * scaling(no_splines - 1);
-        M(no_splines * 4 - 2, last_spline_idx_start + 3) = -3 * scaling(no_splines - 1);
-        // 이미 b_x, b_y는 0으로 설정되어 있음.
-
-        // Curvature 경계 조건
-        // p_0''(0) - p_{last}''(1) = 0
-        // 2*a2_0 - 2*a2_last - 6*a3_last = 0
-        M(no_splines * 4 - 1, 2) = 2; // 2a2_0
-        M(no_splines * 4 - 1, last_spline_idx_start + 2) = -2 * pow(scaling(no_splines - 1), 2);
-        M(no_splines * 4 - 1, last_spline_idx_start + 3) = -6 * pow(scaling(no_splines - 1), 2);
-        // 이미 b_x, b_y는 0으로 설정되어 있음.
-    }
-
-    // 연립방정식 풀기(M · coeffs = b)
-    // x/y_les: spline의 x, y 좌표 나타내는 모든 3차 다항식들의 계수들 나열한 1차원 벡터
-    VectorXd x_les = M.colPivHouseholderQr().solve(b_x);
-    VectorXd y_les = M.colPivHouseholderQr().solve(b_y);
-
-    // 계수 행렬로 변환
-    // .data(): 데이터가 저장된 메모리 시작 주소 가져옴.
-    // 4: row 개수(다항식 계수 4개)
-    // transpose -> 각 행이 하나의 spline 구간의 4개 계수([a0, a1, a2, a3])를 담게 됨.
-    MatrixXd coeffs_x_res = Map<MatrixXd>(x_les.data(), 4, no_splines).transpose(); 
-    MatrixXd coeffs_y_res = Map<MatrixXd>(y_les.data(), 4, no_splines).transpose();
-
-    // 법선 벡터 계산
-    MatrixXd normvec(no_splines, 2); // 각 spline 구간에 대한 2차원 법선 벡터
+    Matrix<double, 4, 8> template_M;
+    template_M << 1, 0, 0, 0, 0, 0, 0, 0,
+                  1, 1, 1, 1, 0, 0, 0, 0, 
+                  0, 1, 2, 3, 0, -1, 0, 0,
+                  0, 0, 2, 6, 0, 0, -2, 0;
+    
     for(int i = 0; i < no_splines; ++i){
-        // i번째 스플라인 구간의 X/Y 방향 1차항 계수(a_1)
-        double dx = coeffs_x_res(i, 1);
-        double dy = coeffs_y_res(i, 1);
-        // 계산된 접선 벡터에 대해 수직인 벡터 저장
-        normvec(i, 0) = -dy;
-        normvec(i, 1) = dx;
-    }
+        int j= i * 4;
 
-    // 법선 벡터 정규화
-    VectorXd norms = normvec.rowwise().norm();
-    MatrixXd normvec_normalized_res(no_splines, 2); // normvec 행렬의 각 행에 대해 유클리드 노름 계산, norm 벡터에 저장
-    for(int i = 0; i < no_splines; ++i){
-        if(norms(i) > 1e-9){ // 0으로 나누는 오류 방지
-            normvec_normalized_res.row(i) = normvec.row(i) / norms(i); // 단위 벡터 생성
+        if(i < no_splines - 1){
+            M.block(j, j, 4, 8) = template_M;
+            M(j + 2, j + 5) *= scaling(i);
+            M(j + 3, j + 6) *= pow(scaling(i), 2);
         }else{
-            normvec_normalized_res.row(i).setZero(); // 0으로 나누는 경우 0 벡터로 설정
-        }        
+            M.block(j, j, 2, 4) << 1, 0, 0, 0,
+                                   1, 1, 1, 1;
+        }
+
+        b_x.segment(j, 2) << path(i, 0), path(i + 1, 0);
+        b_y.segment(j, 2) << path(i, 1), path(i + 1, 1);
     }
 
-    SplineResult result;
-    result.coeffs_x = coeffs_x_res;
-    result.coeffs_y = coeffs_y_res;
-    result.M = M;
-    result.normvec_normalized = normvec_normalized_res;
-    result.ds = ds;
+    if(!closed){
+        double el_length_s = el_lengths_ptr ? (*el_lengths_ptr)(0) : 1.0;
+        double el_length_e = el_lengths_ptr ? el_lengths_ptr->tail(1)(0) : 1.0;
 
-    return result;
+        M(dim - 2, 1) = 1.0;
+        b_x(dim - 2) = cos(psi_s + M_PI_2) * el_length_s;
+        b_y(dim - 2) = sin(psi_s + M_PI_2) * el_length_s;
+
+        M.block(dim - 1, dim - 4, 1, 4) << 0, 1, 2, 3;
+        b_x(dim - 1) = cos(psi_e + M_PI_2) * el_length_e;
+        b_y(dim - 1) = sin(psi_e + M_PI_2) * el_length_e;
+    }else{
+        M(dim - 2, 1) = scaling.tail(1)(0);
+        M.block(dim - 2, dim - 3, 1, 3) << -1, -2, -3;
+        M(dim - 1, 2) = 2 * pow(scaling.tail(1)(0), 2);
+        M.block(dim - 1, dim - 2, 1, 2) << -2, -6;
+    }
+
+    VectorXd x_les = M.fullPivLu().solve(b_x);
+    VectorXd y_les = M.fullPivLu().solve(b_y);
+
+    MatrixXd coeffs_x(no_splines, 4), coeffs_y(no_splines, 4);
+    for (int i = 0; i < no_splines; ++i) {
+        coeffs_x.row(i) = x_les.segment(i * 4, 4).transpose();
+        coeffs_y.row(i) = y_les.segment(i * 4, 4).transpose();
+    }
+
+    MatrixXd normvec(no_splines, 2);
+    for (int i = 0; i < no_splines; ++i) {
+        double dx = coeffs_y(i, 1);
+        double dy = -coeffs_x(i, 1);
+        double norm = std::sqrt(dx * dx + dy * dy);
+        normvec(i, 0) = dx / norm;
+        normvec(i, 1) = dy / norm;
+    }
+
+    VectorXd ds(no_splines);
+    for (int i = 0; i < no_splines; ++i)
+        ds(i) = (path.row(i + 1) - path.row(i)).norm();
+
+    return SplineResult{
+        .coeffs_x = coeffs_x,
+        .coeffs_y = coeffs_y,
+        .M = M,
+        .normvec_normalized = normvec,
+        .ds = ds
+    };
+
 }
 
 // spline 평가하여 위치, 헤딩, 곡률 반환
@@ -485,7 +421,7 @@ bool isPointInsideTrackBounds(double x, double y){
 
     // 가장 가까운 기준선 인덱스의 정보 가져오기
     double ref_x = sampling_map[__x_ref][closest_ref_idx]; // __x_ref, __y_ref: 기준선 좌표
-    double ref_y = sampling_map[__y_ref][closest_ref_idx]; 
+    double ref_y = sampling_map[__y_ref][closest_ref_idx];
     double norm_x = sampling_map[__x_normvec][closest_ref_idx]; // __x_normvec, __y_normvec: 기준선 법선 벡터
     double norm_y = sampling_map[__y_normvec][closest_ref_idx];
     double width_left = sampling_map[__width_left][closest_ref_idx]; // __width_left, __width_right: 기준선으로부터의 좌우 폭
@@ -620,6 +556,68 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
 }
 
 
+// -- prune_graph() --
+
+void prune_graph(Graph& graph, int num_layers, bool closed = true){
+    int j = 0;
+    int rmv_cnt_tot = 0;
+
+    vector<ITuple> nodes;
+    for(int layer = 0; layer < num_layers; ++layer){
+        for(const auto& [key, vec] : graph.getAdjLists()){
+            if(get<0>(key) == layer){
+                nodes.push_back(key);
+            }
+        }
+    }
+
+    while(true){
+        int rmv_cnt = 0;
+
+        for(const auto& node : nodes){
+            int layer = get<0>(node);
+            int node_idx = get<1>(node);
+
+            if(!closed && (layer == 0 || layer == num_layers - 1)){
+                continue;
+            }
+
+            IVector children;
+            vector<ITuple> parents;
+
+            try{
+                graph.getChildIdx(node, children);
+            }catch(...){
+                children.clear();
+            }
+            
+            graph.getParentNode(layer, node_idx, parents);
+
+            if(children.empty() || parents.empty()){
+                if(children.empty()){
+                    for(const auto& parent : parents){
+                        graph.removeEdge(parent, node_idx);
+                        ++rmv_cnt;
+                    }
+                }else{
+                    for(int child : children){
+                        graph.removeEdge(node, child);
+                        ++rmv_cnt;
+                    }
+                }
+            }
+        }
+
+        if(rmv_cnt == 0){
+            break;
+        }else{
+            rmv_cnt_tot += rmv_cnt;
+        }
+        ++j;
+    }
+
+}
+
 // 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
 void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
     plt::clf();
@@ -751,6 +749,8 @@ void runPlanningPipeline(const Offline_Params& params, const std::string& map_fi
     // 4. 스플라인 생성 및 유효성 검사, 최종 그래프 구축
     Graph directedGraph; 
     generateGraphEdges(directedGraph, nodesPerLayer, params);
+
+    prune_graph(directedGraph, nodesPerLayer.size(), true); 
 
     // 5. 최종 그래프 연결 확인 (Print Graph)
     cout << "\n--- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---" << endl;
