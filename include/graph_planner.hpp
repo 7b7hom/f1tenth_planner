@@ -80,6 +80,14 @@ typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key�
 // typedef map<IPair, map<IPair, Spline, myCompare>, myCompare> SplineMap;
 typedef map<IPair, map<IPair, Spline>> SplineMap;
 
+struct ActionSet {
+    string action_id; // "straight"
+    vector<MatrixXd> coeffs; // x_coeff, y_coeff
+    vector<MatrixXd> path_param; // path, psi, kappa, el_lengths 
+    NodeMap nodes; // [[None, None], start_node]
+    vector<IPair> node_idx; // [0, path.size()-1]
+};
+
 #define LayerIdx(pair) (pair.first)
 #define NodeIdx(pair) (pair.second)
 
@@ -114,7 +122,7 @@ void map_size(DMap& map);
 unique_ptr<Spline> calcSplines(const MatrixXd &path,
                                      double psi_s, 
                                      double psi_e, 
-                                     bool use_dist_scaling);
+                                     bool use_dist_scaling=true);
 void genEdges(NodeMap &nodesPerLayer, 
               Graph &edgeList,
               SplineMap &splineMap,
@@ -127,3 +135,13 @@ void genEdges(NodeMap &nodesPerLayer,
               const float min_vel_race,
               const float max_lateral_accel,
               const float veh_turn);
+
+pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
+                        MatrixXd &coeffs_y,
+                        float stepsize_approx,
+                        double spline_len = NAN, 
+                        int no_interp_points = 10);
+                    
+VectorXd calcKappa(MatrixXd &coeffs_x,
+                         MatrixXd &coeffs_y,
+                         VectorXd &t_steps);

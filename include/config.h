@@ -45,6 +45,8 @@ struct Offline_Params {
         float W_CURV_PEAK=2500.0;   // Penalty factor for highest curvature along the spline, applied per meter.
         float W_VIRT_GOAL=10000.0;  // Penalty per meter of lateral offset from the race line at the virtual goal node
 
+        // [CUSTOM]
+        float MAX_HEADING_OFFSET = M_PI / 4;
 };
 
  

@@ -1,9 +1,9 @@
 #include "graph_planner.hpp"
 
 unique_ptr<Spline> calcSplines(const MatrixXd &path,
-                                     double psi_s = NAN,
-                                     double psi_e = NAN,
-                                     bool use_dist_scaling = true) {
+                                     double psi_s,
+                                     double psi_e,
+                                     bool use_dist_scaling) {
     // 구간 길이 계산
     VectorXd el_lengths;
     if (use_dist_scaling) {
@@ -90,12 +90,12 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
     });
 }
 
-VectorXd* calcKappa(MatrixXd &coeffs_x,
+VectorXd calcKappa(MatrixXd &coeffs_x,
                          MatrixXd &coeffs_y,
                          VectorXd &t_steps) {
     int N = t_steps.size();
     VectorXd psi(N);
-    VectorXd* kappa = new VectorXd(N);
+    VectorXd kappa(N);
     // 샘플링 개수만큼 loop
 
     for (int i = 0; i < N; ++i) {
@@ -111,18 +111,18 @@ VectorXd* calcKappa(MatrixXd &coeffs_x,
         double y_dd = 2 * coeffs_y(0, 2) + 6 * coeffs_y(0, 3) * t;
 
         double denom = pow(x_d * x_d + y_d * y_d, 1.5);
-        (*kappa)(i)= (x_d * y_dd - y_d * x_dd) / denom;
+        kappa(i)= (x_d * y_dd - y_d * x_dd) / denom;
     }
 
     return kappa;
 }
 
 // 단일 스플라인에 대한 spline에 대한 샘플링 
-VectorXd* interpSplines(MatrixXd &coeffs_x,
+pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
                         MatrixXd &coeffs_y,
                         float stepsize_approx,
-                        double spline_len = NAN, 
-                        int no_interp_points = 10) {
+                        double spline_len, 
+                        int no_interp_points) {
     if (coeffs_x.rows() != coeffs_y.rows()) {
         throw invalid_argument("Coefficient matrices must have the same length!");
     }
@@ -134,6 +134,7 @@ VectorXd* interpSplines(MatrixXd &coeffs_x,
     if (isnan(stepsize_approx)) {
         throw invalid_argument("Provide one of 'stepsize_approx' and 'stepnum_fixed' and set the other to 'None'!");
     }
+
     // spline 계산 
     // 샘플링할 점 개수
     if (isnan(spline_len)) {
@@ -145,38 +146,22 @@ VectorXd* interpSplines(MatrixXd &coeffs_x,
         for (size_t i = 0; i < no_interp_points; ++i) {
             t_steps[i] = i*step;
         }
-        // cout << "spline 개수: " << no_splines << endl;
-        // MatrixXd* spl_coords = new MatrixXd(no_interp_points, 2);
 
-        // for (int i = 0; i < no_splines; ++i) {
-        //     spl_coords->col(0) =
-        //         coeffs_x(i, 0) * VectorXd::Ones(no_interp_points)
-        //         + coeffs_x(i, 1) * t_steps
-        //         + coeffs_x(i, 2) * t_steps.array().pow(2).matrix()
-        //         + coeffs_x(i, 3) * t_steps.array().pow(3).matrix();
+        VectorXd kappa = calcKappa(coeffs_x, coeffs_y, t_steps);
 
-        //     spl_coords->col(1) =
-        //         coeffs_y(i, 0) * VectorXd::Ones(no_interp_points)
-        //         + coeffs_y(i, 1) * t_steps
-        //         + coeffs_y(i, 2) * t_steps.array().pow(2).matrix()
-        //         + coeffs_y(i, 3) * t_steps.array().pow(3).matrix();           
-        // }
-        // spline_len = 0.0;
-        // for (int j = 1; j < no_interp_points; ++j) {
-        //     double dx = (*spl_coords)(j, 0) - (*spl_coords)(j-1, 0);
-        //     double dy = (*spl_coords)(j, 1) - (*spl_coords)(j-1, 1);
+         // psi 계산
+        VectorXd psi(no_interp_points);
+        for (int i = 0; i < no_interp_points; ++i) {
+            double t = t_steps[i];
+            double dx_dt = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t * t;
+            double dy_dt = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
+            psi[i] = atan2(dy_dt, dx_dt);
+        }
 
-        //     spline_len +=sqrt(dx*dx + dy*dy);
-        // }
-        // cout << spline_len << endl; // levine: 0.5~2.5
-        
-        // delete spl_coords;
-        VectorXd* kappa = calcKappa(coeffs_x, coeffs_y, t_steps);
-
-        return kappa;
+        return make_pair(kappa,psi);
     }
 
-    return nullptr;
+    return make_pair(VectorXd(), VectorXd());
     
     
     // 보류
@@ -297,18 +282,18 @@ void genEdges(NodeMap &nodesPerLayer,
           MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
           MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
 
-          VectorXd* kappa = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
-            if (kappa == nullptr) {
+          auto [kappa, psi] = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
+            if (kappa.size() == 0) {
                 cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
             }
-            splineMap[start][end].kappa = *kappa;
+            splineMap[start][end].kappa = kappa;
             double vel_rl = sampling_map[__vx][layer_idx] * min_vel_race;
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
             bool tooBigKappa = false;
     
-            for (int j = 0; j < kappa->size(); ++j) {
-                double kappa_val = abs((*kappa)(j));
+            for (int j = 0; j < kappa.size(); ++j) {
+                double kappa_val = abs(kappa(j));
                 // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
                 if (kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) {
                  tooBigKappa = true;
@@ -317,8 +302,8 @@ void genEdges(NodeMap &nodesPerLayer,
             }
 
             if (tooBigKappa) graph_wp.removeEdge(start, end, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-            delete kappa;
-            kappa = nullptr;
+            // delete kappa;
+            // kappa = nullptr;
         }
       }
     //   cout << "node loop!" << endl;
