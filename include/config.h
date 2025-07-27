@@ -8,7 +8,7 @@ const int rl_s = 7;
 struct Offline_Params {
 
         // [LATTICE]
-        float LAT_RESOLUTION=0.2;       // Lateral spacing (m) between nodes along each normal
+        float LAT_RESOLUTION=0.18;       // Lateral spacing (m) between nodes along each normal
         float VARIABLE_HEADING=true;    // Determines if node headings are interpolated between boundary and race line angles (else: match race line).
         
         float LON_STRAIGHT_STEP=2.2;   // Max distance (m) between norm vectors along straights on the reference line

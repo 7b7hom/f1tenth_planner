@@ -190,6 +190,41 @@ void calcHeading(DVector &x_raceline,
 
 }
 
+
+void calcCurvature(NodeMap& nodesPerLayer) {
+    const int num_layers = nodesPerLayer.size();
+
+    auto getNodeInBounds = [](const vector<Node>& layer, int j) -> const Node* {
+        if (layer.empty()) return nullptr;
+        if (j < 0) return &layer.front();
+        if (j < static_cast<int>(layer.size())) return &layer[j];
+        return &layer.back();
+    };
+
+    for (int i = 0; i < num_layers; ++i) {
+        int num_nodes = nodesPerLayer[i].size();
+
+        for (int j = 0; j < num_nodes; ++j) {
+            const Node* prev = (i == 0)
+                ? getNodeInBounds(nodesPerLayer[i], j)
+                : getNodeInBounds(nodesPerLayer[i - 1], j);
+
+            const Node* next = (i == num_layers - 1)
+                ? getNodeInBounds(nodesPerLayer[i], j)
+                : getNodeInBounds(nodesPerLayer[i + 1], j);
+
+            if (!prev || !next) continue;  // 안전 확인
+
+            double dpsi = normalizeAngle(next->psi - prev->psi);
+            double ds = std::hypot(next->x - prev->x, next->y - prev->y);
+
+            double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
+            nodesPerLayer[i][j].kappa = kappa;
+        }
+    }
+}
+
+
 void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드 저장하는 2차원 벡터
             IVector& raceline_index_array,  // 각 레이어에서 레이싱라인이 위치한 노드의 인덱스
             const double veh_width,         // 차량의 너비
@@ -226,8 +261,7 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
         for (int idx = 0; idx < num_nodes; ++idx) {
             double alpha = start_alpha + idx * lat_resolution;
             // node의 좌표 계산.
-            node_pos = ref_xy + alpha * norm_vec;
-            // node의 layer내의 인덱스 계산.
+            node_pos = ref_xy + alpha * norm_vec; // node의 layer내의 인덱스 계산.
             node.node_idx = node_idx;
             node.x = node_pos.x();
             node.y = node_pos.y();     
@@ -270,8 +304,17 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
         //     cout << i << "번째 Node" << endl;
         //     cout << node_pos[i] << endl;
         // }
-                // 각 node의 psi, kappa 계산하는 로직 추가
-
+        
+        calcCurvature(nodesPerLayer);
+        // for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
+        //     for (size_t j = 0; j < nodesPerLayer[i].size(); ++j) {
+        //         const Node& n = nodesPerLayer[i][j];
+        //         std::cout << "Layer " << i << ", Node " << j
+        //                 << " | x: " << n.x << ", y: " << n.y
+        //                 << " | psi: " << n.psi
+        //                 << " | kappa: " << n.kappa << std::endl;
+        //     }
+        // }
     }
 }       // 저장 결과 : nodesPerLayer[i][j] (i번째 레이어에서 j번째 lateral 위치의 노드)
         //           raceline_index_array[i] (i번째 레이어에서 레이싱라인이 위치한 인덱스)
@@ -376,6 +419,36 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
     return result;
 }
 
+bool checkKappaValidity(const Vector4d& coeffs_x,
+                        const Vector4d& coeffs_y,
+                        const VectorXd& t_steps,
+                        double max_allowed_kappa) {
+    int N = t_steps.size();
+
+    for (int i = 0; i < N; ++i) {
+        double t = t_steps(i);
+
+        double x_d = coeffs_x(1) + 2 * coeffs_x(2) * t + 3 * coeffs_x(3) * t * t;
+        double y_d = coeffs_y(1) + 2 * coeffs_y(2) * t + 3 * coeffs_y(3) * t * t;
+
+        double x_dd = 2 * coeffs_x(2) + 6 * coeffs_x(3) * t;
+        double y_dd = 2 * coeffs_y(2) + 6 * coeffs_y(3) * t;
+
+        double denom = std::pow(x_d * x_d + y_d * y_d, 1.5);
+        double kappa = 0.0;
+        if (denom > 1e-6) {
+            kappa = std::abs((x_d * y_dd - y_d * x_dd) / denom);
+        }
+
+        if (kappa > max_allowed_kappa) {
+            std::cout << "REJECTED (EXCESSIVE CURVATURE): kappa = " << kappa
+                      << ", max allowed = " << max_allowed_kappa << std::endl;
+            return false;  // 조건 위반 시 바로 종료
+        }
+    }
+
+    return true;  // 모두 조건 만족
+}
 
 // ------------------ genEdge ------------------
 
@@ -385,10 +458,6 @@ Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& co
     double x = coeff_x(0) + coeff_x(1) * t + coeff_x(2) * t2 + coeff_x(3) * t3;
     double y = coeff_y(0) + coeff_y(1) * t + coeff_y(2) * t2 + coeff_y(3) * t3;
     return Vector2d(x, y);
-}
-
-bool pruneEdges(const SplineResult& spline, const Offline_Params& parans) {
-    if (spline)
 }
 
 
@@ -447,10 +516,24 @@ void genEdge(Graph& graph,
 
                 const Node& endNode = end_layer_nodes[destIdx];
 
-                // 스플라인 계산
+                VectorXd t_steps = Eigen::VectorXd::LinSpaced(11, 0.0, 1.0);  // 0~1 사이 11점 샘플링
+
                 auto result = calcSplines(startNode, endNode);
-                const MatrixXd& x_coeffs = result.coeffs_x;
-                const MatrixXd& y_coeffs = result.coeffs_y;
+                const Vector4d& x_coeffs = result.coeffs_x.row(0);
+                const Vector4d& y_coeffs = result.coeffs_y.row(0);
+
+                double max_allowed_kappa = 20.0 / params.VEH_TURN;  // params에 맞게 조정
+
+                if (checkKappaValidity(x_coeffs, y_coeffs, t_steps, max_allowed_kappa)) {
+                    ITuple src_key(start_layer, startNode.node_idx);
+                    graph.addEdge(src_key, endNode.node_idx);
+                    cout << "SPLINE PASSED from (" << start_layer << "," << startNode.node_idx
+                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                } else {
+                    cout << "SPLINE REJECTED from (" << start_layer << "," << startNode.node_idx
+                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                }
+
 
                 // DEBUG
 
@@ -485,6 +568,7 @@ void genEdge(Graph& graph,
         }  
     }
 }
+
 
 void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
     plt::clf();
@@ -643,6 +727,8 @@ int main() {
             nodesPerLayer,
             params,
             raceline_index_array);
+    
+    // pruneEdge(graph, nodesPerLayer, params.KAPPA_LIMIT, closed);
 
     // myGraph.printGraph();
     

@@ -57,6 +57,7 @@ struct Node {
 
 typedef vector<double> DVector;
 typedef vector<int>    IVector;
+typedef vector<Node>   NVector;
 typedef map<string, DVector> DMap;
 typedef map<string, IVector> IMap;
 typedef vector<vector<Node>> NodeMap;
