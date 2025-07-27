@@ -358,7 +358,7 @@ void calcOfflineCost(SplineMap& splineMap,
             offline_cost += raceline_cost;
 
             spline.cost = offline_cost;
-            cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
+            // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
         }   
     } 
 }
@@ -418,7 +418,7 @@ bool checkInsideBounds(const MatrixXd& bound_l,const MatrixXd& bound_r,const Vec
     return within_bounds;
 }
 
-void getClosestNodes(const NodeMap& nodesPerLayer, IVector& closest_idx, const Vector2d& pos, int limit=1) {
+void getClosestNodes(const NodeMap& nodesPerLayer, IPairVector& closest_idx, const Vector2d& pos, int limit=1) {
     int num_nodes = 0;
     for (const auto& layer : nodesPerLayer) {
         num_nodes += layer.size();
@@ -438,20 +438,24 @@ void getClosestNodes(const NodeMap& nodesPerLayer, IVector& closest_idx, const V
     // pos(2, 1) -> pos.transpose() -> (1, 2)
     MatrixXd diff = node_xy.rowwise() - pos.transpose();
     VectorXd dist2 = diff.rowwise().squaredNorm();
+    vector<tuple<double, int, int>> dist_info;
 
-    vector<pair<double, int>> dist_idx;
-    for (int i = 0; i < dist2.size(); ++i) {
-        dist_idx.emplace_back(dist2(i), i);
+    int re_idx = 0;
+    for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
+        for (size_t j = 0; j < nodesPerLayer[i].size(); ++j) {
+            dist_info.emplace_back(dist2(re_idx++), i, j);
+        }
     }
 
-        nth_element(dist_idx.begin(), dist_idx.begin() + limit, dist_idx.end());
+    // 최소 거리 limit개만 앞으로 정렬
+    nth_element(dist_info.begin(), dist_info.begin() + limit, dist_info.end());
 
-    // 최소 거리 limit개만 선택
-    for (int i = 0; i < limit; ++i) {
-        closest_idx.push_back(dist_idx[i].second);  // index 저장
-        cout << "Closest node's idx: " << dist_idx[i].second << endl;
-    
-}
+    // 결과 저장
+    for (int k = 0; k < limit; ++k) {
+        auto [dist, i, j] = dist_info[k];
+        closest_idx.emplace_back(i, j);
+        cout << "Closest node: layer=" << i << ", idx=" << j << endl;
+    }
 }
 
 int main() {
@@ -576,8 +580,12 @@ int main() {
         throw out_of_range("start pos is not in bounds");
     }
 
-    IVector closest_idx;
+    IPairVector closest_idx;
     getClosestNodes(nodesPerLayer, closest_idx, pos_est);
+
+    int goal_layer = (closest_idx[0].first + 2) % (nodesPerLayer.size() - 1);
+    int goal_node = raceline_index_array[goal_layer];
+    cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
 
     f_time = clock();
 
