@@ -458,6 +458,85 @@ void getClosestNodes(const NodeMap& nodesPerLayer, IPairVector& closest_idx, con
     }
 }
 
+void setStartPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_array, const float& max_heading_offset, const float& stepsize_approx) {
+        // 현재 pos, heading 
+    double dx, dy;
+        
+    dx = sampling_map[__x_raceline][1] - sampling_map[__x_raceline][0];
+    dy = sampling_map[__y_raceline][1] - sampling_map[__y_raceline][0];
+
+    Vector2d start_pos(sampling_map[__x_raceline][0], sampling_map[__y_raceline][0]);
+    double start_heading = atan2(dy, dx) - M_PI_2;
+    float vel_est = 0.0;
+
+    int n = sampling_map[__x_bound_l].size();
+    MatrixXd bound_l(n,2);
+    MatrixXd bound_r(n,2);
+    for (int i = 0; i < n; ++i) {
+        bound_l(i, 0) = sampling_map[__x_bound_l][i];
+        bound_l(i, 1) = sampling_map[__y_bound_l][i];
+
+        bound_r(i, 0) = sampling_map[__x_bound_r][i];
+        bound_r(i, 1) = sampling_map[__y_bound_r][i];
+    }
+
+    // set start pos 
+    if (!checkInsideBounds(bound_l, bound_r, start_pos)) {
+        throw out_of_range("start pos is not in bounds");
+    }
+
+    IPairVector closest_idx;
+    getClosestNodes(nodesPerLayer, closest_idx, start_pos);
+
+    int goal_layer = (closest_idx[0].first + 2) % (nodesPerLayer.size() - 1);
+    int goal_node = raceline_index_array[goal_layer];
+    cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
+
+    double end_heading = nodesPerLayer[goal_layer][goal_node].psi;
+    double heading_diff = std::abs(start_heading - end_heading);
+    Vector2d end_pos(nodesPerLayer[goal_layer][goal_node].x, nodesPerLayer[goal_layer][goal_node].y);
+
+    if (heading_diff > M_PI) {
+        heading_diff = std::abs(2*M_PI - heading_diff);
+    }
+    if (heading_diff > max_heading_offset) {
+        cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
+    }
+
+    MatrixXd path(2, 2);
+    path.block<1, 2>(0, 0) = start_pos.transpose();
+    path.block<1, 2>(1, 0) = end_pos.transpose();
+
+    auto result = calcSplines(path, start_heading, end_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
+
+    auto [kappa, psi]  = interpSplines(result->coeffs_x, result->coeffs_y, stepsize_approx);
+
+    ActionSet actionSet;
+
+    actionSet.action_id = "straight";
+
+    MatrixXd coeffs_all(2, 4);
+    coeffs_all.row(0) = result->coeffs_x;
+    coeffs_all.row(1) = result->coeffs_y;
+
+    // cout << coeffs_all.row(0) << endl;
+
+    actionSet.coeffs.push_back(coeffs_all);
+    // cout << result->el_lengths.rows() << result->el_lengths.cols();
+    VectorXd el_lengths_all(2);
+    el_lengths_all(0) = result->el_lengths(0); // 거리
+    el_lengths_all(1) = 0.0;
+
+    MatrixXd action_param(1, 5);
+    action_param(0, 0) = start_pos.x();  
+    action_param(0, 1) = start_pos.y();   
+    action_param(0, 2) = psi(0);             
+    action_param(0, 3) = kappa(0);           
+    action_param(0, 4) = el_lengths_all(0);
+
+    plotSpline(*result, "blue");
+}
+
 int main() {
     clock_t s_time, f_time;
     s_time = clock();
@@ -554,79 +633,8 @@ int main() {
                    params.LAT_RESOLUTION, 
                    params.W_RACELINE, 
                    params.W_RACELINE_SAT);
-    // 현재 pos, heading 
-    double dx, dy;
-        
-    dx = sampling_map[__x_raceline][1] - sampling_map[__x_raceline][0];
-    dy = sampling_map[__y_raceline][1] - sampling_map[__y_raceline][0];
 
-    Vector2d start_pos(sampling_map[__x_raceline][0], sampling_map[__y_raceline][0]);
-    double start_heading = atan2(dy, dx) - M_PI_2;
-    float vel_est = 0.0;
-
-    int n = sampling_map[__x_bound_l].size();
-    MatrixXd bound_l(n,2);
-    MatrixXd bound_r(n,2);
-    for (int i = 0; i < n; ++i) {
-        bound_l(i, 0) = sampling_map[__x_bound_l][i];
-        bound_l(i, 1) = sampling_map[__y_bound_l][i];
-
-        bound_r(i, 0) = sampling_map[__x_bound_r][i];
-        bound_r(i, 1) = sampling_map[__y_bound_r][i];
-    }
-
-    // set start pos 
-    if (!checkInsideBounds(bound_l, bound_r, start_pos)) {
-        throw out_of_range("start pos is not in bounds");
-    }
-
-    IPairVector closest_idx;
-    getClosestNodes(nodesPerLayer, closest_idx, start_pos);
-
-    int goal_layer = (closest_idx[0].first + 2) % (nodesPerLayer.size() - 1);
-    int goal_node = raceline_index_array[goal_layer];
-    cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
-
-    double end_heading = nodesPerLayer[goal_layer][goal_node].psi;
-    double heading_diff = std::abs(start_heading - end_heading);
-    Vector2d end_pos(nodesPerLayer[goal_layer][goal_node].x, nodesPerLayer[goal_layer][goal_node].y);
-
-    if (heading_diff > M_PI) {
-        heading_diff = std::abs(2*M_PI - heading_diff);
-    }
-    if (heading_diff > params.MAX_HEADING_OFFSET) {
-        cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
-        return 0;
-    }
-
-    MatrixXd path(2, 2);
-    path.block<1, 2>(0, 0) = start_pos.transpose();
-    path.block<1, 2>(1, 0) = end_pos.transpose();
-
-    auto result = calcSplines(path, start_heading, end_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
-
-    auto [kappa, psi]  = interpSplines(result->coeffs_x, result->coeffs_y, params.STEPSIZE_APPROX);
-
-    ActionSet actionSet;
-    cout << "hi" << endl;
-    actionSet.action_id = "straight";
-
-    MatrixXd coeffs_all(2, 4);
-    coeffs_all.row(0) = result->coeffs_x;
-    coeffs_all.row(1) = result->coeffs_y;
-
-    actionSet.coeffs.push_back(coeffs_all);
-    // cout << result->el_lengths.rows() << result->el_lengths.cols();
-    VectorXd el_lengths_all(2);
-    el_lengths_all(0) = result->el_lengths(0); // 거리
-    el_lengths_all(1) = 0.0;
-
-    MatrixXd action_param(1, 5);
-    action_param(0, 0) = start_pos.x();  
-    action_param(0, 1) = start_pos.y();   
-    action_param(0, 2) = psi(0);             
-    action_param(0, 3) = kappa(0);           
-    action_param(0, 4) = el_lengths_all(0);
+    setStartPos(nodesPerLayer, raceline_index_array, params.MAX_HEADING_OFFSET, params.STEPSIZE_APPROX);
 
     f_time = clock();
 
@@ -635,7 +643,8 @@ int main() {
     // visual process 
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
     
-    visual(graph_wp, nodesPerLayer, splineMap, "orange", *result);
+    
+    visual(graph_wp, nodesPerLayer, splineMap, "orange");
 
     return 0;
 }

@@ -144,23 +144,18 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, co
         }
     }
 
-    plt::title("All Spline Paths");
-    plt::xlabel("X");
-    plt::ylabel("Y");
-    plt::axis("equal");
-    plt::show();
 }
 
 void plotSpline(const Spline& spline, const string& color) {
     // Spline 점 생성
-    std::vector<Vector2d> spline_points = generateSplinePoints(spline);
+    vector<Vector2d> spline_points = generateSplinePoints(spline);
 
     DVector xs, ys;
     for (const auto& pt : spline_points) {
         xs.push_back(pt.x());
         ys.push_back(pt.y());
     }
-
+    // cout << "I'm in plotSpline!" << endl;
     // // Spline 그리기
     plt::plot(xs, ys, {{"color", color}});
 
@@ -171,8 +166,8 @@ void plotSpline(const Spline& spline, const string& color) {
     // plt::show();
 }
 
-void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color, const Spline& result) {
-    plt::clf();
+void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color) {
+    // plt::clf();
 
     DVector x_bound_l = sampling_map[__x_bound_l];
     DVector y_bound_l = sampling_map[__y_bound_l];
@@ -213,11 +208,10 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
     // 노드마다 psi확인할 수 있는 용도 
     plotHeading(nodesPerLayer);
 
-    plotSpline(result , "blue");   
     plotAllSplines(splineMap, nodesPerLayer, color);
 
-    // plt::title("Track");
-    // plt::grid(true);
-    // plt::axis("equal");
-    // plt::show();  
+    plt::title("Track");
+    plt::grid(true);
+    plt::axis("equal");
+    plt::show();  
 }
