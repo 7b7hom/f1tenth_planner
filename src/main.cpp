@@ -635,7 +635,7 @@ int main() {
     // visual process 
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
     
-    visual(graph_wp, nodesPerLayer, splineMap, "orange");
+    visual(graph_wp, nodesPerLayer, splineMap, "orange", *result);
 
     return 0;
 }

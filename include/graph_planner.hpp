@@ -111,7 +111,7 @@ extern DMap sampling_map;
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
 void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
-void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
+void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color, const Spline& result);
 
 // toCSV
 void readDMapFromCSV(const string& pathname, DMap& map);
