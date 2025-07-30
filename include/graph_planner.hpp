@@ -119,7 +119,7 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
-bool checkInsideBounds(const Vector2d& pos);
+bool checkInsideBounds(const Vector2d& pos, const float veh_width);
 
 unique_ptr<string> Load(const string& filename);
 //genSplines.cpp
@@ -131,6 +131,7 @@ void genEdges(NodeMap &nodesPerLayer,
               Graph &edgeList,
               SplineMap &splineMap,
               const IVector &raceline_index_array,
+              const float veh_width,
               const float lat_offset,
               const float lat_resolution,
               const float curve_thr,
@@ -143,7 +144,8 @@ void genEdges(NodeMap &nodesPerLayer,
 pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
                         MatrixXd &coeffs_y,
                         float stepsize_approx,
-                        double spline_len = NAN, 
+                        const float& veh_width,
+                        double spline_len = NAN,
                         int no_interp_points = 10);
                     
 VectorXd calcKappa(MatrixXd &coeffs_x,

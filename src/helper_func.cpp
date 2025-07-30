@@ -78,7 +78,15 @@ unique_ptr<string> Load(const string& filename) {
 
 }
 
-bool checkInsideBounds(const Vector2d& pos) {
+bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
+
+    if (sampling_map.find(__x_bound_l) == sampling_map.end() || 
+    sampling_map.find(__y_bound_l) == sampling_map.end() ||
+    sampling_map.find(__x_bound_r) == sampling_map.end() || 
+    sampling_map.find(__y_bound_r) == sampling_map.end()) {
+    throw invalid_argument("Boundary keys are missing in sampling_map!");
+}
+
     int n = sampling_map[__x_bound_l].size();
     MatrixXd bound_l(n,2);
     MatrixXd bound_r(n,2);
@@ -138,6 +146,20 @@ bool checkInsideBounds(const Vector2d& pos) {
     // 차량에서 각 bound까지 거리 (제곱)
     double d_bl_2 = (bl_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
     double d_br_2 = (br_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
+
+    double dist_to_left_bound = sqrt(d_bl_2);
+    double dist_to_right_bound = sqrt(d_br_2);
+
+
+    cout << "-------here" << endl;
+    cout << dist_to_left_bound << endl;
+    cout << dist_to_right_bound << endl;
+    // VEH_WIDTH 조건 확인
+    if (dist_to_left_bound < veh_width || dist_to_right_bound < veh_width)
+    {
+        // throw invalid_argument("Spline point violates VEH_WIDTH constraints!");
+        return false;
+    }
 
     // bound 밖에 있는지 여부 확인
     bool within_bounds = !(d_bl_2 > d_track2 || d_br_2 > d_track2);

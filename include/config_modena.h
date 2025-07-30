@@ -11,10 +11,10 @@ struct Offline_Params {
         float LAT_RESOLUTION=0.9;       // Lateral spacing (m) between nodes along each normal
         float VARIABLE_HEADING=true;    // Determines if node headings are interpolated between boundary and race line angles (else: match race line).
         
-        float LON_STRAIGHT_STEP=30.0;   // Max distance (m) between norm vectors along straights on the reference line
-        float LON_CURVE_STEP=6.5;      // Max norm vector spacing (m) on reference-line curves.
+        float LON_STRAIGHT_STEP=15.0;   // Max distance (m) between norm vectors along straights on the reference line
+        float LON_CURVE_STEP=7.0;      // Max norm vector spacing (m) on reference-line curves.
                                         
-        float CURVE_THR=0.01;          // recommand: 0.15 ~ 0.3
+        float CURVE_THR=0.07;          // recommand: 0.15 ~ 0.3
         float LAT_OFFSET=3.5;
 
         int MAX_LAT_STEPS=2;    // Permitted lateral deviation from the raceline per meter traveled.
@@ -35,7 +35,7 @@ struct Offline_Params {
         // [VEHICLE]
         float VEH_WIDTH=1.8;    // Vehicle width (m); increase for greater safety margin
         float VEH_LENGTH=5.0;   // vehicle length in m (in order to obtain a safety distance in follow mode)
-        float VEH_TURN=6.0;     // Min turn radius (m); splines below this are excluded.
+        float VEH_TURN=7.0;     // Min turn radius (m); splines below this are excluded.
         // 휠베이스/sin(최대조향각)
         // [COST]
         float W_RACELINE=1.0;   // Penalty for path length and lateral offset from raceline, applied per meter

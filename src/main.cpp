@@ -241,12 +241,7 @@ void genNode(NodeMap& nodesPerLayer,
                 {   
                     double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
                     double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
-                    psi_interp = bl + (p - bl) * node_idx / raceline_index;
-                    if (i == 23) {
-                        cout << idx << endl;
-                        cout << "bl: " << bl << endl;
-                        cout << "p: " << p << endl;      
-                    }           
+                    psi_interp = bl + (p - bl) * node_idx / raceline_index;          
                 }
                 else {
                     psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
@@ -337,13 +332,12 @@ void calcOfflineCost(SplineMap& splineMap,
 
             if (end_layer < 0 || end_layer >= raceline_index_array.size())
             {
-                cerr << "Invalid end_layer index: " << end_layer << endl;
                 continue;
             }
 
             if (spline.kappa.size() == 0)
             {
-                cerr << "Empty kappa in spline!" << endl;
+                // cerr << "Empty kappa in spline!" << endl;
                 continue;
             }
 
@@ -370,6 +364,7 @@ void calcOfflineCost(SplineMap& splineMap,
             // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
         }   
     } 
+
 }
 
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
@@ -412,16 +407,21 @@ void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vec
     }
 }
 
-void setInitialPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_array, const float& max_heading_offset, const float& stepsize_approx) {
+void setInitialPos(const NodeMap &nodesPerLayer,
+                   const IVector &raceline_index_array, 
+                   const float &max_heading_offset, 
+                   const float &stepsize_approx,
+                   float &veh_width)
+{
     // 현재 pos, heading 
     double dx, dy;
         
-    Vector2d start_pos(sampling_map[__x_raceline][1], sampling_map[__y_raceline][1]);
+    Vector2d start_pos(sampling_map[__x_raceline][3], sampling_map[__y_raceline][3]);
     
     float vel_est = 0.0;
 
     // set start pos 
-    if (!checkInsideBounds(start_pos)) {
+    if (!checkInsideBounds(start_pos, veh_width)) {
         throw out_of_range("start pos is not in bounds");
     }
 
@@ -455,8 +455,19 @@ void setInitialPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_a
     path.block<1, 2>(1, 0) = end_pos.transpose();
 
     auto result = calcSplines(path, start_heading, end_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
+    cout << "initial" << endl;
+    auto [kappa, psi] = interpSplines(result->coeffs_x, result->coeffs_y, stepsize_approx, veh_width);
 
-    auto [kappa, psi]  = interpSplines(result->coeffs_x, result->coeffs_y, stepsize_approx);
+    // kappa와 psi의 크기 확인
+    if (kappa.size() == 0) {
+        std::cerr << "Error: kappa is empty!" << std::endl;
+        return;
+    }
+
+    if (psi.size() == 0) {
+        std::cerr << "Error: psi is empty!" << std::endl;
+        return;
+    }
 
     ActionSet actionSet;
 
@@ -480,8 +491,9 @@ void setInitialPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_a
     action_param(0, 2) = psi(0);             
     action_param(0, 3) = kappa(0);           
     action_param(0, 4) = el_lengths_all(0);
-
+    cout << "hi" << endl;
     plotSpline(*result, "blue");
+
 }
 
 int main() {
@@ -570,6 +582,7 @@ int main() {
              graph_wp,
              splineMap,
              raceline_index_array,
+             params.VEH_WIDTH,
              params.LAT_OFFSET,
              params.LAT_RESOLUTION,
              params.CURVE_THR,
@@ -588,7 +601,11 @@ int main() {
                    params.W_RACELINE, 
                    params.W_RACELINE_SAT);
 
-    setInitialPos(nodesPerLayer, raceline_index_array, params.MAX_HEADING_OFFSET, params.STEPSIZE_APPROX);
+    setInitialPos(nodesPerLayer,
+                  raceline_index_array, 
+                  params.MAX_HEADING_OFFSET, 
+                  params.STEPSIZE_APPROX, 
+                  params.VEH_WIDTH);
 
     f_time = clock();
 

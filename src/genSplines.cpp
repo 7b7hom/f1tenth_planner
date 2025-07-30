@@ -123,6 +123,7 @@ VectorXd calcKappa(MatrixXd &coeffs_x,
 pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
                         MatrixXd &coeffs_y,
                         float stepsize_approx,
+                        const float &veh_width,
                         double spline_len, 
                         int no_interp_points) {
     if (coeffs_x.rows() != coeffs_y.rows()) {
@@ -157,22 +158,19 @@ pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
             double t = t_steps[i];
             double dx_dt = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t * t;
             double dy_dt = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
+        
+            Vector2d pos(coeffs_x(0, 0) + dx_dt * t, coeffs_y(0, 0) + dy_dt * t);
+            if (!checkInsideBounds(pos, veh_width)) {
+                // cerr << "[WARNING] Spline point is outside track bounds!" << endl;
+                return make_pair(VectorXd(), VectorXd());
+            }
+
             psi[i] = atan2(dy_dt, dx_dt);
         }
-    
         return make_pair(kappa,psi);
     }
 
     return make_pair(VectorXd(), VectorXd());
-    
-    
-    // 보류
-    // MatrixXd path_interp = MatrixXd::Zero(no_interp_points, 2); 
-    // VectorXd spline_inds = VectorXd::Zero(no_interp_points);
-    // VectorXd t_values = VectorXd::Zero(no_interp_points);
-
-    // for (size_t i = 0; i < no_interp_points - 1; ++i) {
-    // }
     
 }
 
@@ -180,6 +178,7 @@ void genEdges(NodeMap &nodesPerLayer,
               Graph &graph_wp,
               SplineMap &splineMap,
               const IVector &raceline_index_array,
+              const float veh_width,
               const float lat_offset,
               const float lat_resolution,
               const float curve_thr,
@@ -302,6 +301,7 @@ void genEdges(NodeMap &nodesPerLayer,
     // visual(graph_wp, nodesPerLayer, splineMap, "pink");
     int edge_cnt = 0;
     int remove_cnt = 0;
+    int Invalid_edge_cnt = 0;
     // layer 개수만큼 loop
     for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
       int srcLayerIdx = layer_idx;
@@ -319,9 +319,11 @@ void genEdges(NodeMap &nodesPerLayer,
           MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
           MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
 
-          auto [kappa, psi] = interpSplines(coeffs_x, coeffs_y, stepsize_approx);
+          auto [kappa, psi] = interpSplines(coeffs_x, coeffs_y, stepsize_approx, veh_width);
             if (kappa.size() == 0) {
-                cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
+                Invalid_edge_cnt++;
+                // cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
+                continue;
             }
             splineMap[start][end].kappa = kappa;
             if (splineMap[start][end].raceline) {
@@ -378,6 +380,7 @@ void genEdges(NodeMap &nodesPerLayer,
     // cout << "---remove 후---" << endl
     cout << "Added " << edge_cnt << " splines to the graph!" << endl;
     cout << "removed " << remove_cnt << " splines due to violation of the specified vehicle's turn radius or velocity aims!" << endl;
+    cout << "Ignored " << Invalid_edge_cnt << " splines(outside track bounds!)" << endl;
     // cout << "the end" << endl;
 
 }
