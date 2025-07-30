@@ -222,6 +222,30 @@ src/genSplines.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/genSplines.cpp.s
 .PHONY : src/genSplines.cpp.s
 
+src/importData.o: src/importData.cpp.o
+.PHONY : src/importData.o
+
+# target to build an object file
+src/importData.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/importData.cpp.o
+.PHONY : src/importData.cpp.o
+
+src/importData.i: src/importData.cpp.i
+.PHONY : src/importData.i
+
+# target to preprocess a source file
+src/importData.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/importData.cpp.i
+.PHONY : src/importData.cpp.i
+
+src/importData.s: src/importData.cpp.s
+.PHONY : src/importData.s
+
+# target to generate assembly for a file
+src/importData.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/importData.cpp.s
+.PHONY : src/importData.cpp.s
+
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
 
@@ -246,53 +270,29 @@ src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
 
-src/plotting.o: src/plotting.cpp.o
-.PHONY : src/plotting.o
+src/visualization.o: src/visualization.cpp.o
+.PHONY : src/visualization.o
 
 # target to build an object file
-src/plotting.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.o
-.PHONY : src/plotting.cpp.o
+src/visualization.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/visualization.cpp.o
+.PHONY : src/visualization.cpp.o
 
-src/plotting.i: src/plotting.cpp.i
-.PHONY : src/plotting.i
-
-# target to preprocess a source file
-src/plotting.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.i
-.PHONY : src/plotting.cpp.i
-
-src/plotting.s: src/plotting.cpp.s
-.PHONY : src/plotting.s
-
-# target to generate assembly for a file
-src/plotting.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/plotting.cpp.s
-.PHONY : src/plotting.cpp.s
-
-src/toCSV.o: src/toCSV.cpp.o
-.PHONY : src/toCSV.o
-
-# target to build an object file
-src/toCSV.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/toCSV.cpp.o
-.PHONY : src/toCSV.cpp.o
-
-src/toCSV.i: src/toCSV.cpp.i
-.PHONY : src/toCSV.i
+src/visualization.i: src/visualization.cpp.i
+.PHONY : src/visualization.i
 
 # target to preprocess a source file
-src/toCSV.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/toCSV.cpp.i
-.PHONY : src/toCSV.cpp.i
+src/visualization.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/visualization.cpp.i
+.PHONY : src/visualization.cpp.i
 
-src/toCSV.s: src/toCSV.cpp.s
-.PHONY : src/toCSV.s
+src/visualization.s: src/visualization.cpp.s
+.PHONY : src/visualization.s
 
 # target to generate assembly for a file
-src/toCSV.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/toCSV.cpp.s
-.PHONY : src/toCSV.cpp.s
+src/visualization.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/visualization.cpp.s
+.PHONY : src/visualization.cpp.s
 
 # Help Target
 help:
@@ -313,15 +313,15 @@ help:
 	@echo "... src/genSplines.o"
 	@echo "... src/genSplines.i"
 	@echo "... src/genSplines.s"
+	@echo "... src/importData.o"
+	@echo "... src/importData.i"
+	@echo "... src/importData.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
-	@echo "... src/plotting.o"
-	@echo "... src/plotting.i"
-	@echo "... src/plotting.s"
-	@echo "... src/toCSV.o"
-	@echo "... src/toCSV.i"
-	@echo "... src/toCSV.s"
+	@echo "... src/visualization.o"
+	@echo "... src/visualization.i"
+	@echo "... src/visualization.s"
 .PHONY : help
 
 

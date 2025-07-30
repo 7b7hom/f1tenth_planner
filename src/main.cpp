@@ -76,6 +76,7 @@ void samplePointsFromRaceline(const DVector& kappa,
                               double d_straight,
                               double curve_th,
                               IVector& idx_array) {
+    // idx_array: smapling된 raceline 위 인덱스
 
     const size_t n = kappa.size();
     double cur_dist = 0.0;
@@ -199,8 +200,7 @@ void genNode(NodeMap& nodesPerLayer,
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
         raceline_index_array.push_back(raceline_index);
-        
-        // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
+        // cout << i << "번째 layer 길이" << (sampling_map[__width_left][i] + sampling_map[__width_right][i])<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
         // cout << "-----" << endl;
 
@@ -209,7 +209,7 @@ void genNode(NodeMap& nodesPerLayer,
         
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
-        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;  // num_nodes : 좌우 총 가능한 노드 수
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution ;  // num_nodes : 좌우 총 가능한 노드 수
         
         nodesPerLayer[i].resize(num_nodes); 
         
@@ -225,6 +225,14 @@ void genNode(NodeMap& nodesPerLayer,
             node.y = node_pos.y();      
             node.raceline = (node_idx == raceline_index);
             
+            #if 0
+            if (idx == num_nodes - 1) {
+                cout << i << "번째 레이어의 " << idx << "번째 노드" << endl;
+                cout << sampling_map[__x_bound_r][idx] - alpha << endl;
+            }
+            #endif
+
+
             // psi 재계산
             double psi_interp;
             if (node_idx < raceline_index) {
@@ -335,8 +343,6 @@ void calcOfflineCost(SplineMap& splineMap,
                 continue;
             }
 
-
-
             double abs_kappa = spline.kappa.array().abs().sum();
             double s_length = spline.el_lengths.sum();
             // cout << "s_length: " << s_length << endl;
@@ -350,7 +356,6 @@ void calcOfflineCost(SplineMap& splineMap,
             offline_cost += w_length * s_length;
 
             // raceline cost
-
 
             double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * lat_resolution;
             double raceline_cost = std::min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
@@ -418,7 +423,7 @@ bool checkInsideBounds(const MatrixXd& bound_l,const MatrixXd& bound_r,const Vec
     return within_bounds;
 }
 
-void getClosestNodes(const NodeMap& nodesPerLayer, IPairVector& closest_idx, const Vector2d& pos, int limit=1) {
+void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
     int num_nodes = 0;
     for (const auto& layer : nodesPerLayer) {
         num_nodes += layer.size();
@@ -453,20 +458,17 @@ void getClosestNodes(const NodeMap& nodesPerLayer, IPairVector& closest_idx, con
     // 결과 저장
     for (int k = 0; k < limit; ++k) {
         auto [dist, i, j] = dist_info[k];
-        closest_idx.emplace_back(i, j);
+        closest_idx = make_pair(i, j);
         cout << "Closest node: layer=" << i << ", idx=" << j << endl;
     }
 }
 
-void setStartPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_array, const float& max_heading_offset, const float& stepsize_approx) {
-        // 현재 pos, heading 
+void setInitialPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_array, const float& max_heading_offset, const float& stepsize_approx) {
+    // 현재 pos, heading 
     double dx, dy;
         
-    dx = sampling_map[__x_raceline][1] - sampling_map[__x_raceline][0];
-    dy = sampling_map[__y_raceline][1] - sampling_map[__y_raceline][0];
-
-    Vector2d start_pos(sampling_map[__x_raceline][0], sampling_map[__y_raceline][0]);
-    double start_heading = atan2(dy, dx) - M_PI_2;
+    Vector2d start_pos(sampling_map[__x_raceline][1], sampling_map[__y_raceline][1]);
+    
     float vel_est = 0.0;
 
     int n = sampling_map[__x_bound_l].size();
@@ -485,22 +487,29 @@ void setStartPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_arr
         throw out_of_range("start pos is not in bounds");
     }
 
-    IPairVector closest_idx;
+    IPair closest_idx;
     getClosestNodes(nodesPerLayer, closest_idx, start_pos);
 
-    int goal_layer = (closest_idx[0].first + 2) % (nodesPerLayer.size() - 1);
+    double start_heading = nodesPerLayer[closest_idx.first][closest_idx.second].psi;
+
+    int goal_layer = (closest_idx.first + 2) % (nodesPerLayer.size() - 1);
     int goal_node = raceline_index_array[goal_layer];
     cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
 
     double end_heading = nodesPerLayer[goal_layer][goal_node].psi;
+    // cout << "start_heading: " << start_heading << endl;
+    // cout << "end_heading: " << end_heading << endl;
+
     double heading_diff = std::abs(start_heading - end_heading);
     Vector2d end_pos(nodesPerLayer[goal_layer][goal_node].x, nodesPerLayer[goal_layer][goal_node].y);
 
     if (heading_diff > M_PI) {
         heading_diff = std::abs(2*M_PI - heading_diff);
+        // cout <<"hi" << endl;
     }
     if (heading_diff > max_heading_offset) {
-        cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
+        // cout << "heading_diff: " << heading_diff << ", " << max_heading_offset << endl;
+        // cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
     }
 
     MatrixXd path(2, 2);
@@ -544,8 +553,11 @@ int main() {
     IVector idx_sampling;
     Offline_Params params;
 
-    string map_file_in = "inputs/gtpl_levine.csv";
-    string map_file_out = "inputs/gtpl_levine_out.csv";
+    unique_ptr<string> track = Load("include/driving_task.ini");
+
+    // 3. 자동 경로 설정
+    string map_file_in  = "inputs/traj_ltpl_cl_" + *track + ".csv";
+    string map_file_out = "inputs/traj_ltpl_cl_" + *track + "_out.csv";
 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     readDMapFromCSV(map_file_in, gtpl_map);
@@ -607,6 +619,10 @@ int main() {
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
+    // for (auto index : raceline_index_array) {
+    //     cout << index << endl;
+    // }
+
     // sampling points' info 
     // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
 
@@ -634,7 +650,7 @@ int main() {
                    params.W_RACELINE, 
                    params.W_RACELINE_SAT);
 
-    setStartPos(nodesPerLayer, raceline_index_array, params.MAX_HEADING_OFFSET, params.STEPSIZE_APPROX);
+    setInitialPos(nodesPerLayer, raceline_index_array, params.MAX_HEADING_OFFSET, params.STEPSIZE_APPROX);
 
     f_time = clock();
 
@@ -644,7 +660,7 @@ int main() {
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
     
     
-    visual(graph_wp, nodesPerLayer, splineMap, "orange");
+    visual(graph_wp, nodesPerLayer, splineMap, "gray");
 
     return 0;
 }

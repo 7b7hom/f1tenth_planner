@@ -107,19 +107,19 @@ public:
 extern DMap gtpl_map;
 extern DMap sampling_map;
 
-// plotting
+// visualization.cpp
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
 void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
 void plotSpline(const Spline& spline, const string& color);
 void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
 
-// toCSV
+// importData.cpp
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
-
-//genSplines
+unique_ptr<string> Load(const string& filename);
+//genSplines.cpp
 unique_ptr<Spline> calcSplines(const MatrixXd &path,
                                      double psi_s, 
                                      double psi_e, 

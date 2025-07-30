@@ -230,7 +230,7 @@ void genEdges(NodeMap &nodesPerLayer,
             // 커브에서 더 많이 연결(추월 경로를 위하여)
             int lat_steps = round(factor * dist * lat_offset / lat_resolution);
             // cout << srcLayerIdx << "의 " << srcNodeIdx << "가 다음 refendNode와의 거리: " << dist << endl;
-            lat_steps = min(lat_steps, max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
+            lat_steps = max(lat_steps, max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
             // cout << srcNodeIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
@@ -291,7 +291,7 @@ void genEdges(NodeMap &nodesPerLayer,
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
             bool tooBigKappa = false;
-    
+            // cout << layer_idx << ", " << node_idx <<endl;
             for (int j = 0; j < kappa.size(); ++j) {
                 double kappa_val = abs(kappa(j));
                 // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
@@ -324,6 +324,7 @@ void genEdges(NodeMap &nodesPerLayer,
                     if (isChild) {
                         // cout << layerIdx << ", " << nodeIdx << endl;
                         for (auto& child : childs) {
+                            // cout << "remove!" << endl;
                             graph_wp.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
                         }
                     }

@@ -88,6 +88,14 @@ void Graph::removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* spli
         }
     }
 
+    // IPairVector parents;
+    // if (!getParentNodes(srcIdx, parents, num_layers)) {
+    //     IPairVector childs2 = adjLists[srcIdx];
+    //     for (auto& child: childs2) {
+    //         removeEdge(srcIdx, child, splineMap, remove_cnt, num_layers);
+    //     }
+    // }
+
     if (childs.empty()) {
         IPairVector parents;
         if (getParentNodes(srcIdx, parents, num_layers)) {
