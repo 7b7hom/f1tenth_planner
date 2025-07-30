@@ -222,29 +222,29 @@ src/genSplines.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/genSplines.cpp.s
 .PHONY : src/genSplines.cpp.s
 
-src/importData.o: src/importData.cpp.o
-.PHONY : src/importData.o
+src/helper_func.o: src/helper_func.cpp.o
+.PHONY : src/helper_func.o
 
 # target to build an object file
-src/importData.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/importData.cpp.o
-.PHONY : src/importData.cpp.o
+src/helper_func.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/helper_func.cpp.o
+.PHONY : src/helper_func.cpp.o
 
-src/importData.i: src/importData.cpp.i
-.PHONY : src/importData.i
+src/helper_func.i: src/helper_func.cpp.i
+.PHONY : src/helper_func.i
 
 # target to preprocess a source file
-src/importData.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/importData.cpp.i
-.PHONY : src/importData.cpp.i
+src/helper_func.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/helper_func.cpp.i
+.PHONY : src/helper_func.cpp.i
 
-src/importData.s: src/importData.cpp.s
-.PHONY : src/importData.s
+src/helper_func.s: src/helper_func.cpp.s
+.PHONY : src/helper_func.s
 
 # target to generate assembly for a file
-src/importData.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/importData.cpp.s
-.PHONY : src/importData.cpp.s
+src/helper_func.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/helper_func.cpp.s
+.PHONY : src/helper_func.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -313,9 +313,9 @@ help:
 	@echo "... src/genSplines.o"
 	@echo "... src/genSplines.i"
 	@echo "... src/genSplines.s"
-	@echo "... src/importData.o"
-	@echo "... src/importData.i"
-	@echo "... src/importData.s"
+	@echo "... src/helper_func.o"
+	@echo "... src/helper_func.i"
+	@echo "... src/helper_func.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"

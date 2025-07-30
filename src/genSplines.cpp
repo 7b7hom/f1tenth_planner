@@ -80,6 +80,7 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
 
     VectorXd kappa;
     double cost = 0.0;
+    bool raceline = false;
     // 결과 반환
     return make_unique<Spline>(Spline{
         coeffs_x,  // (4, 1)
@@ -87,6 +88,7 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
         kappa,
         el_lengths,
         cost,
+        raceline,
     });
 }
 
@@ -157,7 +159,7 @@ pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
             double dy_dt = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
             psi[i] = atan2(dy_dt, dx_dt);
         }
-
+    
         return make_pair(kappa,psi);
     }
 
@@ -191,9 +193,39 @@ void genEdges(NodeMap &nodesPerLayer,
         throw invalid_argument("Too small lateral offset!");
     }
 
+    // raceline 
+    for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) { 
+        int dstLayerIdx = layerIdx+1;
+        if (dstLayerIdx >= nodesPerLayer.size()) {
+            dstLayerIdx -= nodesPerLayer.size();
+        }
+        int startNodeIdx = raceline_index_array[layerIdx];
+        int endNodeIdx = raceline_index_array[dstLayerIdx];
+
+        Node& startNode = nodesPerLayer[layerIdx][startNodeIdx];
+        Node& endNode = nodesPerLayer[dstLayerIdx][endNodeIdx];
+
+        MatrixXd path(2, 2);
+        path(0,0) = startNode.x;
+        path(0,1) = startNode.y;
+        path(1,0) = endNode.x;
+        path(1,1) = endNode.y;
+
+        auto result = calcSplines(path, startNode.psi, endNode.psi);
+
+        IPair startPoint = make_pair(layerIdx, startNodeIdx);
+        IPair endPoint = make_pair(dstLayerIdx, endNodeIdx);
+        
+        result->raceline = true;
+
+        splineMap[startPoint][endPoint] = *result;
+
+        graph_wp.addEdge(startPoint, endPoint);
+    }
+
     // cout << nodesPerLayer.size() << endl; 출력: 51
     // 레이어 별 loop
-
+    // raceline spline 먼저 생성해서 splineMap에 등록, 뒤에서 재등록하지 않게 index 겹치면 pass
     for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
         
         int srcLayerIdx = layerIdx;
@@ -235,6 +267,11 @@ void genEdges(NodeMap &nodesPerLayer,
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
                 endNodeIdx <= min(static_cast<int>(nodesPerLayer[dstLayerIdx].size() - 1), refEndNodeIdx + lat_steps); ++endNodeIdx) {
+                    
+                    if (srcNodeIdx == raceline_index_array[layerIdx] && endNodeIdx == raceline_index_array[dstLayerIdx]) {
+                        continue;
+                    }
+
                     Node& endNode = nodesPerLayer[dstLayerIdx][endNodeIdx];
                     
                     MatrixXd path(2, 2);
@@ -287,6 +324,10 @@ void genEdges(NodeMap &nodesPerLayer,
                 cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
             }
             splineMap[start][end].kappa = kappa;
+            if (splineMap[start][end].raceline) {
+                continue;
+            }
+          
             double vel_rl = sampling_map[__vx][layer_idx] * min_vel_race;
             double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             

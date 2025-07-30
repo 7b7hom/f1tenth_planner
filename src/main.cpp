@@ -76,7 +76,7 @@ void samplePointsFromRaceline(const DVector& kappa,
                               double d_straight,
                               double curve_th,
                               IVector& idx_array) {
-    // idx_array: smapling된 raceline 위 인덱스
+    // idx_array: sampling된 raceline 위 인덱스
 
     const size_t n = kappa.size();
     double cur_dist = 0.0;
@@ -89,7 +89,7 @@ void samplePointsFromRaceline(const DVector& kappa,
         if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_th) {
             next_dist = cur_dist;
         }
-
+        // cout << fabs(kappa[i]) << endl;
         // 다음 샘플링 지점 도달
         if ((cur_dist + dist[i]) > next_dist) {
             idx_array.push_back(static_cast<int>(i));
@@ -242,7 +242,11 @@ void genNode(NodeMap& nodesPerLayer,
                     double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
                     double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
                     psi_interp = bl + (p - bl) * node_idx / raceline_index;
-                                       
+                    if (i == 23) {
+                        cout << idx << endl;
+                        cout << "bl: " << bl << endl;
+                        cout << "p: " << p << endl;      
+                    }           
                 }
                 else {
                     psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
@@ -368,61 +372,6 @@ void calcOfflineCost(SplineMap& splineMap,
     } 
 }
 
-bool checkInsideBounds(const MatrixXd& bound_l,const MatrixXd& bound_r,const Vector2d& pos) {
-    MatrixXd centerline = (bound_l + bound_r) / 2;
-
-    // 가장 가까운 segment 인덱스 찾기
-    int closest_idx = -1;
-    double min_dist2 = numeric_limits<double>::max();
-    for (int i = 0; i < centerline.rows() - 1; ++i) {
-        // segment 중심 계산
-        Vector2d mid = (centerline.row(i) + centerline.row(i + 1)) / 2.0;
-        double dist2 = (mid - pos).squaredNorm();
-        if (dist2 < min_dist2) {
-            min_dist2 = dist2;
-            closest_idx = i;
-        }
-    }
-
-    if (closest_idx < 0 || closest_idx >= bound_l.rows() - 1)
-        return false; // 예외 처리
-
-    // bound_l, bound_r, centerline 보간 (선형 보간 10개 지점)
-    int interp_points = 10;
-    MatrixXd bl_interp(interp_points, 2);
-    MatrixXd br_interp(interp_points, 2);
-    MatrixXd center_interp(interp_points, 2);
-
-    for (int i = 0; i < interp_points; ++i) {
-        double t = static_cast<double>(i) / (interp_points - 1);
-        bl_interp.row(i) = (1 - t) * bound_l.row(closest_idx) + t * bound_l.row(closest_idx + 1);
-        br_interp.row(i) = (1 - t) * bound_r.row(closest_idx) + t * bound_r.row(closest_idx + 1);
-        center_interp.row(i) = (1 - t) * centerline.row(closest_idx) + t * centerline.row(closest_idx + 1);
-    }
-
-    // pos에 가장 가까운 center_interp 인덱스 찾기
-    int nearest_idx = -1;
-    double best_dist2 = numeric_limits<double>::max();
-    for (int i = 0; i < interp_points; ++i) {
-        double d2 = (center_interp.row(i) - pos.transpose()).squaredNorm();
-        if (d2 < best_dist2) {
-            best_dist2 = d2;
-            nearest_idx = i;
-        }
-    }
-
-    // bound 사이 거리 (제곱)
-    double d_track2 = (bl_interp.row(nearest_idx) - br_interp.row(nearest_idx)).squaredNorm();
-
-    // 차량에서 각 bound까지 거리 (제곱)
-    double d_bl_2 = (bl_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
-    double d_br_2 = (br_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
-
-    // bound 밖에 있는지 여부 확인
-    bool within_bounds = !(d_bl_2 > d_track2 || d_br_2 > d_track2);
-    return within_bounds;
-}
-
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
     int num_nodes = 0;
     for (const auto& layer : nodesPerLayer) {
@@ -471,19 +420,8 @@ void setInitialPos(const NodeMap& nodesPerLayer, const IVector& raceline_index_a
     
     float vel_est = 0.0;
 
-    int n = sampling_map[__x_bound_l].size();
-    MatrixXd bound_l(n,2);
-    MatrixXd bound_r(n,2);
-    for (int i = 0; i < n; ++i) {
-        bound_l(i, 0) = sampling_map[__x_bound_l][i];
-        bound_l(i, 1) = sampling_map[__y_bound_l][i];
-
-        bound_r(i, 0) = sampling_map[__x_bound_r][i];
-        bound_r(i, 1) = sampling_map[__y_bound_r][i];
-    }
-
     // set start pos 
-    if (!checkInsideBounds(bound_l, bound_r, start_pos)) {
+    if (!checkInsideBounds(start_pos)) {
         throw out_of_range("start pos is not in bounds");
     }
 
@@ -659,7 +597,8 @@ int main() {
     // visual process 
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
     
-    
+    // printSplineMapVerbose(splineMap, nodesPerLayer);
+
     visual(graph_wp, nodesPerLayer, splineMap, "gray");
 
     return 0;

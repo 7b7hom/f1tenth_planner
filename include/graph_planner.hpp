@@ -57,6 +57,7 @@ struct Spline {
     VectorXd kappa;
     VectorXd el_lengths;   
     double cost;
+    bool raceline;
 };
 
 typedef vector<double> DVector;
@@ -114,10 +115,12 @@ void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, co
 void plotSpline(const Spline& spline, const string& color);
 void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
 
-// importData.cpp
+// helper_func.cpp
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
+bool checkInsideBounds(const Vector2d& pos);
+
 unique_ptr<string> Load(const string& filename);
 //genSplines.cpp
 unique_ptr<Spline> calcSplines(const MatrixXd &path,
