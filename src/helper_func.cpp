@@ -1,5 +1,44 @@
 #include "graph_planner.hpp"
 
+unique_ptr<string> Load(const string& filename) {
+    ifstream file(filename);
+    if (!file.is_open()) {
+        cerr << "Could not open INI file: " << filename << endl;
+    }
+
+    string line;
+    bool in_section = false;
+    while (getline(file, line)) {
+        // 섹션 시작
+        if (line.find("[DRIVING_TASK]") != string::npos) {
+            in_section = true;
+            continue;
+        }
+
+        // 다른 섹션으로 넘어가면 종료
+        if (in_section && line.find('[') != string::npos)
+            break;
+
+        // track 키 찾기
+        if (in_section && line.find("track") != string::npos) {
+            size_t eq_pos = line.find('=');
+            if (eq_pos != string::npos) {
+                string value = line.substr(eq_pos + 1);
+                value.erase(0, value.find_first_not_of(" \t\r\n"));
+                value.erase(value.find_last_not_of(" \t\r\n") + 1);
+                return make_unique<string>(value);
+            }
+        }
+    }
+
+}
+
+double normalizeAngle(double angle) {
+    while (angle > M_PI)  angle -= 2.0 * M_PI;
+    while (angle < -M_PI) angle += 2.0 * M_PI;
+    return angle;
+}
+
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
@@ -45,37 +84,70 @@ void map_size(DMap& map) {
     cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
 }
 
-unique_ptr<string> Load(const string& filename) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "Could not open INI file: " << filename << endl;
-    }
 
-    string line;
-    bool in_section = false;
-    while (getline(file, line)) {
-        // 섹션 시작
-        if (line.find("[DRIVING_TASK]") != string::npos) {
-            in_section = true;
-            continue;
+void addDVectorToMap(DMap &map,
+                     string attr,
+                     const IVector *idx_array) {
+    size_t len;
+    if (idx_array == nullptr) {
+        len = map[__x_ref].size();
+    } 
+    else {
+        len = idx_array->size();
+    }
+    // cout << "attr: "<< attr << " / len:" << len << endl;
+
+    DVector x_out(len), y_out(len);
+    string x_label = "x_" + attr;
+    string y_label = "y_" + attr;
+    
+    if (!attr.compare("bound_r")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__width_right][i];
+            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__width_right][i];
         }
 
-        // 다른 섹션으로 넘어가면 종료
-        if (in_section && line.find('[') != string::npos)
-            break;
-
-        // track 키 찾기
-        if (in_section && line.find("track") != string::npos) {
-            size_t eq_pos = line.find('=');
-            if (eq_pos != string::npos) {
-                string value = line.substr(eq_pos + 1);
-                value.erase(0, value.find_first_not_of(" \t\r\n"));
-                value.erase(value.find_last_not_of(" \t\r\n") + 1);
-                return make_unique<string>(value);
-            }
+        // x_label = "x_" + attr;
+        // y_label = "y_" + attr;
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    }
+    else if (!attr.compare("bound_l")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] - map[__x_normvec][i] * map[__width_left][i];
+            y_out[i] = map[__y_ref][i] - map[__y_normvec][i] * map[__width_left][i];
         }
+
+        // x_label = "x_" + attr;
+        // y_label = "y_" + attr;
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    }
+    else if (!attr.compare("raceline")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__alpha][i];
+            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__alpha][i];
+        }
+
+        // x_label = "x_" + attr;
+        // y_label = "y_" + attr;
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    }
+    // i번째와 i-1번째 point의 delta_s 계산 
+    // delta_s[0] = 0 
+    else if (!attr.compare("delta_s")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len - 1; ++i) {
+            x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i]; // 마지막 원소는 0
+        }
+        map[attr] = x_out; 
     }
 
+    // map_size(map);
 }
 
 bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
@@ -164,4 +236,34 @@ bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
     // bound 밖에 있는지 여부 확인
     bool within_bounds = !(d_bl_2 > d_track2 || d_br_2 > d_track2);
     return within_bounds;
+}
+
+void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
+
+    for (auto& [startPoint, endPoints] : splineMap) {
+        for (auto& [endPoint, spline] : endPoints) {
+
+
+        const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
+        const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
+
+        cout << "\n(" << startPoint.first << ", " << startPoint.second << ") --> ("
+                  << endPoint.first << ", " << endPoint.second << ")\n";
+
+        cout << "  [Start Node] x: " << startNode.x
+                  << ", y: " << startNode.y
+                  << ", psi: " << startNode.psi << "\n";
+        cout << "  [End Node]   x: " << endNode.x
+                  << ", y: " << endNode.y
+                  << ", psi: " << endNode.psi << "\n";
+
+        cout << "  coeffs_x (" << spline.coeffs_x.rows() << "x" << spline.coeffs_x.cols() << "):\n";
+        cout << spline.coeffs_x << "\n";
+
+        cout << "  coeffs_y (" << spline.coeffs_y.rows() << "x" << spline.coeffs_y.cols() << "):\n";
+        cout << spline.coeffs_y << "\n";
+
+        cout << "----------------------------------------";
+        }
+    }
 }

@@ -92,6 +92,34 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
     });
 }
 
+void calcHeading(DVector &x_raceline,
+                 DVector &y_raceline,
+                 DVector &psi) {
+
+    size_t N = x_raceline.size();
+    psi.resize(N);
+
+    // 닫힌 회로 가정. 예외 처리 필요
+    double dx, dy;
+    for (size_t i = 0; i < N; ++i) {
+        
+        if (i != N -1) {
+            dx = x_raceline[i+1] - x_raceline[i];
+            dy = y_raceline[i+1] - y_raceline[i];
+        } else {
+            dx = x_raceline[0] - x_raceline[N - 1];
+            dy = y_raceline[0] - y_raceline[N - 1];
+        } 
+    psi[i] = atan2(dy, dx) - M_PI_2;
+        
+    normalizeAngle(psi[i]);
+
+    }
+    // cout << i<< ": " << psi[i] << endl;
+    // cout << psi.size() << endl;
+
+}
+
 VectorXd calcKappa(MatrixXd &coeffs_x,
                          MatrixXd &coeffs_y,
                          VectorXd &t_steps) {
@@ -384,4 +412,3 @@ void genEdges(NodeMap &nodesPerLayer,
     // cout << "the end" << endl;
 
 }
-

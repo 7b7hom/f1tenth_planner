@@ -4,72 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-// Dvector를 Map 구조로 추가(연산)
-void addDVectorToMap(DMap &map,
-                     string attr,
-                     const IVector *idx_array = nullptr) {
-    size_t len;
-    if (idx_array == nullptr) {
-        len = map[__x_ref].size();
-    } 
-    else {
-        len = idx_array->size();
-    }
-    // cout << "attr: "<< attr << " / len:" << len << endl;
-
-    DVector x_out(len), y_out(len);
-    string x_label = "x_" + attr;
-    string y_label = "y_" + attr;
-    
-    if (!attr.compare("bound_r")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__width_right][i];
-            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__width_right][i];
-        }
-
-        // x_label = "x_" + attr;
-        // y_label = "y_" + attr;
-        map[x_label] = x_out;
-        map[y_label] = y_out;
-    }
-    else if (!attr.compare("bound_l")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] - map[__x_normvec][i] * map[__width_left][i];
-            y_out[i] = map[__y_ref][i] - map[__y_normvec][i] * map[__width_left][i];
-        }
-
-        // x_label = "x_" + attr;
-        // y_label = "y_" + attr;
-        map[x_label] = x_out;
-        map[y_label] = y_out;
-    }
-    else if (!attr.compare("raceline")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__alpha][i];
-            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__alpha][i];
-        }
-
-        // x_label = "x_" + attr;
-        // y_label = "y_" + attr;
-        map[x_label] = x_out;
-        map[y_label] = y_out;
-    }
-    // i번째와 i-1번째 point의 delta_s 계산 
-    // delta_s[0] = 0 
-    else if (!attr.compare("delta_s")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len - 1; ++i) {
-            x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i]; // 마지막 원소는 0
-        }
-        map[attr] = x_out; 
-    }
-
-    // map_size(map);
-}
-
 void samplePointsFromRaceline(const DVector& kappa,
                               const DVector& dist,
                               double d_curve,
@@ -109,40 +43,6 @@ void samplePointsFromRaceline(const DVector& kappa,
     // for (size_t i=0; i < idx_array.size(); ++i) 
     //     cout << idx_array[i] << endl;
     // cout << "size: " << idx_array.size() << endl;
-}
-
-double normalizeAngle(double angle) {
-    while (angle > M_PI)  angle -= 2.0 * M_PI;
-    while (angle < -M_PI) angle += 2.0 * M_PI;
-    return angle;
-}
-
-void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline,
-                 DVector &psi) {
-
-    size_t N = x_raceline.size();
-    psi.resize(N);
-
-    // 닫힌 회로 가정. 예외 처리 필요
-    double dx, dy;
-    for (size_t i = 0; i < N; ++i) {
-        
-        if (i != N -1) {
-            dx = x_raceline[i+1] - x_raceline[i];
-            dy = y_raceline[i+1] - y_raceline[i];
-        } else {
-            dx = x_raceline[0] - x_raceline[N - 1];
-            dy = y_raceline[0] - y_raceline[N - 1];
-        } 
-    psi[i] = atan2(dy, dx) - M_PI_2;
-        
-    normalizeAngle(psi[i]);
-
-    }
-    // cout << i<< ": " << psi[i] << endl;
-    // cout << psi.size() << endl;
-
 }
 
 void computeCurvature(NodeMap& nodesPerLayer) {
@@ -277,36 +177,6 @@ void genNode(NodeMap& nodesPerLayer,
 
 }
 
-void printSplineMapVerbose(const SplineMap& splineMap, const NodeMap& nodesPerLayer) {
-
-    for (auto& [startPoint, endPoints] : splineMap) {
-        for (auto& [endPoint, spline] : endPoints) {
-
-
-        const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
-        const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
-
-        cout << "\n(" << startPoint.first << ", " << startPoint.second << ") --> ("
-                  << endPoint.first << ", " << endPoint.second << ")\n";
-
-        cout << "  [Start Node] x: " << startNode.x
-                  << ", y: " << startNode.y
-                  << ", psi: " << startNode.psi << "\n";
-        cout << "  [End Node]   x: " << endNode.x
-                  << ", y: " << endNode.y
-                  << ", psi: " << endNode.psi << "\n";
-
-        cout << "  coeffs_x (" << spline.coeffs_x.rows() << "x" << spline.coeffs_x.cols() << "):\n";
-        cout << spline.coeffs_x << "\n";
-
-        cout << "  coeffs_y (" << spline.coeffs_y.rows() << "x" << spline.coeffs_y.cols() << "):\n";
-        cout << spline.coeffs_y << "\n";
-
-        cout << "----------------------------------------";
-        }
-    }
-}
-
 void calcOfflineCost(SplineMap& splineMap,
                    IVector& raceline_index_array,
                    float w_curv_avg,
@@ -430,7 +300,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
 
     double start_heading = nodesPerLayer[closest_idx.first][closest_idx.second].psi;
 
-    int goal_layer = (closest_idx.first + 2) % (nodesPerLayer.size() - 1);
+    int goal_layer = (closest_idx.first + 1) % (nodesPerLayer.size() - 1);
     int goal_node = raceline_index_array[goal_layer];
     cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
 
@@ -491,7 +361,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     action_param(0, 2) = psi(0);             
     action_param(0, 3) = kappa(0);           
     action_param(0, 4) = el_lengths_all(0);
-    cout << "hi" << endl;
+
     plotSpline(*result, "blue");
 
 }
@@ -507,7 +377,7 @@ int main() {
 
     // 3. 자동 경로 설정
     string map_file_in  = "inputs/traj_ltpl_cl_" + *track + ".csv";
-    string map_file_out = "inputs/traj_ltpl_cl_" + *track + "_out.csv";
+    string map_file_out = "outputs/" + *track + "_out.csv";
 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     readDMapFromCSV(map_file_in, gtpl_map);
@@ -614,7 +484,7 @@ int main() {
     // visual process 
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
     
-    // printSplineMapVerbose(splineMap, nodesPerLayer);
+    // printSplineInfo(splineMap, nodesPerLayer);
 
     visual(graph_wp, nodesPerLayer, splineMap, "gray");
 

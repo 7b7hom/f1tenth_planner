@@ -50,10 +50,9 @@ struct Node {
     bool raceline;
 };
 
-// 스플라인 결과
 struct Spline {
-    MatrixXd coeffs_x;          // x 계수
-    MatrixXd coeffs_y;          // y 계수  
+    MatrixXd coeffs_x;          
+    MatrixXd coeffs_y;          
     VectorXd kappa;
     VectorXd el_lengths;   
     double cost;
@@ -64,22 +63,15 @@ typedef vector<double> DVector;
 typedef vector<int>    IVector;
 typedef map<string, DVector> DMap;
 typedef map<string, IVector> IMap;
-
 typedef vector<vector<Node>> NodeMap;
-// typedef tuple<int, int> ITuple;
-// typedef map<ITuple, IVector> TupleMap;
 
 typedef pair<int, int> IPair; // <layerIdx, nodeIdx>
 typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vector
 typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
-
-// typedef pair<IPair, IPair> EdgeKey;
-// typedef map<EdgeKey, SplineResult> SplineMap;
-
-// nodeMap[layerIdx][nodeIdx]
-// splineMap[layerIdx][nodeIdx] = spline 
-// typedef map<IPair, map<IPair, Spline, myCompare>, myCompare> SplineMap;
 typedef map<IPair, map<IPair, Spline>> SplineMap;
+
+extern DMap gtpl_map;
+extern DMap sampling_map;
 
 struct ActionSet {
     string action_id; // "straight"
@@ -88,9 +80,6 @@ struct ActionSet {
     NodeMap nodes; // [[None, None], start_node]
     vector<IPair> node_idx; // [0, path.size()-1]
 };
-
-#define LayerIdx(pair) (pair.first)
-#define NodeIdx(pair) (pair.second)
 
 class Graph {
 private:
@@ -105,9 +94,6 @@ public:
     void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt, int num_layers);
 };
 
-extern DMap gtpl_map;
-extern DMap sampling_map;
-
 // visualization.cpp
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
@@ -116,17 +102,26 @@ void plotSpline(const Spline& spline, const string& color);
 void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
 
 // helper_func.cpp
+unique_ptr<string> Load(const string& filename);
+double normalizeAngle(double angle);
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
+void addDVectorToMap(DMap& map, string attr, const IVector* idx_array = nullptr);
 bool checkInsideBounds(const Vector2d& pos, const float veh_width);
+void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer);
 
-unique_ptr<string> Load(const string& filename);
 //genSplines.cpp
+void calcHeading(DVector &x_raceline,
+                 DVector &y_raceline, 
+                 DVector &psi);
 unique_ptr<Spline> calcSplines(const MatrixXd &path,
                                      double psi_s, 
                                      double psi_e, 
                                      bool use_dist_scaling=true);
+VectorXd calcKappa(MatrixXd &coeffs_x,
+                   MatrixXd &coeffs_y,
+                   VectorXd &t_steps);
 void genEdges(NodeMap &nodesPerLayer, 
               Graph &edgeList,
               SplineMap &splineMap,
@@ -147,7 +142,3 @@ pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
                         const float& veh_width,
                         double spline_len = NAN,
                         int no_interp_points = 10);
-                    
-VectorXd calcKappa(MatrixXd &coeffs_x,
-                         MatrixXd &coeffs_y,
-                         VectorXd &t_steps);
