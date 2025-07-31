@@ -45,47 +45,6 @@ void samplePointsFromRaceline(const DVector& kappa,
     // cout << "size: " << idx_array.size() << endl;
 }
 
-void computeCurvature(NodeMap& nodesPerLayer) {
-    const int num_layers = nodesPerLayer.size();
-
-    // safe node access: 없는 j 인덱스는 가장 가까운 노드로 fallback
-    auto safeGetNode = [](const vector<Node>& layer, int j) -> const Node* {
-        if (layer.empty()) return nullptr;
-        if (j < 0) return &layer.front();
-        if (j < static_cast<int>(layer.size())) return &layer[j];
-        return &layer.back();  // 가장 오른쪽 노드로 fallback
-    };
-
-    for (int i = 0; i < num_layers; ++i) {
-        int num_nodes_i = nodesPerLayer[i].size();
-
-        for (int j = 0; j < num_nodes_i; ++j) {
-            const Node* prev = nullptr;
-            const Node* next = nullptr;
-
-            if (i > 0 && i < num_layers - 1) {
-                prev = safeGetNode(nodesPerLayer[i - 1], j);
-                next = safeGetNode(nodesPerLayer[i + 1], j);
-            } else if (i == 0 && num_layers > 1) {
-                prev = safeGetNode(nodesPerLayer[i], j);
-                next = safeGetNode(nodesPerLayer[i + 1], j);
-            } else if (i == num_layers - 1 && num_layers > 1) {
-                prev = safeGetNode(nodesPerLayer[i - 1], j);
-                next = safeGetNode(nodesPerLayer[i], j);
-            }
-
-            double dpsi = 0.0, ds = 0.0;
-            if (prev && next) {
-                dpsi = normalizeAngle(next->psi - prev->psi);
-                ds = hypot(next->x - prev->x, next->y - prev->y);
-            }
-
-            double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
-            nodesPerLayer[i][j].kappa = kappa;
-        }
-    }
-}
-
 void genNode(NodeMap& nodesPerLayer,
             IVector& raceline_index_array,
             const double veh_width,
@@ -109,7 +68,7 @@ void genNode(NodeMap& nodesPerLayer,
         
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
-        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution ;  // num_nodes : 좌우 총 가능한 노드 수
+        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution;  // num_nodes : 좌우 총 가능한 노드 수
         
         nodesPerLayer[i].resize(num_nodes); 
         
@@ -125,15 +84,14 @@ void genNode(NodeMap& nodesPerLayer,
             node.y = node_pos.y();      
             node.raceline = (node_idx == raceline_index);
             
-            #if 0
+            #if 0 
             if (idx == num_nodes - 1) {
                 cout << i << "번째 레이어의 " << idx << "번째 노드" << endl;
                 cout << sampling_map[__x_bound_r][idx] - alpha << endl;
             }
             #endif
 
-
-            // psi 재계산
+            // psi 재계산  
             double psi_interp;
             if (node_idx < raceline_index) {
                 
@@ -165,10 +123,7 @@ void genNode(NodeMap& nodesPerLayer,
 
         }
 
-        
     }
-    // 곡률 계산 (헤딩 변화량 / 거리)
-    computeCurvature(nodesPerLayer);
         // cout << i << "번째 Layer의" << endl;
         // for (size_t i =0; i < node_pos.size(); ++i) {        
         //     cout << i << "번째 Node" << endl;
@@ -238,6 +193,7 @@ void calcOfflineCost(SplineMap& splineMap,
 }
 
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
+
     int num_nodes = 0;
     for (const auto& layer : nodesPerLayer) {
         num_nodes += layer.size();
@@ -287,60 +243,61 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     double dx, dy;
         
     Vector2d start_pos(sampling_map[__x_raceline][3], sampling_map[__y_raceline][3]);
-    
+    cout << sampling_map[__x_raceline][3] << endl;
     float vel_est = 0.0;
 
     // set start pos 
     if (!checkInsideBounds(start_pos, veh_width)) {
         throw out_of_range("start pos is not in bounds");
     }
-
+    
     IPair closest_idx;
     getClosestNodes(nodesPerLayer, closest_idx, start_pos);
-
+    int start_layer = closest_idx.first;
+    int start_node = closest_idx.second;
     double start_heading = nodesPerLayer[closest_idx.first][closest_idx.second].psi;
 
-    int goal_layer = (closest_idx.first + 1) % (nodesPerLayer.size() - 1);
-    int goal_node = raceline_index_array[goal_layer];
-    cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
+    int end_layer = (closest_idx.first + 2) % (nodesPerLayer.size() - 1);
 
-    double end_heading = nodesPerLayer[goal_layer][goal_node].psi;
-    // cout << "start_heading: " << start_heading << endl;
-    // cout << "end_heading: " << end_heading << endl;
+    for (int layerIdx = start_layer; layerIdx < end_layer;++layerIdx) {
+        
+        int goal_layer = layerIdx + 1;
+        int goal_node = raceline_index_array[goal_layer];
+        cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
+        double goal_heading = nodesPerLayer[goal_layer][goal_node].psi;
+        double heading_diff = std::abs(start_heading - goal_heading);
+        Vector2d end_pos(nodesPerLayer[goal_layer][goal_node].x, nodesPerLayer[goal_layer][goal_node].y);
 
-    double heading_diff = std::abs(start_heading - end_heading);
-    Vector2d end_pos(nodesPerLayer[goal_layer][goal_node].x, nodesPerLayer[goal_layer][goal_node].y);
+        if (heading_diff > M_PI) {
+            heading_diff = std::abs(2*M_PI - heading_diff);
+            // cout <<"hi" << endl;
+        }
+        if (heading_diff > max_heading_offset) {
+            // cout << "heading_diff: " << heading_diff << ", " << max_heading_offset << endl;
+            // cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
+        }
 
-    if (heading_diff > M_PI) {
-        heading_diff = std::abs(2*M_PI - heading_diff);
-        // cout <<"hi" << endl;
+        MatrixXd path(2, 2);
+        path.block<1, 2>(0, 0) = start_pos.transpose();
+        path.block<1, 2>(1, 0) = end_pos.transpose();
+
+        auto result = calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
+        auto [kappa, psi] = interpSplines(result->coeffs_x, result->coeffs_y, stepsize_approx, veh_width);
+
+        // kappa와 psi의 크기 확인
+        if (kappa.size() == 0) {
+            cerr << "Error: kappa is empty!" << std::endl;
+            return;
+        }
+
+        if (psi.size() == 0) {
+            cerr << "Error: psi is empty!" << std::endl;
+            return;
+        }
+        plotSpline(*result, "blue");    
     }
-    if (heading_diff > max_heading_offset) {
-        // cout << "heading_diff: " << heading_diff << ", " << max_heading_offset << endl;
-        // cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
-    }
-
-    MatrixXd path(2, 2);
-    path.block<1, 2>(0, 0) = start_pos.transpose();
-    path.block<1, 2>(1, 0) = end_pos.transpose();
-
-    auto result = calcSplines(path, start_heading, end_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
-    cout << "initial" << endl;
-    auto [kappa, psi] = interpSplines(result->coeffs_x, result->coeffs_y, stepsize_approx, veh_width);
-
-    // kappa와 psi의 크기 확인
-    if (kappa.size() == 0) {
-        std::cerr << "Error: kappa is empty!" << std::endl;
-        return;
-    }
-
-    if (psi.size() == 0) {
-        std::cerr << "Error: psi is empty!" << std::endl;
-        return;
-    }
-
+    #if 0
     ActionSet actionSet;
-
     actionSet.action_id = "straight";
 
     MatrixXd coeffs_all(2, 4);
@@ -361,8 +318,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     action_param(0, 2) = psi(0);             
     action_param(0, 3) = kappa(0);           
     action_param(0, 4) = el_lengths_all(0);
-
-    plotSpline(*result, "blue");
+    #endif
 
 }
 

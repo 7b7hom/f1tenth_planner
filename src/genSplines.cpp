@@ -284,12 +284,10 @@ void genEdges(NodeMap &nodesPerLayer,
             // spline 연결할 노드 선정 기준 : lat_steps
             double dist = (d_end - d_start).norm();
             // genNode에서 kappa 계산한거 토대로(+기능 추가 완료)
-            double ratio = min(startNode.kappa / curve_thr, 2.0); // 최대 2배까지만 증폭
-            double factor = 1.0 + 0.5 * ratio;
-            // 커브에서 더 많이 연결(추월 경로를 위하여)
-            int lat_steps = round(factor * dist * lat_offset / lat_resolution);
+
+            int lat_steps = static_cast<int>(round(dist * lat_offset / lat_resolution));
             // cout << srcLayerIdx << "의 " << srcNodeIdx << "가 다음 refendNode와의 거리: " << dist << endl;
-            lat_steps = max(lat_steps, max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
+            lat_steps = min(lat_steps, max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
             // cout << srcNodeIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
@@ -311,10 +309,8 @@ void genEdges(NodeMap &nodesPerLayer,
                     // cout << "result: " << result->el_lengths.size()  << endl;
                     IPair startPoint = make_pair(srcLayerIdx, srcNodeIdx);
                     IPair endPoint = make_pair(dstLayerIdx, endNodeIdx);
-                    // EdgeKey srcKey= make_pair(startPoint, endPoint);
+
                     splineMap[startPoint][endPoint] = *result;
-                    //splineMap[startPoint][endPoint] = *result
-                    // graph_wp & splineMap
 
                     // graph에 넣는 과정 
                     graph_wp.addEdge(startPoint, endPoint);
@@ -342,7 +338,7 @@ void genEdges(NodeMap &nodesPerLayer,
         graph_wp.getChildNodes(start, childNodes);
         // 연결되어있는 child node에 대하여 
         for (auto& end : childNodes) {
-          edge_cnt++;
+          
 
           MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
           MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
@@ -366,13 +362,14 @@ void genEdges(NodeMap &nodesPerLayer,
             for (int j = 0; j < kappa.size(); ++j) {
                 double kappa_val = abs(kappa(j));
                 // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
-                if (kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) {
+                if ((kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) && !splineMap[start][end].raceline) {
                  tooBigKappa = true;
                     break; // 더 볼 필요 없음, 바로 탈출
                 }
             }
 
             if (tooBigKappa) graph_wp.removeEdge(start, end, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
+            else {edge_cnt++;}
             // delete kappa;
             // kappa = nullptr;
         }

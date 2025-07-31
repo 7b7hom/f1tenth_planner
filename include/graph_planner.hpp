@@ -46,7 +46,6 @@ struct Node {
     double x;
     double y;
     double psi;
-    double kappa;
     bool raceline;
 };
 

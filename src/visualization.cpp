@@ -157,7 +157,7 @@ void plotSpline(const Spline& spline, const string& color) {
     }
     // cout << "I'm in plotSpline!" << endl;
     // Spline 그리기
-    plt::plot(xs, ys, {{"color", color}});
+    plt::plot(xs, ys, {{"color", color}, {"linewidth", "3.0"}});
 
     // plt::title("Spline Path");
     // plt::xlabel("X");

@@ -223,9 +223,9 @@ bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
     double dist_to_right_bound = sqrt(d_br_2);
 
 
-    cout << "-------here" << endl;
-    cout << dist_to_left_bound << endl;
-    cout << dist_to_right_bound << endl;
+    // cout << "-------here" << endl;
+    // cout << dist_to_left_bound << endl;
+    // cout << dist_to_right_bound << endl;
     // VEH_WIDTH 조건 확인
     if (dist_to_left_bound < veh_width || dist_to_right_bound < veh_width)
     {
