@@ -1,5 +1,4 @@
 #include "graph_planner.hpp"
-#include "config.h"
 
 DMap gtpl_map;
 DMap sampling_map;
@@ -181,7 +180,7 @@ void calcOfflineCost(SplineMap& splineMap,
             // raceline cost
 
             double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * lat_resolution;
-            double raceline_cost = std::min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
+            double raceline_cost = min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
 
             offline_cost += raceline_cost;
 
@@ -189,7 +188,6 @@ void calcOfflineCost(SplineMap& splineMap,
             // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
         }   
     } 
-
 }
 
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
@@ -242,30 +240,33 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     // 현재 pos, heading 
     double dx, dy;
         
-    Vector2d start_pos(sampling_map[__x_raceline][3], sampling_map[__y_raceline][3]);
-    cout << sampling_map[__x_raceline][3] << endl;
+    Vector2d initial_pos(sampling_map[__x_raceline][1], sampling_map[__y_raceline][1]);
     float vel_est = 0.0;
 
     // set start pos 
-    if (!checkInsideBounds(start_pos, veh_width)) {
+    if (!checkInsideBounds(initial_pos, veh_width)) {
         throw out_of_range("start pos is not in bounds");
     }
     
     IPair closest_idx;
-    getClosestNodes(nodesPerLayer, closest_idx, start_pos);
+    getClosestNodes(nodesPerLayer, closest_idx, initial_pos);
     int start_layer = closest_idx.first;
     int start_node = closest_idx.second;
     double start_heading = nodesPerLayer[closest_idx.first][closest_idx.second].psi;
 
     int end_layer = (closest_idx.first + 2) % (nodesPerLayer.size() - 1);
 
-    for (int layerIdx = start_layer; layerIdx < end_layer;++layerIdx) {
-        
-        int goal_layer = layerIdx + 1;
+    for (int layer_idx = start_layer; layer_idx < end_layer;++layer_idx) {
+        if (layer_idx != start_layer) {
+            start_node = raceline_index_array[layer_idx];
+            start_heading = nodesPerLayer[layer_idx][start_node].psi;
+        }
+
+        int goal_layer = layer_idx + 1;
         int goal_node = raceline_index_array[goal_layer];
-        cout << "goal_layer: " << goal_layer << " / goal_node: " << goal_node << endl;
         double goal_heading = nodesPerLayer[goal_layer][goal_node].psi;
         double heading_diff = std::abs(start_heading - goal_heading);
+        Vector2d start_pos(nodesPerLayer[layer_idx][start_node].x, nodesPerLayer[layer_idx][start_node].y);
         Vector2d end_pos(nodesPerLayer[goal_layer][goal_node].x, nodesPerLayer[goal_layer][goal_node].y);
 
         if (heading_diff > M_PI) {
@@ -286,16 +287,16 @@ void setInitialPos(const NodeMap &nodesPerLayer,
 
         // kappa와 psi의 크기 확인
         if (kappa.size() == 0) {
-            cerr << "Error: kappa is empty!" << std::endl;
-            return;
+            cerr << "Error: kappa is empty!" << endl;
         }
 
         if (psi.size() == 0) {
-            cerr << "Error: psi is empty!" << std::endl;
+            cerr << "Error: psi is empty!" << endl;
             return;
         }
         plotSpline(*result, "blue");    
     }
+    cout << "Goal node: layer=" << end_layer << ", idx= " << raceline_index_array[end_layer] << endl;
     #if 0
     ActionSet actionSet;
     actionSet.action_id = "straight";
