@@ -52,8 +52,8 @@ void map_size(DMap& map) {
 
 // Dvector를 Map 구조로 추가(연산)
 void addDVectorToMap(DMap &map,
-                     string attr,
-                     const IVector *idx_array) {
+                    string attr,
+                    const IVector *idx_array) {
     size_t len;
     if (idx_array == nullptr) {
         len = map[__x_ref].size();  // 지정X -> 전체 데이터 대상
@@ -164,8 +164,8 @@ double normalizeAngle(double angle) {
 }
 
 void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline,
-                 DVector &psi) {
+                DVector &y_raceline,
+                DVector &psi) {
 
     size_t N = x_raceline.size();
     psi.resize(N);
@@ -276,7 +276,6 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
                     double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
                     double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
                     psi_interp = bl + (p - bl) * node_idx / raceline_index;
-                                       
                 }
                 else {
                     psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
@@ -319,48 +318,6 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
 }       // 저장 결과 : nodesPerLayer[i][j] (i번째 레이어에서 j번째 lateral 위치의 노드)
         //           raceline_index_array[i] (i번째 레이어에서 레이싱라인이 위치한 인덱스)
         //           노드 정보
-
-void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale = 0.5) {
-    double dx, dy;
-    double theta, arrow_len;
-    double angle;
-    double x_arrow1, y_arrow1;
-    double x_arrow2, y_arrow2;
-
-    for (size_t i = 0; i < x.size(); ++i) {
-        dx = scale * cos(psi[i] + M_PI_2);
-        dy = scale * sin(psi[i] + M_PI_2);
-        DVector x_line = {x[i], x[i] + dx};
-        DVector y_line = {y[i], y[i] + dy};
-        plt::plot(x_line, y_line, {{"color", "green"}});
-
-        #if 1 // 화살촉 그리기
-        theta = atan2(dy, dx);
-        arrow_len = 0.2 * scale;
-        angle = M_PI / 6.0;
-
-        x_arrow1 = x[i] + dx - arrow_len * cos(theta - angle);
-        y_arrow1 = y[i] + dy - arrow_len * sin(theta - angle);
-        x_arrow2 = x[i] + dx - arrow_len * cos(theta + angle);
-        y_arrow2 = y[i] + dy - arrow_len * sin(theta + angle);
-
-        plt::plot({x[i] + dx, x_arrow1}, {y[i] + dy, y_arrow1}, {{"color", "green"}});
-        plt::plot({x[i] + dx, x_arrow2}, {y[i] + dy, y_arrow2}, {{"color", "green"}});
-        #endif
-    }
-}
-
-// NodeMap에 저장된 모든 노드들을 보라색 점으로 플로팅하고, 각 노드의 헤딩을 화살표로 시각화
-void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
-    DVector node_x, node_y;
-    for (const auto& layer_nodes : nodesPerLayer) {
-        for (const auto& node : layer_nodes) {
-            node_x.push_back(node.x);
-            node_y.push_back(node.y);
-        }
-    }
-    plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}, {"label", "Nodes"}});
-}
 
 
 
@@ -461,10 +418,11 @@ Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& co
 }
 
 
-void genEdge(Graph& graph, 
-    const NodeMap& nodesPerLayer, 
-    const Offline_Params& params,
-    const IVector& raceline_index_array,
+void genEdge(Graph &graph, 
+    SplineMap &splineMap,
+    const NodeMap &nodesPerLayer, 
+    const Offline_Params &params,
+    const IVector &raceline_index_array,
     bool closed = true) {
 
 
@@ -544,110 +502,45 @@ void genEdge(Graph& graph,
                     cout << "SPLINE REJECTED from (" << start_layer << "," << startNode.node_idx
                             << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
                 }
-
-
-                // DEBUG
-
-                // double d = std::sqrt(std::pow(endNode.x - startNode.x, 2) +
-                //      std::pow(endNode.y - startNode.y, 2));
-
-                // for (double t = 0; t <= d; t += 0.2) {
-                //     Vector2d pt = computeSplinePosition(x_coeffs.row(0), y_coeffs.row(0), t);
-                //     std::cout << "  - t=" << t << " → (" << pt.x() << ", " << pt.y() << ")\n";
-                // }
-                // std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
-                //         << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
-
-                // std::cout << "coeff_x: " << x_coeffs << std::endl;
-                // std::cout << "coeff_y: " << y_coeffs << std::endl;
-
-                // for (int k = 0; k <= 10; ++k) {
-                //     double t = static_cast<double>(k) / 10.0;
-                //     double x = x_coeffs(0) + x_coeffs(1) * t + x_coeffs(2) * t * t + x_coeffs(3) * t * t * t;
-                //     double y = y_coeffs(0) + y_cofeffs(1) * t + y_coeffs(2) * t * t + y_coeffs(3) * t * t * t;
-                //     std::cout << "  - point(" << t << "): (" << x << ", " << y << ")\n";
-                // }
-
-            }
-        }  
-    }
-}
-
-
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
-    plt::clf();
-
-    // 트랙 경계선
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
-
-    // 레이싱 라인 및 샘플링된 포인트
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
-    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
-
-    plotHeading(nodesPerLayer);
-    
-    DVector spline_x_pts; 
-    DVector spline_y_pts;
-
-    for (const auto& layer_nodes : nodesPerLayer) {
-        for (const auto& current_node : layer_nodes) {
-            IPair src_key = std::make_pair(current_node.layer_idx, current_node.node_idx);
-            IPairVector child_nodes_idx; 
-
-            try {
-                graph.getChildNodes(src_key, child_nodes_idx);
-            } catch (const std::runtime_error& e) {
-                continue;
-            }
-            
-            for (const auto& dst_key : child_nodes_idx) {
-                spline_x_pts.clear(); 
-                spline_y_pts.clear(); 
-
-                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
-
-                int dest_node_idx = dst_key.second;
-                
-                if (dest_node_idx < 0 || dest_node_idx >= static_cast<int>(nodesPerLayer[next_layer_idx].size())) {
-                    continue;
-                }
-
-                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
-
-                // 스플라인 경로 생성
-                MatrixXd spline_path(2, 2);
-                spline_path << current_node.x, current_node.y,
-                               next_node.x, next_node.y;
-                
-                SplineResult res;
-                try {
-                    res = calcSplines(current_node, next_node);
-                } catch (const std::exception& e) {
-                    continue;
-                }
-
-                const int num_spline_segments = 10; 
-                for (int k = 0; k <= num_spline_segments; ++k) {
-                    double t_eval = static_cast<double>(k) / num_spline_segments;
-                    Vector2d pos = computeSplinePosition(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
-                    spline_x_pts.push_back(pos.x());
-                    spline_y_pts.push_back(pos.y());
-                }
-
-                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}});
             }
         }
     }
 
-    plt::title("Track and Planned Graph");
-    plt::grid(true);
-    plt::axis("equal");
-    plt::legend();
-    plt::show();
-}
+    int remove_cnt = 0;
 
+    for (int layer = 0; layer < nodesPerLayer.size(); ++layer) {
+        for (int node = 0; node < nodesPerLayer[layer].size(); ++node) {
+            IPair srcNodeIdx = make_pair(layer, node);
+
+            IPairVector parents;
+            IPairVector children;
+
+            bool hasParent = graph.getParentNodes(srcNodeIdx, parents, static_cast<int>(nodesPerLayer.size()));
+            bool hasChild  = graph.getChildNodes(srcNodeIdx, children);
+
+            // 부모 없음 → 자식으로 향하는 엣지 제거
+            if (!hasParent) {
+                for (auto& child : children) {
+                    graph.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
+                    std::cout << "Removed edge (no parent): " << layer << "," << node << " → "
+                            << child.first << "," << child.second << std::endl;
+                }
+            }
+
+            // 자식 없음 → 부모로부터 오는 엣지 제거
+            if (!hasChild) {
+                for (auto& parent : parents) {
+                    graph.removeEdge(parent, srcNodeIdx, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
+                    std::cout << "Removed edge (no child): " << parent.first << "," << parent.second
+                            << " → " << layer << "," << node << std::endl;
+                }
+            }
+        }
+    }
+
+    std::cout << "총 제거된 엣지 수: " << remove_cnt << "개" << std::endl;
+
+}
 
 
 int main() {
@@ -670,11 +563,11 @@ int main() {
     
     // layer 간격을 위한 raceline points sampling 
     samplePointsFromRaceline(gtpl_map[__kappa],
-                             gtpl_map[__delta_s],
-                             params.LON_CURVE_STEP,
-                             params.LON_STRAIGHT_STEP,
-                             params.CURVE_THR,
-                             idx_sampling);
+                            gtpl_map[__delta_s],
+                            params.LON_CURVE_STEP,
+                            params.LON_STRAIGHT_STEP,
+                            params.CURVE_THR,
+                            idx_sampling);
 
     // cout << "idx size:" << idx_sampling.size() << endl;
     
@@ -721,14 +614,17 @@ int main() {
 
     // 최종 그래프 생성
     Graph myGraph;
+    SplineMap splineMap;
+
     genEdge(myGraph,
+            splineMap,
             nodesPerLayer,
             params,
             raceline_index_array);
     
     // pruneEdge(graph, nodesPerLayer, params.KAPPA_LIMIT, closed);
 
-    myGraph.printGraph();
+    // myGraph.printGraph();
     
     // 시각화
     visual(nodesPerLayer, myGraph, params);

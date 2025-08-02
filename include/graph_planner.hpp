@@ -108,48 +108,43 @@ public:
 // visualization.cpp
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
-void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
-void plotSpline(const Spline& spline, const string& color);
-void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params);
 
 // helper_func.cpp
-unique_ptr<string> Load(const string& filename);
 double normalizeAngle(double angle);
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
 void addDVectorToMap(DMap& map, string attr, const IVector* idx_array = nullptr);
-bool checkInsideBounds(const Vector2d& pos, const float veh_width);
-void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer);
+void samplePointsFromRaceline(const DVector& kappa,     // 곡률
+                              const DVector& dist,      // 점 사이 거리
+                              double d_curve,           // 곡선 구간 샘플링 간격
+                              double d_straight,        // 직선 구간 샘플링 간격
+                              double curve_th,          // 곡선 판단 기준 곡률
+                              IVector& idx_array);
 
 //genSplines.cpp
 void calcHeading(DVector &x_raceline,
                  DVector &y_raceline, 
                  DVector &psi);
-unique_ptr<Spline> calcSplines(const MatrixXd &path,
-                                     double psi_s, 
-                                     double psi_e, 
-                                     bool use_dist_scaling=true);
-VectorXd calcKappa(MatrixXd &coeffs_x,
-                   MatrixXd &coeffs_y,
-                   VectorXd &t_steps);
-void genEdges(NodeMap &nodesPerLayer, 
-              Graph &edgeList,
-              SplineMap &splineMap,
-              const IVector &raceline_index_array,
-              const float veh_width,
-              const float lat_offset,
-              const float lat_resolution,
-              const float curve_thr,
-              const int max_lat_steps,
-              const float stepsize_approx,
-              const float min_vel_race,
-              const float max_lateral_accel,
-              const float veh_turn);
 
-pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
-                        MatrixXd &coeffs_y,
-                        float stepsize_approx,
-                        const float& veh_width,
-                        double spline_len = NAN,
-                        int no_interp_points = 10);
+VectorXd computeEuclideanDistances(const MatrixXd& path);
+SplineResult calcSplines(const Node& startNode, const Node& endNode);
+
+void calcCurvature(NodeMap& nodesPerLayer);
+bool checkKappaValidity(const Vector4d& coeffs_x,
+                        const Vector4d& coeffs_y,
+                        const VectorXd& t_steps,
+                        double max_allowed_kappa);
+Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& coeff_y, double t);
+                        
+void genNode(NodeMap& nodesPerLayer,        
+            IVector& raceline_index_array,  
+            const double veh_width,
+            float lat_resolution);
+void genEdge(Graph& graph, 
+    SplineMap &splineMap,
+    const NodeMap& nodesPerLayer, 
+    const Offline_Params& params,
+    const IVector& raceline_index_array,
+    bool closed);
