@@ -308,10 +308,10 @@ void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드
         // for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
         //     for (size_t j = 0; j < nodesPerLayer[i].size(); ++j) {
         //         const Node& n = nodesPerLayer[i][j];
-        //         std::cout << "Layer " << i << ", Node " << j
+        //         cout << "Layer " << i << ", Node " << j
         //                 << " | x: " << n.x << ", y: " << n.y
         //                 << " | psi: " << n.psi
-        //                 << " | kappa: " << n.kappa << std::endl;
+        //                 << " | kappa: " << n.kappa << endl;
         //     }
         // }
     }
@@ -353,9 +353,9 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
          0, 1, 2, 3;    // x'(1) = a_1 + 2a_2 + 3a_3
 
     b_x << startNode.x,
-           endNode.x,
-           cos(psi_s),
-           cos(psi_e);
+            endNode.x,
+            cos(psi_s),
+            cos(psi_e);
 
     b_y << startNode.y,
            endNode.y,
@@ -398,8 +398,8 @@ bool checkKappaValidity(const Vector4d& coeffs_x,
         }
 
         if (kappa > max_allowed_kappa) {
-            // std::cout << "REJECTED (EXCESSIVE CURVATURE): kappa = " << kappa
-            //           << ", max allowed = " << max_allowed_kappa << std::endl;
+            // cout << "REJECTED (EXCESSIVE CURVATURE): kappa = " << kappa
+            //           << ", max allowed = " << max_allowed_kappa << endl;
             return false;  // 조건 위반 시 바로 종료
         }
     }
@@ -482,6 +482,8 @@ void genEdge(Graph &graph,
 
                 double max_allowed_kappa = 20.0 / params.VEH_TURN;  // params에 맞게 조정
 
+                    
+                // 1차로 곡률 조건 만족하지 않는 엣지는 빼고 저장
                 if (checkKappaValidity(x_coeffs, y_coeffs, t_steps, max_allowed_kappa)) {
                     IPair src_key = make_pair(startNode.layer_idx, startNode.node_idx);
                     IPair dst_key = make_pair(endNode.layer_idx, endNode.node_idx);
@@ -492,7 +494,7 @@ void genEdge(Graph &graph,
                             << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
                     
                     // 그래프에 엣지 추가
-                    // std::cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
+                    // cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
                     //         << ") → " << endNode.node_idx << "\n";
                     
                 } else {
@@ -500,12 +502,13 @@ void genEdge(Graph &graph,
                     IPair dst_key = make_pair(endNode.layer_idx, endNode.node_idx);
 
                     cout << "SPLINE REJECTED from (" << start_layer << "," << startNode.node_idx
-                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << endl;
                 }
             }
         }
     }
-
+    
+    // 부모, 자식 없는 노드 제거
     int remove_cnt = 0;
 
     for (int layer = 0; layer < nodesPerLayer.size(); ++layer) {
@@ -518,27 +521,27 @@ void genEdge(Graph &graph,
             bool hasParent = graph.getParentNodes(srcNodeIdx, parents, static_cast<int>(nodesPerLayer.size()));
             bool hasChild  = graph.getChildNodes(srcNodeIdx, children);
 
-            // 부모 없음 → 자식으로 향하는 엣지 제거
+            // 부모 없음 → OUTCOME 엣지 제거
             if (!hasParent) {
                 for (auto& child : children) {
                     graph.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-                    std::cout << "Removed edge (no parent): " << layer << "," << node << " → "
-                            << child.first << "," << child.second << std::endl;
+                    cout << "Removed edge (no parent): " << layer << "," << node << " → "
+                            << child.first << "," << child.second << endl;
                 }
             }
 
-            // 자식 없음 → 부모로부터 오는 엣지 제거
+            // 자식 없음 → INCOME 엣지 제거
             if (!hasChild) {
                 for (auto& parent : parents) {
                     graph.removeEdge(parent, srcNodeIdx, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-                    std::cout << "Removed edge (no child): " << parent.first << "," << parent.second
-                            << " → " << layer << "," << node << std::endl;
+                    cout << "Removed edge (no child): " << parent.first << "," << parent.second
+                            << " → " << layer << "," << node << endl;
                 }
             }
         }
     }
 
-    std::cout << "총 제거된 엣지 수: " << remove_cnt << "개" << std::endl;
+    cout << "총 제거된 엣지 수: " << remove_cnt << "개" << endl;
 
 }
 
@@ -552,7 +555,7 @@ int main() {
 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     readDMapFromCSV(map_file_in, gtpl_map);
-    std::cout << "CSV loaded, columns: " << gtpl_map.size() << std::endl;
+    cout << "CSV loaded, columns: " << gtpl_map.size() << endl;
 
     addDVectorToMap(gtpl_map, "bound_r");
     addDVectorToMap(gtpl_map, "bound_l");
@@ -621,8 +624,6 @@ int main() {
             nodesPerLayer,
             params,
             raceline_index_array);
-    
-    // pruneEdge(graph, nodesPerLayer, params.KAPPA_LIMIT, closed);
 
     // myGraph.printGraph();
     

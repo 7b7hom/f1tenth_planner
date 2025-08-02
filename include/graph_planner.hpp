@@ -117,16 +117,16 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
 void addDVectorToMap(DMap& map, string attr, const IVector* idx_array = nullptr);
 void samplePointsFromRaceline(const DVector& kappa,     // 곡률
-                              const DVector& dist,      // 점 사이 거리
-                              double d_curve,           // 곡선 구간 샘플링 간격
-                              double d_straight,        // 직선 구간 샘플링 간격
-                              double curve_th,          // 곡선 판단 기준 곡률
-                              IVector& idx_array);
+                            const DVector& dist,      // 점 사이 거리
+                            double d_curve,           // 곡선 구간 샘플링 간격
+                            double d_straight,        // 직선 구간 샘플링 간격
+                            double curve_th,          // 곡선 판단 기준 곡률
+                            IVector& idx_array);
 
 //genSplines.cpp
 void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline, 
-                 DVector &psi);
+                DVector &y_raceline, 
+                DVector &psi);
 
 VectorXd computeEuclideanDistances(const MatrixXd& path);
 SplineResult calcSplines(const Node& startNode, const Node& endNode);
@@ -137,7 +137,6 @@ bool checkKappaValidity(const Vector4d& coeffs_x,
                         const VectorXd& t_steps,
                         double max_allowed_kappa);
 Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& coeff_y, double t);
-                        
 void genNode(NodeMap& nodesPerLayer,        
             IVector& raceline_index_array,  
             const double veh_width,
