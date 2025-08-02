@@ -4,7 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-
 // CSV를 읽어서 DMap으로 변경 
 void readDMapFromCSV(const string& pathname, DMap& map) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
@@ -14,13 +13,14 @@ void readDMapFromCSV(const string& pathname, DMap& map) {
         map[label] = csv.GetColumn<double>(label);
 }
 
+
 // DMap을 CSV에 작성 
-void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',') {
+void writeDMapToCSV(const string& pathname, DMap& map, char delimiter) {
     ofstream file(pathname);
     if (!file.is_open()) throw runtime_error("Can't open file.");
 
-    size_t num_cols = map.size();   // 열 개수 = map의 key 개수
-    size_t num_rows = map.begin()->second.size();   // 행 개수 = 첫 번째 key의 값의 길이
+    size_t num_cols = map.size();
+    size_t num_rows = map.begin()->second.size();
 
     // Header
     size_t i = 0;
@@ -47,13 +47,13 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',') {
 void map_size(DMap& map) {
     size_t num_cols = map.size();
     size_t num_rows = map.begin()->second.size();
-    cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
+    // cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
 }
 
 // Dvector를 Map 구조로 추가(연산)
 void addDVectorToMap(DMap &map,
                      string attr,
-                     const IVector *idx_array = nullptr) {
+                     const IVector *idx_array) {
     size_t len;
     if (idx_array == nullptr) {
         len = map[__x_ref].size();  // 지정X -> 전체 데이터 대상
@@ -116,28 +116,29 @@ void addDVectorToMap(DMap &map,
     // map_size(map);
 }
 
-void samplePointsFromRaceline(const DVector& kappa,
-                              const DVector& dist,
-                              double d_curve,
-                              double d_straight,
-                              double curve_th,
-                              IVector& idx_array) {
+// samplePoint : 레이어가 생성될 위치 정하는 것. (결과적으로 레이어 간격 의미)
+void samplePointsFromRaceline(const DVector& kappa,     // 곡률
+                              const DVector& dist,      // 점 사이 거리
+                              double d_curve,           // 곡선 구간 샘플링 간격
+                              double d_straight,        // 직선 구간 샘플링 간격
+                              double curve_th,          // 곡선 판단 기준 곡률
+                              IVector& idx_array) {     // 결과 (샘플링 인덱스) 저장할 벡터
 
-    const size_t n = kappa.size();
-    double cur_dist = 0.0;
-    double next_dist = 0.0;
-    double next_dist_min = 0.0;
+    const size_t n = kappa.size();  // 전체 경로 길이 (전체 경로에서 몇 개의 점을 갖는지)
+    double cur_dist = 0.0;          // 지금까지 이동한 거리
+    double next_dist = 0.0;         // 다음 샘플링 지점 결정하는 기준 거리
+    double next_dist_min = 0.0;     // 곡선 구간일 경우 : 다음 샘플링까지 최소 간격 확보용
 
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = 0; i < n; ++i) {    // 경로의 각 점에 대해 반복
 
         // 곡선이면 최소 거리 갱신
-        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_th) {
+        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_th) {    // fabs() : float absolute value (절댓값 반환)
             next_dist = cur_dist;
         }
 
         // 다음 샘플링 지점 도달
-        if ((cur_dist + dist[i]) > next_dist) {
-            idx_array.push_back(static_cast<int>(i));
+        if ((cur_dist + dist[i]) > next_dist) { // 현재 위치가 next_dist 넘었다면 샘플링 지점 도달!
+            idx_array.push_back(static_cast<int>(i));   // 명시적 형변환
 
             if (fabs(kappa[i]) < curve_th) {  // 직선 구간
                 next_dist += d_straight;
@@ -145,15 +146,15 @@ void samplePointsFromRaceline(const DVector& kappa,
                 next_dist += d_curve;
             }
 
-            next_dist_min = cur_dist + d_curve;
+            next_dist_min = cur_dist + d_curve; // 너무 가까운 곳은 샘플 중복해서 찍지 않도록 해줌
         }
 
         cur_dist += dist[i];
     }
 
-    // for (size_t i=0; i < idx_array.size(); ++i) 
-    //     cout << idx_array[i] << endl;
-    // cout << "size: " << idx_array.size() << endl;
+    //  for (size_t i=0; i < idx_array.size(); ++i) 
+    //      cout << idx_array[i] << endl;
+    //  cout << "size: " << idx_array.size() << endl;
 }
 
 double normalizeAngle(double angle) {
@@ -180,58 +181,93 @@ void calcHeading(DVector &x_raceline,
             dx = x_raceline[0] - x_raceline[N - 1];
             dy = y_raceline[0] - y_raceline[N - 1];
         } 
-    psi[i] = atan2(dy, dx) - M_PI_2;
-        
-    normalizeAngle(psi[i]);
+    psi[i] = normalizeAngle(atan2(dy, dx) - M_PI_2);
+
+    // cout << i<< ": " << psi[i] << endl;
 
     }
-    // cout << i<< ": " << psi[i] << endl;
     // cout << psi.size() << endl;
 
 }
 
-void genNode(NodeMap& nodesPerLayer,
-            const double veh_width,
-            float lat_resolution) {
+
+void calcCurvature(NodeMap& nodesPerLayer) {
+    const int num_layers = nodesPerLayer.size();
+
+    auto getNodeInBounds = [](const vector<Node>& layer, int j) -> const Node* {
+        if (layer.empty()) return nullptr;
+        if (j < 0) return &layer.front();
+        if (j < static_cast<int>(layer.size())) return &layer[j];
+        return &layer.back();
+    };
+
+    for (int i = 0; i < num_layers; ++i) {
+        int num_nodes = nodesPerLayer[i].size();
+
+        for (int j = 0; j < num_nodes; ++j) {
+            const Node* prev = (i == 0)
+                ? getNodeInBounds(nodesPerLayer[i], j)
+                : getNodeInBounds(nodesPerLayer[i - 1], j);
+
+            const Node* next = (i == num_layers - 1)
+                ? getNodeInBounds(nodesPerLayer[i], j)
+                : getNodeInBounds(nodesPerLayer[i + 1], j);
+
+            if (!prev || !next) continue;  // 안전 확인
+
+            double dpsi = normalizeAngle(next->psi - prev->psi);
+            double ds = std::hypot(next->x - prev->x, next->y - prev->y);
+
+            double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
+            nodesPerLayer[i][j].kappa = kappa;
+        }
+    }
+}
+
+
+void genNode(NodeMap& nodesPerLayer,        // 각 레이어에 생성된 노드 저장하는 2차원 벡터
+            IVector& raceline_index_array,  // 각 레이어에서 레이싱라인이 위치한 노드의 인덱스
+            const double veh_width,         // 차량의 너비
+            float lat_resolution) {         // 노드 간 lateral 간격 (옆 방향 노드들 간격, m 단위)
     
-    const size_t N = sampling_map[__alpha].size();
-    IVector raceline_index_array;
+    const size_t N = sampling_map[__alpha].size();  // 총 레이어 수
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
+    
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
         node.layer_idx = i; 
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
         int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width / 2) / lat_resolution);
-        raceline_index_array.push_back(raceline_index);
+        raceline_index_array.push_back(raceline_index); // 레이스라인 노드 저장
         
         // cout << "layer 길이" << (sampling_map[__width_left][i] + sampling_map[__alpha][i] - veh_width/2)<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
-        // cout << "-----" << endl;
 
-        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 기준선에서의 위치
-        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
+
+        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 레이어의 기준이 되는 점 (기준선 위 한 점)
+        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // ref point에서 옆 방향을 알려주는 벡터
         
-        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
+        double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지 (lat_resolution씩 증가시키며 노드 생성)
         int node_idx = 0;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;  // num_nodes : 좌우 총 가능한 노드 수
         nodesPerLayer[i].resize(num_nodes); 
 
         // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;
-        // node별 loop 
-        for (double alpha = start_alpha; alpha <= sampling_map[__width_right][i] - veh_width / 2 ; alpha+=lat_resolution) {
-            // node_alphas.push_back(alpha);
+
+        // node별 loop (노드 생성 시작)
+        // (0,0) error
+        for (int idx = 0; idx < num_nodes; ++idx) {
+            double alpha = start_alpha + idx * lat_resolution;
             // node의 좌표 계산.
-            node_pos = ref_xy + alpha * norm_vec;
-            // node의 layer내의 인덱스 계산.
+            node_pos = ref_xy + alpha * norm_vec; // node의 layer내의 인덱스 계산.
             node.node_idx = node_idx;
             node.x = node_pos.x();
-            node.y = node_pos.y();
-            node.psi = 0.0;
-            node.kappa = 0.0;        
+            node.y = node_pos.y();     
             node.raceline = (node_idx == raceline_index);
 
+            // psi 보간 처리
             double psi_interp;
             if (node_idx < raceline_index) {
                 
@@ -268,16 +304,23 @@ void genNode(NodeMap& nodesPerLayer,
         //     cout << i << "번째 Node" << endl;
         //     cout << node_pos[i] << endl;
         // }
-                // 각 node의 psi, kappa 계산하는 로직 추가
-
+        
+        calcCurvature(nodesPerLayer);
+        // for (size_t i = 0; i < nodesPerLayer.size(); ++i) {
+        //     for (size_t j = 0; j < nodesPerLayer[i].size(); ++j) {
+        //         const Node& n = nodesPerLayer[i][j];
+        //         std::cout << "Layer " << i << ", Node " << j
+        //                 << " | x: " << n.x << ", y: " << n.y
+        //                 << " | psi: " << n.psi
+        //                 << " | kappa: " << n.kappa << std::endl;
+        //     }
+        // }
     }
-}
+}       // 저장 결과 : nodesPerLayer[i][j] (i번째 레이어에서 j번째 lateral 위치의 노드)
+        //           raceline_index_array[i] (i번째 레이어에서 레이싱라인이 위치한 인덱스)
+        //           노드 정보
 
-void plotHeading(const DVector &x,
-                 const DVector &y,
-                 const DVector &psi,
-                 double scale = 0.5)
-{
+void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale = 0.5) {
     double dx, dy;
     double theta, arrow_len;
     double angle;
@@ -287,123 +330,336 @@ void plotHeading(const DVector &x,
     for (size_t i = 0; i < x.size(); ++i) {
         dx = scale * cos(psi[i] + M_PI_2);
         dy = scale * sin(psi[i] + M_PI_2);
-
-        // psi 방향 
         DVector x_line = {x[i], x[i] + dx};
         DVector y_line = {y[i], y[i] + dy};
         plt::plot(x_line, y_line, {{"color", "green"}});
 
-        #if 1
-        // 화살촉 
+        #if 1 // 화살촉 그리기
         theta = atan2(dy, dx);
         arrow_len = 0.2 * scale;
-        angle = M_PI / 6.0;  // 30 degrees
+        angle = M_PI / 6.0;
 
         x_arrow1 = x[i] + dx - arrow_len * cos(theta - angle);
         y_arrow1 = y[i] + dy - arrow_len * sin(theta - angle);
-
         x_arrow2 = x[i] + dx - arrow_len * cos(theta + angle);
         y_arrow2 = y[i] + dy - arrow_len * sin(theta + angle);
 
-        // 화살촉 그리기 
         plt::plot({x[i] + dx, x_arrow1}, {y[i] + dy, y_arrow1}, {{"color", "green"}});
         plt::plot({x[i] + dx, x_arrow2}, {y[i] + dy, y_arrow2}, {{"color", "green"}});
         #endif
-
     }
-        // raceline 좌표와 psi 프린팅 
-        #if 0
-        for (size_t i = 0; i < x.size(); ++i) {
-        ostringstream label;
-        label.precision(2);
-        label << fixed << "(" << x[i] << ", " << y[i] << ")\nψ=" << psi[i];
-
-        plt::text(x[i], y[i], label.str());
-    }
-        #endif
 }
 
+// NodeMap에 저장된 모든 노드들을 보라색 점으로 플로팅하고, 각 노드의 헤딩을 화살표로 시각화
 void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
-    DVector x_line, y_line;
     DVector node_x, node_y;
     for (const auto& layer_nodes : nodesPerLayer) {
         for (const auto& node : layer_nodes) {
-            double dx = scale * cos(node.psi + M_PI_2);
-            double dy = scale * sin(node.psi + M_PI_2);
-
             node_x.push_back(node.x);
             node_y.push_back(node.y);
-            plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}});
-
-            #if 0
-            x_line = {node.x, node.x + dx};
-            y_line = {node.y, node.y + dy};
-            plt::plot(x_line, y_line, {{"color", "purple"}});
-
-            // 화살촉 (arrowhead)
-            
-            double theta = atan2(dy, dx);
-            double arrow_len = 0.2 * scale;
-            double angle = M_PI / 6.0;
-
-            double x_arrow1 = node.x + dx - arrow_len * cos(theta - angle);
-            double y_arrow1 = node.y + dy - arrow_len * sin(theta - angle);
-
-            double x_arrow2 = node.x + dx - arrow_len * cos(theta + angle);
-            double y_arrow2 = node.y + dy - arrow_len * sin(theta + angle);
-
-            plt::plot({node.x + dx, x_arrow1}, {node.y + dy, y_arrow1}, {{"color", "purple"}});
-            plt::plot({node.x + dx, x_arrow2}, {node.y + dy, y_arrow2}, {{"color", "purple"}});
-            #endif
         }
+    }
+    plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}, {"label", "Nodes"}});
+}
+
+
+
+// -------------------------------------------
+// gen_spline --------------------------------
+// -------------------------------------------
+
+// 경로 행렬의 각 점 사이의 유클리드 거리 계산 함수
+VectorXd computeEuclideanDistances(const MatrixXd& path) {
+    int N = path.rows() - 1;    // 구간 개수는 점 개수 - 1
+    VectorXd dists(N);          // 거리 저장 벡터
+    for (int i = 0; i < N; ++i) {
+        dists(i) = (path.row(i + 1) - path.row(i)).norm();  // 두 점 사이 거리 계산 (유클리드 노름)
+    }
+    return dists;
+}
+
+// only startNode, endNode
+SplineResult calcSplines(const Node& startNode, const Node& endNode) {
+    // fixed M matrix assuming d = 1
+    MatrixXd M(4, 4);
+    VectorXd b_x(4), b_y(4);
+
+    // heading 방향 90도 회전
+    double psi_s = startNode.psi + M_PI_2;
+    double psi_e = endNode.psi + M_PI_2;
+
+    // 거리 정규화
+    // d = 1 fixed
+    M << 1, 0, 0, 0,    // x(0) = a_0
+         1, 1, 1, 1,    // x(1) = a_0 + a_1 + a_2 + a_3
+         0, 1, 0, 0,    // x'(0) = a_1
+         0, 1, 2, 3;    // x'(1) = a_1 + 2a_2 + 3a_3
+
+    b_x << startNode.x,
+           endNode.x,
+           cos(psi_s),
+           cos(psi_e);
+
+    b_y << startNode.y,
+           endNode.y,
+           sin(psi_s),
+           sin(psi_e);
+
+    VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
+    VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
+
+    // transpose
+    MatrixXd coeffs_x_trans = coeffs_x.transpose();  // (1x4)
+    MatrixXd coeffs_y_trans = coeffs_y.transpose();  // (1x4)
+
+    SplineResult result;
+    result.coeffs_x = coeffs_x_trans;
+    result.coeffs_y = coeffs_y_trans;
+
+    return result;
+}
+
+bool checkKappaValidity(const Vector4d& coeffs_x,
+                        const Vector4d& coeffs_y,
+                        const VectorXd& t_steps,
+                        double max_allowed_kappa) {
+    int N = t_steps.size();
+
+    for (int i = 0; i < N; ++i) {
+        double t = t_steps(i);
+
+        double x_d = coeffs_x(1) + 2 * coeffs_x(2) * t + 3 * coeffs_x(3) * t * t;
+        double y_d = coeffs_y(1) + 2 * coeffs_y(2) * t + 3 * coeffs_y(3) * t * t;
+
+        double x_dd = 2 * coeffs_x(2) + 6 * coeffs_x(3) * t;
+        double y_dd = 2 * coeffs_y(2) + 6 * coeffs_y(3) * t;
+
+        double denom = std::pow(x_d * x_d + y_d * y_d, 1.5);
+        double kappa = 0.0;
+        if (denom > 1e-6) {
+            kappa = std::abs((x_d * y_dd - y_d * x_dd) / denom);
+        }
+
+        if (kappa > max_allowed_kappa) {
+            // std::cout << "REJECTED (EXCESSIVE CURVATURE): kappa = " << kappa
+            //           << ", max allowed = " << max_allowed_kappa << std::endl;
+            return false;  // 조건 위반 시 바로 종료
+        }
+    }
+
+    return true;  // 모두 조건 만족
+}
+
+// ------------------ genEdge ------------------
+
+Vector2d computeSplinePosition(const RowVector4d& coeff_x, const RowVector4d& coeff_y, double t) {
+    double t2 = t * t;
+    double t3 = t2 * t;
+    double x = coeff_x(0) + coeff_x(1) * t + coeff_x(2) * t2 + coeff_x(3) * t3;
+    double y = coeff_y(0) + coeff_y(1) * t + coeff_y(2) * t2 + coeff_y(3) * t3;
+    return Vector2d(x, y);
+}
+
+
+void genEdge(Graph& graph, 
+    const NodeMap& nodesPerLayer, 
+    const Offline_Params& params,
+    const IVector& raceline_index_array,
+    bool closed = true) {
+
+
+        // closed -> 마지막과 0번 레이어 연결, open -> break
+        for (size_t layer = 0; layer < nodesPerLayer.size(); ++layer) {
+            
+            const size_t start_layer = layer;
+            const size_t end_layer = (layer + 1) % nodesPerLayer.size();
         
+            if (params.CLOSURE_DETECTION_DIST < 1e-6 && end_layer == 0) break;
+
+            // 1. 각 레이어의 레이스라인 기준 인덱스
+            const int start_race_idx = raceline_index_array[start_layer];
+            const int end_race_idx   = raceline_index_array[end_layer];
+
+            // 2. 시작 레이어의 각 노드에 대해 반복
+            const auto& start_layer_nodes = nodesPerLayer[start_layer];
+            const auto& end_layer_nodes   = nodesPerLayer[end_layer];
+
+            for (size_t start_idx = 0; start_idx < start_layer_nodes.size(); ++start_idx) {
+                const Node& startNode = start_layer_nodes[start_idx];
+
+            // 3. 레이스라인에서 같은 위치에 있는 end 레이어의 참조 노드 인덱스 계산
+            int offset_from_raceline = static_cast<int>(start_idx) - start_race_idx;
+            int aligned_end_idx = end_race_idx + offset_from_raceline;
+
+            // 4. 범위 클램프 (value, min, max) : value가 [min, max] 사이에 있도록 제한 (min보다 작으면 min, max보다 크면 max 반환)
+            aligned_end_idx = std::clamp(aligned_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
+
+            // 5. 거리 계산을 위한 노드 좌표 가져오기
+            const Node& ref_end_node = end_layer_nodes[aligned_end_idx];
+
+            // 6. 거리 계산을 위한 좌표 행렬 생성
+            MatrixXd spline_path(2, 2);
+            spline_path << startNode.x, startNode.y,
+                        ref_end_node.x, ref_end_node.y;
+
+
+            VectorXd el_lengths = computeEuclideanDistances(spline_path);
+            double dist = el_lengths(0);
+
+            // 커브면 더 많이 연결
+            double factor = (startNode.kappa > params.CURVE_THR) ? 2.0 : 1.0;
+            int lat_steps = round(factor * dist * params.LAT_OFFSET / params.LAT_RESOLUTION);
+
+            for (int destIdx = std::max(0, aligned_end_idx - lat_steps);
+                destIdx <= std::min(static_cast<int>(end_layer_nodes.size() - 1), aligned_end_idx + lat_steps);
+                ++destIdx) {
+
+                const Node& endNode = end_layer_nodes[destIdx];
+
+                VectorXd t_steps = Eigen::VectorXd::LinSpaced(11, 0.0, 1.0);  // 0~1 사이 11점 샘플링
+
+                auto result = calcSplines(startNode, endNode);
+                const Vector4d& x_coeffs = result.coeffs_x.row(0);
+                const Vector4d& y_coeffs = result.coeffs_y.row(0);
+
+                double max_allowed_kappa = 20.0 / params.VEH_TURN;  // params에 맞게 조정
+
+                if (checkKappaValidity(x_coeffs, y_coeffs, t_steps, max_allowed_kappa)) {
+                    IPair src_key = make_pair(startNode.layer_idx, startNode.node_idx);
+                    IPair dst_key = make_pair(endNode.layer_idx, endNode.node_idx);
+
+                    graph.addEdge(src_key, dst_key);
+
+                    cout << "SPLINE PASSED from (" << start_layer << "," << startNode.node_idx
+                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                    
+                    // 그래프에 엣지 추가
+                    // std::cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
+                    //         << ") → " << endNode.node_idx << "\n";
+                    
+                } else {
+                    IPair src_key = make_pair(startNode.layer_idx, startNode.node_idx);
+                    IPair dst_key = make_pair(endNode.layer_idx, endNode.node_idx);
+
+                    cout << "SPLINE REJECTED from (" << start_layer << "," << startNode.node_idx
+                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                }
+
+
+                // DEBUG
+
+                // double d = std::sqrt(std::pow(endNode.x - startNode.x, 2) +
+                //      std::pow(endNode.y - startNode.y, 2));
+
+                // for (double t = 0; t <= d; t += 0.2) {
+                //     Vector2d pt = computeSplinePosition(x_coeffs.row(0), y_coeffs.row(0), t);
+                //     std::cout << "  - t=" << t << " → (" << pt.x() << ", " << pt.y() << ")\n";
+                // }
+                // std::cout << "start: (" << startNode.x << ", " << startNode.y << "), "
+                //         << "end: (" << endNode.x << ", " << endNode.y << ")" << std::endl;
+
+                // std::cout << "coeff_x: " << x_coeffs << std::endl;
+                // std::cout << "coeff_y: " << y_coeffs << std::endl;
+
+                // for (int k = 0; k <= 10; ++k) {
+                //     double t = static_cast<double>(k) / 10.0;
+                //     double x = x_coeffs(0) + x_coeffs(1) * t + x_coeffs(2) * t * t + x_coeffs(3) * t * t * t;
+                //     double y = y_coeffs(0) + y_cofeffs(1) * t + y_coeffs(2) * t * t + y_coeffs(3) * t * t * t;
+                //     std::cout << "  - point(" << t << "): (" << x << ", " << y << ")\n";
+                // }
+
+            }
+        }  
     }
 }
 
-void visual(const NodeMap& nodesPerLayer) {
+
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
     plt::clf();
 
+    // 트랙 경계선
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
     plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
 
-    // plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
+    // 레이싱 라인 및 샘플링된 포인트
+    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
+    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
+    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
-
-    plotHeading(sampling_map[__x_raceline],
-                sampling_map[__y_raceline],
-                sampling_map[__psi]);
-
-    // plotHeading(sampling_map[__x_bound_l],
-    //             sampling_map[__y_bound_l],
-    //             psi_bound_l);
-
-    // plotHeading(sampling_map[__x_bound_r],
-    //             sampling_map[__y_bound_r],
-    //             psi_bound_r);
-
-
-    // 노드마다 psi확인할 수 있는 용도 
     plotHeading(nodesPerLayer);
+    
+    DVector spline_x_pts; 
+    DVector spline_y_pts;
 
-    plt::title("Track");
+    for (const auto& layer_nodes : nodesPerLayer) {
+        for (const auto& current_node : layer_nodes) {
+            IPair src_key = std::make_pair(current_node.layer_idx, current_node.node_idx);
+            IPairVector child_nodes_idx; 
+
+            try {
+                graph.getChildNodes(src_key, child_nodes_idx);
+            } catch (const std::runtime_error& e) {
+                continue;
+            }
+            
+            for (const auto& dst_key : child_nodes_idx) {
+                spline_x_pts.clear(); 
+                spline_y_pts.clear(); 
+
+                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
+
+                int dest_node_idx = dst_key.second;
+                
+                if (dest_node_idx < 0 || dest_node_idx >= static_cast<int>(nodesPerLayer[next_layer_idx].size())) {
+                    continue;
+                }
+
+                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
+
+                // 스플라인 경로 생성
+                MatrixXd spline_path(2, 2);
+                spline_path << current_node.x, current_node.y,
+                               next_node.x, next_node.y;
+                
+                SplineResult res;
+                try {
+                    res = calcSplines(current_node, next_node);
+                } catch (const std::exception& e) {
+                    continue;
+                }
+
+                const int num_spline_segments = 10; 
+                for (int k = 0; k <= num_spline_segments; ++k) {
+                    double t_eval = static_cast<double>(k) / num_spline_segments;
+                    Vector2d pos = computeSplinePosition(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval);
+                    spline_x_pts.push_back(pos.x());
+                    spline_y_pts.push_back(pos.y());
+                }
+
+                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}});
+            }
+        }
+    }
+
+    plt::title("Track and Planned Graph");
     plt::grid(true);
-	plt::axis("equal");
-	plt::show();  
+    plt::axis("equal");
+    plt::legend();
+    plt::show();
 }
 
 
+
 int main() {
-    #if 0
     IVector idx_sampling;
     Offline_Params params;
 
-    string map_file_in = "inputs/gtpl_levine.csv";
-    string map_file_out = "inputs/gtpl_levine_out.csv";
+    string map_file_in = "../inputs/gtpl_levine.csv";
+    string map_file_out = "../inputs/gtpl_levine_out.csv";
 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     readDMapFromCSV(map_file_in, gtpl_map);
+    std::cout << "CSV loaded, columns: " << gtpl_map.size() << std::endl;
 
     addDVectorToMap(gtpl_map, "bound_r");
     addDVectorToMap(gtpl_map, "bound_l");
@@ -411,7 +667,7 @@ int main() {
     addDVectorToMap(gtpl_map, "delta_s");
 
     writeDMapToCSV(map_file_out, gtpl_map);
-
+    
     // layer 간격을 위한 raceline points sampling 
     samplePointsFromRaceline(gtpl_map[__kappa],
                              gtpl_map[__delta_s],
@@ -429,82 +685,53 @@ int main() {
             }
         }
     }
-    // writeDMapToCSV("inputs/sampling_map", sampling_map);
-    // map_size(sampling_map); // (51, 3)
-
     addDVectorToMap(sampling_map, "delta_s", &idx_sampling);
-    
-    // map_size(sampling_map); // (51, 4)
 
-    // 추후 저장될 예정 
     calcHeading(sampling_map[__x_raceline],
                 sampling_map[__y_raceline],
                 sampling_map[__psi]);
-    
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
     calcHeading(sampling_map[__x_bound_l],
                 sampling_map[__y_bound_l],
                 sampling_map[__psi_bound_l]);
-
     calcHeading(sampling_map[__x_bound_r],
                 sampling_map[__y_bound_r],
                 sampling_map[__psi_bound_r]);  
 
-    // sampling_map[__psi_bound_l] = psi_bound_l;
-    // sampling_map[__psi_bound_r] = psi_bound_r;
-
+    // 노드 그리드 생성
     NodeMap nodesPerLayer;
+    IVector raceline_index_array;
+    Vector2d node_pos;
 
     genNode(nodesPerLayer,
+            raceline_index_array,
             params.VEH_WIDTH,
             params.LAT_RESOLUTION);
 
-    // sampling points' info 
-    // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
-    
-    // visual process 
-    visual(nodesPerLayer);
-    #endif
+    //Graph edgeList;
 
-    // Graph sample code 
-    Graph directedGraph(true);
-    ITuple t1(0, 0);
-    ITuple t2(0, 1);
-    ITuple t3(1, 0);
-    ITuple t4(0, 2);
-    // spline 생성 후 edge로 집어넣음.
-    directedGraph.addEdge(t1, 3);// push_back이라서 sorting은 되지 않음. 
-    directedGraph.addEdge(t1, 4);
-    directedGraph.addEdge(t1, 5);
-    directedGraph.addEdge(t3, 2);
-    directedGraph.addEdge(t4, 3);
-    // 실제 로직은 node idx가 작은 순서대로 그래프가 그러질 예정이라 괜찮을 듯.
-    // grpah 전체 print 
-    cout << "---처음 Graph---" << endl;
-    directedGraph.printGraph();
-
-    IVector child1;
-    // t1 노드의 뒤로 연결된(child) node들을 뽑아온다.
-    // directedGraph.getChildIdx(t1, child1);
-
-    // Error Index(child가 없는 경우 runtime_error)
-    // directedGraph.getChildIdx(t2, child);
-    
-    // (0, n)이라는 임의의 노드 n이 (1, 3)을 들고 있는 경우 해당 list에서 3번 삭제
-    // 이후 child 노드가 그 뒤로 연결된 spline이 없는 경우 parent의 adjList에서 child 노드를 삭제하기 위하여 필요함.
-    vector<ITuple> parent; 
-    // 0번째 layer에서 1번째 layer의 3번 노드를 들고 있는 노드가 있는지 찾고 parent로 반환함.
-    directedGraph.getParentNode(0, 3, parent); 
-    
-    cout << "---0번째 Layer의 node 중에서 1번째 Layer의 3번째 노드와 엣지로 연결되어 있는 노드의 idx---" << endl;
-    for (size_t i = 0; i < parent.size(); ++i) {
-        cout << get<1>(parent[i]) << endl;
-        // 해당 엣지 삭제
-        directedGraph.removeEdge(parent[i], 3);
+    MatrixXd path_xy(sampling_map[__x_raceline].size(), 2);
+    for (size_t i = 0; i < sampling_map[__x_raceline].size(); ++i) {
+        path_xy(i, 0) = sampling_map[__x_raceline][i];
+        path_xy(i, 1) = sampling_map[__y_raceline][i];
     }
-    cout << "---위의 엣지를 제거한 후 graph 상태---" << endl;
-    // 결과 확인용 
-    directedGraph.printGraph();
 
+    double psi_s = sampling_map[__psi][0];
+    double psi_e = sampling_map[__psi].back();
+
+    // 최종 그래프 생성
+    Graph myGraph;
+    genEdge(myGraph,
+            nodesPerLayer,
+            params,
+            raceline_index_array);
+    
+    // pruneEdge(graph, nodesPerLayer, params.KAPPA_LIMIT, closed);
+
+    myGraph.printGraph();
+    
+    // 시각화
+    visual(nodesPerLayer, myGraph, params);
+    
     return 0;
 }

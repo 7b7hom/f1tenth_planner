@@ -7,7 +7,11 @@
 #include <iomanip>  
 #include <cmath>
 #include <algorithm>
+#include <time.h>
+#include <set>
+#include <queue>
 #include <Eigen/Dense>
+#include "config.h"
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
 
@@ -21,6 +25,7 @@
 #define __kappa " kappa_racetraj_radpm"
 #define __s_racetraj " s_racetraj_m"
 #define __psi " psi_racetraj_rad"
+#define __vx " vx_racetraj_mps"
 
 #define __x_raceline "x_raceline"
 #define __y_raceline "y_raceline"
@@ -37,6 +42,25 @@ using namespace rapidcsv;
 using namespace Eigen;
 namespace plt = matplotlibcpp;
 
+struct Node {
+    double x;
+    double y;
+    double psi;
+    double kappa;
+    int node_idx;
+    int layer_idx;
+    bool raceline;
+};
+
+struct Spline {
+    MatrixXd coeffs_x;          
+    MatrixXd coeffs_y;          
+    VectorXd kappa;
+    VectorXd el_lengths;   
+    double cost;
+    bool raceline;
+};
+
 // 스플라인 결과를 담기 위한 구조체: x, y 방향 계수, 행렬 M, 정규화된 노멀 벡터
 struct SplineResult {
     MatrixXd coeffs_x;              // 각 구간의 x 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
@@ -45,81 +69,87 @@ struct SplineResult {
     MatrixXd normvec_normalized;    // 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
 };
 
-struct Node {
-    int layer_idx;
-    int node_idx;
-    double x;
-    double y;
-    double psi;
-    double kappa;
-    bool raceline;
-};
-
 typedef vector<double> DVector;
 typedef vector<int>    IVector;
-typedef vector<Node>   NVector;
 typedef map<string, DVector> DMap;
 typedef map<string, IVector> IMap;
 typedef vector<vector<Node>> NodeMap;
 typedef tuple<int, int> ITuple;
-typedef map<ITuple, IVector> TupleMap;
 
-// TUM의 GraphBase 역할 
-class Graph {
-private:
-    TupleMap adjList;
-    bool isDirected;
-public:
-    Graph(bool directed = true) {
-        isDirected = directed;
-    }
-    
-    void addEdge(ITuple srcKey, int destIdx) {
-        adjList[srcKey].push_back(destIdx);
-    }
+typedef pair<int, int> IPair; // <layerIdx, nodeIdx>
+typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vector
+typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
+typedef map<IPair, map<IPair, Spline>> SplineMap;
 
-    void printGraph() const {
-        for (const auto& [key, neighbors] : adjList) {
-            cout << "(" << get<0>(key) << "," << get<1>(key) << ")" << ": ";
-            for (int dest : neighbors) {
-                cout << dest << " -> ";
-            }
-            cout << "NULL\n";
-        }
-    }
+extern DMap gtpl_map;
+extern DMap sampling_map;
 
-    void getChildIdx(ITuple srcKey, IVector& childIdx) {
-        if (adjList[srcKey].size() <= 0) 
-            throw runtime_error{"Unable to print child node for srcKey"};
-        for (const auto& value : adjList[srcKey]) {
-            childIdx.push_back(value);
-        }
-    }
-    // 코드 수정 필요. 제기능은 함.  
-    void getParentNode(int target_layer, int value, vector<ITuple>& parent) {
-        for (auto& [key, vec] : adjList) {
-            if (get<0>(key) == target_layer) {
-                    for (auto it = adjList[key].begin(); it != adjList[key].end(); it++) {
-                        if (*it == value) {
-                            parent.push_back(key);
-                        }
-                    }
-                        
-                }
-            }
-        }
-
-    void removeEdge(ITuple& parent, int value) {
-        for (auto& [key, vec] : adjList) {
-            if (key == parent) {
-                auto it = remove(vec.begin(), vec.end(), value);
-                if (it != vec.end()) {
-                    vec.erase(it, vec.end());
-                }
-            }
-        }
-    }
-
+struct ActionSet {
+    string action_id; // "straight"
+    vector<MatrixXd> coeffs; // x_coeff, y_coeff
+    vector<MatrixXd> path_param; // path, psi, kappa, el_lengths 
+    NodeMap nodes; // [[None, None], start_node]
+    vector<IPair> node_idx; // [0, path.size()-1]
 };
 
+class Graph {
+private:
+    bool isDirected;
+public:
+    IPairAdjList adjLists;
+    Graph(bool directed = true);
+    void addEdge(IPair srcIdx, IPair dstIdx);
+    void printGraph();
+    bool getChildNodes(const IPair& parentIdx, IPairVector& childIdx);
+    bool getParentNodes(const IPair& childIdx, IPairVector& parentIdx, int num_layers);
+    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt, int num_layers);
+};
 
+// visualization.cpp
+void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
+void plotHeading(const NodeMap& nodesPerLayer, double scale);
+void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
+void plotSpline(const Spline& spline, const string& color);
+void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
+
+// helper_func.cpp
+unique_ptr<string> Load(const string& filename);
+double normalizeAngle(double angle);
+void readDMapFromCSV(const string& pathname, DMap& map);
+void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
+void map_size(DMap& map);
+void addDVectorToMap(DMap& map, string attr, const IVector* idx_array = nullptr);
+bool checkInsideBounds(const Vector2d& pos, const float veh_width);
+void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer);
+
+//genSplines.cpp
+void calcHeading(DVector &x_raceline,
+                 DVector &y_raceline, 
+                 DVector &psi);
+unique_ptr<Spline> calcSplines(const MatrixXd &path,
+                                     double psi_s, 
+                                     double psi_e, 
+                                     bool use_dist_scaling=true);
+VectorXd calcKappa(MatrixXd &coeffs_x,
+                   MatrixXd &coeffs_y,
+                   VectorXd &t_steps);
+void genEdges(NodeMap &nodesPerLayer, 
+              Graph &edgeList,
+              SplineMap &splineMap,
+              const IVector &raceline_index_array,
+              const float veh_width,
+              const float lat_offset,
+              const float lat_resolution,
+              const float curve_thr,
+              const int max_lat_steps,
+              const float stepsize_approx,
+              const float min_vel_race,
+              const float max_lateral_accel,
+              const float veh_turn);
+
+pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
+                        MatrixXd &coeffs_y,
+                        float stepsize_approx,
+                        const float& veh_width,
+                        double spline_len = NAN,
+                        int no_interp_points = 10);
