@@ -254,7 +254,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     int start_node = closest_idx.second;
     double start_heading = nodesPerLayer[closest_idx.first][closest_idx.second].psi;
 
-    int end_layer = (closest_idx.first + 2) % (nodesPerLayer.size() - 1);
+    int end_layer = (closest_idx.first + 4) % (nodesPerLayer.size() - 1);
 
     for (int layer_idx = start_layer; layer_idx < end_layer;++layer_idx) {
         if (layer_idx != start_layer) {

@@ -11,7 +11,7 @@
 #include <set>
 #include <queue>
 #include <Eigen/Dense>
-#include "config_berlin.h"
+#include "config_modena.h"
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
 
