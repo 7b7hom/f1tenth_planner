@@ -216,7 +216,7 @@ void calcCurvature(NodeMap& nodesPerLayer) {
             if (!prev || !next) continue;  // 안전 확인
 
             double dpsi = normalizeAngle(next->psi - prev->psi);
-            double ds = std::hypot(next->x - prev->x, next->y - prev->y);
+            double ds = hypot(next->x - prev->x, next->y - prev->y);
 
             double kappa = (ds > 1e-6) ? dpsi / ds : 0.0;
             nodesPerLayer[i][j].kappa = kappa;
@@ -391,10 +391,10 @@ bool checkKappaValidity(const Vector4d& coeffs_x,
         double x_dd = 2 * coeffs_x(2) + 6 * coeffs_x(3) * t;
         double y_dd = 2 * coeffs_y(2) + 6 * coeffs_y(3) * t;
 
-        double denom = std::pow(x_d * x_d + y_d * y_d, 1.5);
+        double denom = pow(x_d * x_d + y_d * y_d, 1.5);
         double kappa = 0.0;
         if (denom > 1e-6) {
-            kappa = std::abs((x_d * y_dd - y_d * x_dd) / denom);
+            kappa = abs((x_d * y_dd - y_d * x_dd) / denom);
         }
 
         if (kappa > max_allowed_kappa) {
@@ -450,7 +450,7 @@ void genEdge(Graph &graph,
             int aligned_end_idx = end_race_idx + offset_from_raceline;
 
             // 4. 범위 클램프 (value, min, max) : value가 [min, max] 사이에 있도록 제한 (min보다 작으면 min, max보다 크면 max 반환)
-            aligned_end_idx = std::clamp(aligned_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
+            aligned_end_idx = clamp(aligned_end_idx, 0, static_cast<int>(end_layer_nodes.size() - 1));
 
             // 5. 거리 계산을 위한 노드 좌표 가져오기
             const Node& ref_end_node = end_layer_nodes[aligned_end_idx];
@@ -468,8 +468,8 @@ void genEdge(Graph &graph,
             double factor = (startNode.kappa > params.CURVE_THR) ? 2.0 : 1.0;
             int lat_steps = round(factor * dist * params.LAT_OFFSET / params.LAT_RESOLUTION);
 
-            for (int destIdx = std::max(0, aligned_end_idx - lat_steps);
-                destIdx <= std::min(static_cast<int>(end_layer_nodes.size() - 1), aligned_end_idx + lat_steps);
+            for (int destIdx = max(0, aligned_end_idx - lat_steps);
+                destIdx <= min(static_cast<int>(end_layer_nodes.size() - 1), aligned_end_idx + lat_steps);
                 ++destIdx) {
 
                 const Node& endNode = end_layer_nodes[destIdx];
@@ -491,10 +491,10 @@ void genEdge(Graph &graph,
                     graph.addEdge(src_key, dst_key);
 
                     // cout << "SPLINE PASSED from (" << start_layer << "," << startNode.node_idx
-                    //         << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                    //         << ") to (" << end_layer << "," << endNode.node_idx << ")" << endl;
                     
                     // 그래프에 엣지 추가
-                    // cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
+                    // cout << "  → Adding edge: (" << get<0>(src_key) << "," << get<1>(src_key)
                     //         << ") → " << endNode.node_idx << "\n";
                     
                 } else {
@@ -541,16 +541,16 @@ void genEdge(Graph &graph,
         }
     }
 
-    cout << "총 제거된 엣지 수: " << remove_cnt << "개" << endl;
+    // cout << "총 제거된 엣지 수: " << remove_cnt << "개" << endl;
 
 }
 
 void calcOfflineCost(SplineMap& splineMap,
-                     IVector& raceline_index_array,
-                     const Offline_Params& params) {
-    
-    if (splineMap.size() <= 0) {
-        throw std::invalid_argument("SplineMap size is zero!!!");
+                    IVector& raceline_index_array,
+                    const Offline_Params& params) {
+
+    if (splineMap.empty()) {
+        throw std::invalid_argument("SplineMap is empty! Cannot calculate offline cost.");
     }
 
     for (auto& [startPoint, endPoints] : splineMap) {
@@ -559,38 +559,34 @@ void calcOfflineCost(SplineMap& splineMap,
             int end_layer = endPoint.first;
             int end_node = endPoint.second;
 
-            if (end_layer < 0 || end_layer >= raceline_index_array.size()) {
-                continue;
-            }
+            if (end_layer < 0 || end_layer >= raceline_index_array.size()) continue;
 
-            if (spline.kappa.size() == 0) {
-                continue;
-            }
+            if (spline.kappa.size() == 0) continue;
 
             double abs_kappa = spline.kappa.array().abs().sum();
             double s_length = spline.el_lengths.sum();
 
             // average curvature
-            offline_cost += params.W_CURV_AVG * std::pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
+            offline_cost += params.W_CURV_AVG * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
 
             // peak curvature
-            double max_min = std::abs(spline.kappa.maxCoeff() - spline.kappa.minCoeff());
-            offline_cost += params.W_CURV_PEAK * std::pow(max_min, 2) * s_length;
+            double max_min = abs(spline.kappa.maxCoeff() - spline.kappa.minCoeff());
+            offline_cost += params.W_CURV_PEAK * pow(max_min, 2) * s_length;
 
             // path length
             offline_cost += params.W_LENGTH * s_length;
 
             // raceline cost
-            double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * params.LAT_RESOLUTION;
-            double raceline_cost = std::min(params.W_RACELINE * s_length * raceline_dist,
-                                            params.W_RACELINE_SAT * s_length);
+            double raceline_dist = abs(raceline_index_array[end_layer] - end_node) * params.LAT_RESOLUTION;
+            double raceline_cost = min(params.W_RACELINE * s_length * raceline_dist, params.W_RACELINE_SAT * s_length);
             offline_cost += raceline_cost;
 
+            // 저장
             spline.cost = offline_cost;
 
             // 디버깅
-            std::cout << "(" << startPoint.first << ", " << startPoint.second << ") -> ("
-                       << end_layer << ", " << end_node << "): cost = " << offline_cost << std::endl;
+            cout << "(" << startPoint.first << ", " << startPoint.second << ") -> ("
+            << end_layer << ", " << end_node << "): cost = " << offline_cost << endl;
         }
     }
 }
