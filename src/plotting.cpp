@@ -90,6 +90,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                 spline_path << current_node.x, current_node.y,
                             next_node.x, next_node.y;
                 
+                // splineMap에넣어야헤....................            
                 SplineResult res;
                 try {
                     res = calcSplines(current_node, next_node);

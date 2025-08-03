@@ -672,7 +672,7 @@ int main() {
             params,
             raceline_index_array);
 
-    calcOfflineCost(splineMap, raceline_index_array, params);
+    // calcOfflineCost(splineMap, raceline_index_array, params);
     // myGraph.printGraph();
     
     // 시각화
