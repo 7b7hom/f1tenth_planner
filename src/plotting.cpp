@@ -55,7 +55,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
     plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
-    // plotHeading(nodesPerLayer);
+    plotHeading(nodesPerLayer);
     
     DVector spline_x_pts; 
     DVector spline_y_pts;

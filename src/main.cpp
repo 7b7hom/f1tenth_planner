@@ -490,8 +490,8 @@ void genEdge(Graph &graph,
 
                     graph.addEdge(src_key, dst_key);
 
-                    cout << "SPLINE PASSED from (" << start_layer << "," << startNode.node_idx
-                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
+                    // cout << "SPLINE PASSED from (" << start_layer << "," << startNode.node_idx
+                    //         << ") to (" << end_layer << "," << endNode.node_idx << ")" << std::endl;
                     
                     // 그래프에 엣지 추가
                     // cout << "  → Adding edge: (" << std::get<0>(src_key) << "," << std::get<1>(src_key)
@@ -501,8 +501,8 @@ void genEdge(Graph &graph,
                     IPair src_key = make_pair(startNode.layer_idx, startNode.node_idx);
                     IPair dst_key = make_pair(endNode.layer_idx, endNode.node_idx);
 
-                    cout << "SPLINE REJECTED from (" << start_layer << "," << startNode.node_idx
-                            << ") to (" << end_layer << "," << endNode.node_idx << ")" << endl;
+                    // cout << "SPLINE REJECTED from (" << start_layer << "," << startNode.node_idx
+                    //         << ") to (" << end_layer << "," << endNode.node_idx << ")" << endl;
                 }
             }
         }
@@ -544,6 +544,57 @@ void genEdge(Graph &graph,
     cout << "총 제거된 엣지 수: " << remove_cnt << "개" << endl;
 
 }
+
+void calcOfflineCost(SplineMap& splineMap,
+                     IVector& raceline_index_array,
+                     const Offline_Params& params) {
+    
+    if (splineMap.size() <= 0) {
+        throw std::invalid_argument("SplineMap size is zero!!!");
+    }
+
+    for (auto& [startPoint, endPoints] : splineMap) {
+        for (auto& [endPoint, spline] : endPoints) {
+            double offline_cost = 0.0;
+            int end_layer = endPoint.first;
+            int end_node = endPoint.second;
+
+            if (end_layer < 0 || end_layer >= raceline_index_array.size()) {
+                continue;
+            }
+
+            if (spline.kappa.size() == 0) {
+                continue;
+            }
+
+            double abs_kappa = spline.kappa.array().abs().sum();
+            double s_length = spline.el_lengths.sum();
+
+            // average curvature
+            offline_cost += params.W_CURV_AVG * std::pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
+
+            // peak curvature
+            double max_min = std::abs(spline.kappa.maxCoeff() - spline.kappa.minCoeff());
+            offline_cost += params.W_CURV_PEAK * std::pow(max_min, 2) * s_length;
+
+            // path length
+            offline_cost += params.W_LENGTH * s_length;
+
+            // raceline cost
+            double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * params.LAT_RESOLUTION;
+            double raceline_cost = std::min(params.W_RACELINE * s_length * raceline_dist,
+                                            params.W_RACELINE_SAT * s_length);
+            offline_cost += raceline_cost;
+
+            spline.cost = offline_cost;
+
+            // 디버깅
+            std::cout << "(" << startPoint.first << ", " << startPoint.second << ") -> ("
+                       << end_layer << ", " << end_node << "): cost = " << offline_cost << std::endl;
+        }
+    }
+}
+
 
 
 int main() {
@@ -625,6 +676,7 @@ int main() {
             params,
             raceline_index_array);
 
+    calcOfflineCost(splineMap, raceline_index_array, params);
     // myGraph.printGraph();
     
     // 시각화
