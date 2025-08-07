@@ -43,7 +43,7 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}, {"label", "Nodes"}});
 }
 
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params, SplineMap& splineMap) {
     plt::clf();
 
     // 트랙 경계선
@@ -56,7 +56,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
     plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
 
     plotHeading(nodesPerLayer);
-    
+
     DVector spline_x_pts; 
     DVector spline_y_pts;
 
@@ -65,6 +65,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
             IPair src_key = std::make_pair(current_node.layer_idx, current_node.node_idx);
             IPairVector child_nodes_idx; 
 
+            // 자식 노드 가져오기, 예외 대신 리턴값 확인이 가능하다면 변경 추천
             try {
                 graph.getChildNodes(src_key, child_nodes_idx);
             } catch (const std::runtime_error& e) {
@@ -75,29 +76,27 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
                 spline_x_pts.clear(); 
                 spline_y_pts.clear(); 
 
-                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
-
+                int next_layer_idx = dst_key.first;
                 int dest_node_idx = dst_key.second;
-                
-                if (dest_node_idx < 0 || dest_node_idx >= static_cast<int>(nodesPerLayer[next_layer_idx].size())) {
-                    continue;
-                }
+
+                // 범위 확인
+                if (next_layer_idx < 0 || next_layer_idx >= static_cast<int>(nodesPerLayer.size())) continue;
+                if (dest_node_idx < 0 || dest_node_idx >= static_cast<int>(nodesPerLayer[next_layer_idx].size())) continue;
 
                 const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
 
-                // 스플라인 경로 생성
-                MatrixXd spline_path(2, 2);
-                spline_path << current_node.x, current_node.y,
-                            next_node.x, next_node.y;
-                
-                // splineMap에넣어야헤....................            
-                SplineResult res;
+                // 스플라인 계산
+                Spline res;
                 try {
                     res = calcSplines(current_node, next_node);
                 } catch (const std::exception& e) {
                     continue;
                 }
 
+                // splineMap에 저장 (추가)
+                splineMap[src_key][dst_key] = res;
+
+                // 스플라인 점 샘플링 및 시각화
                 const int num_spline_segments = 10; 
                 for (int k = 0; k <= num_spline_segments; ++k) {
                     double t_eval = static_cast<double>(k) / num_spline_segments;

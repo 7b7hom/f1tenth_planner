@@ -336,26 +336,24 @@ VectorXd computeEuclideanDistances(const MatrixXd& path) {
 }
 
 // only startNode, endNode
-SplineResult calcSplines(const Node& startNode, const Node& endNode) {
-    // fixed M matrix assuming d = 1
+Spline calcSplines(const Node& startNode, const Node& endNode) {
+
     MatrixXd M(4, 4);
     VectorXd b_x(4), b_y(4);
 
-    // heading 방향 90도 회전
+    // 시작/종료 방향에서 90도 회전 (법선 방향)
     double psi_s = startNode.psi + M_PI_2;
     double psi_e = endNode.psi + M_PI_2;
 
-    // 거리 정규화
-    // d = 1 fixed
-    M << 1, 0, 0, 0,    // x(0) = a_0
-         1, 1, 1, 1,    // x(1) = a_0 + a_1 + a_2 + a_3
-         0, 1, 0, 0,    // x'(0) = a_1
-         0, 1, 2, 3;    // x'(1) = a_1 + 2a_2 + 3a_3
+    M << 1, 0, 0, 0,    // f(0) = a0
+         1, 1, 1, 1,    // f(1) = a0 + a1 + a2 + a3
+         0, 1, 0, 0,    // f'(0) = a1
+         0, 1, 2, 3;    // f'(1) = a1 + 2a2 + 3a3
 
     b_x << startNode.x,
-            endNode.x,
-            cos(psi_s),
-            cos(psi_e);
+           endNode.x,
+           cos(psi_s),
+           cos(psi_e);
 
     b_y << startNode.y,
            endNode.y,
@@ -365,16 +363,48 @@ SplineResult calcSplines(const Node& startNode, const Node& endNode) {
     VectorXd coeffs_x = M.colPivHouseholderQr().solve(b_x);
     VectorXd coeffs_y = M.colPivHouseholderQr().solve(b_y);
 
-    // transpose
-    MatrixXd coeffs_x_trans = coeffs_x.transpose();  // (1x4)
-    MatrixXd coeffs_y_trans = coeffs_y.transpose();  // (1x4)
+    // Spline 객체 생성 및 계수 저장
+    Spline spline;
+    spline.coeffs_x = coeffs_x.transpose();
+    spline.coeffs_y = coeffs_y.transpose();
 
-    SplineResult result;
-    result.coeffs_x = coeffs_x_trans;
-    result.coeffs_y = coeffs_y_trans;
+    // 계산 후 나중에 할당
+    spline.kappa = VectorXd();         
+    spline.el_lengths = VectorXd();    
+    spline.cost = 0.0;
+    spline.raceline = false;
 
-    return result;
+    return spline;
 }
+
+VectorXd calcKappa(const MatrixXd &coeffs_x,
+                  const MatrixXd &coeffs_y,
+                  const VectorXd &t_steps) {
+    int N = t_steps.size();
+    VectorXd kappa(N);
+
+    for (int i = 0; i < N; ++i) {
+        double t = t_steps(i);
+
+        // 1차, 2차, 3차 미분 계수 이용해 1차, 2차 도함수 계산
+        double x_d = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t * t;
+        double y_d = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
+
+        double x_dd = 2 * coeffs_x(0, 2) + 6 * coeffs_x(0, 3) * t;
+        double y_dd = 2 * coeffs_y(0, 2) + 6 * coeffs_y(0, 3) * t;
+
+        double denom = pow(x_d * x_d + y_d * y_d, 1.5);
+
+        if (denom < 1e-9) {
+            kappa(i) = 0.0;  // 분모가 너무 작으면 곡률 0으로 처리
+        } else {
+            kappa(i) = (x_d * y_dd - y_d * x_dd) / denom;
+        }
+    }
+
+    return kappa;
+}
+
 
 bool checkKappaValidity(const Vector4d& coeffs_x,
                         const Vector4d& coeffs_y,
@@ -488,6 +518,21 @@ void genEdge(Graph &graph,
                     IPair src_key = make_pair(startNode.layer_idx, startNode.node_idx);
                     IPair dst_key = make_pair(endNode.layer_idx, endNode.node_idx);
 
+                    VectorXd kappa_vec = calcKappa(result.coeffs_x, result.coeffs_y, t_steps);
+
+                    VectorXd el_lengths = computeEuclideanDistances(spline_path);
+
+                    // Spline 객체 생성 및 값 할당
+                    Spline spline;
+                    spline.coeffs_x = result.coeffs_x;  // calcSplines 결과 행렬 저장
+                    spline.coeffs_y = result.coeffs_y;
+                    spline.kappa = kappa_vec;
+                    spline.el_lengths = el_lengths;
+                    spline.cost = 0.0;
+
+                    // splineMap에 저장
+                    splineMap[src_key][dst_key] = spline;
+                                        
                     graph.addEdge(src_key, dst_key);
 
                     // cout << "SPLINE PASSED from (" << start_layer << "," << startNode.node_idx
@@ -525,8 +570,8 @@ void genEdge(Graph &graph,
             if (!hasParent) {
                 for (auto& child : children) {
                     graph.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-                    cout << "Removed edge (no parent): " << layer << "," << node << " → "
-                            << child.first << "," << child.second << endl;
+                    // cout << "Removed edge (no parent): " << layer << "," << node << " → "
+                    //         << child.first << "," << child.second << endl;
                 }
             }
 
@@ -534,8 +579,8 @@ void genEdge(Graph &graph,
             if (!hasChild) {
                 for (auto& parent : parents) {
                     graph.removeEdge(parent, srcNodeIdx, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-                    cout << "Removed edge (no child): " << parent.first << "," << parent.second
-                            << " → " << layer << "," << node << endl;
+                    // cout << "Removed edge (no child): " << parent.first << "," << parent.second
+                    //         << " → " << layer << "," << node << endl;
                 }
             }
         }
@@ -548,9 +593,10 @@ void genEdge(Graph &graph,
 void calcOfflineCost(SplineMap& splineMap,
                     IVector& raceline_index_array,
                     const Offline_Params& params) {
+     cout << "offline cost" << endl;
 
     if (splineMap.empty()) {
-        throw std::invalid_argument("SplineMap is empty! Cannot calculate offline cost.");
+        throw invalid_argument("SplineMap is empty! Cannot calculate offline cost.");
     }
 
     for (auto& [startPoint, endPoints] : splineMap) {
@@ -672,11 +718,11 @@ int main() {
             params,
             raceline_index_array);
 
-    // calcOfflineCost(splineMap, raceline_index_array, params);
+    calcOfflineCost(splineMap, raceline_index_array, params);
     // myGraph.printGraph();
     
     // 시각화
-    visual(nodesPerLayer, myGraph, params);
+    visual(nodesPerLayer, myGraph, params, splineMap);
     
     return 0;
 }

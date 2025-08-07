@@ -61,14 +61,6 @@ struct Spline {
     bool raceline;
 };
 
-// 스플라인 결과를 담기 위한 구조체: x, y 방향 계수, 행렬 M, 정규화된 노멀 벡터
-struct SplineResult {
-    MatrixXd coeffs_x;              // 각 구간의 x 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
-    MatrixXd coeffs_y;              // 각 구간의 y 방향 3차 다항식 계수 행렬 (구간 개수 x 4)
-    MatrixXd M;                     // 스플라인 계수 계산에 사용된 시스템 행렬
-    MatrixXd normvec_normalized;    // 각 구간의 법선 벡터를 정규화한 값 (구간 개수 x 2)
-};
-
 typedef vector<double> DVector;
 typedef vector<int>    IVector;
 typedef map<string, DVector> DMap;
@@ -108,7 +100,7 @@ public:
 // visualization.cpp
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params);
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params, SplineMap& splineMap);
 
 // helper_func.cpp
 double normalizeAngle(double angle);
@@ -129,7 +121,7 @@ void calcHeading(DVector &x_raceline,
                 DVector &psi);
 
 VectorXd computeEuclideanDistances(const MatrixXd& path);
-SplineResult calcSplines(const Node& startNode, const Node& endNode);
+Spline calcSplines(const Node& startNode, const Node& endNode);
 
 void calcCurvature(NodeMap& nodesPerLayer);
 bool checkKappaValidity(const Vector4d& coeffs_x,
