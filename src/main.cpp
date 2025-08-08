@@ -22,6 +22,7 @@ void set_startpos(const Eigen::Vector2d& pos_est, double heading_est, const Offl
 
 void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params);
 
+
 // 전체 경로 계획 파이프라인을 실행하는 함수
 int main() {
     Offline_Params params;

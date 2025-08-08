@@ -1966,6 +1966,7 @@ CMakeFiles/main.dir/src/main.cpp.o: /home/uiiiqns/f1tenth_planner/src/main.cpp \
   /usr/lib/python3/dist-packages/numpy/core/include/numpy/utils.h
 
 CMakeFiles/main.dir/src/visualization.cpp.o: /home/uiiiqns/f1tenth_planner/src/visualization.cpp \
+  /home/uiiiqns/f1tenth_planner/include/config.h \
   /home/uiiiqns/f1tenth_planner/include/graph_planner.hpp \
   /home/uiiiqns/f1tenth_planner/include/matplotlibcpp.h \
   /home/uiiiqns/f1tenth_planner/include/rapidcsv.h \

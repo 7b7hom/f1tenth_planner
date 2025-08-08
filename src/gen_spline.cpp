@@ -444,6 +444,13 @@ bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, 
 void genEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params params){
     const size_t num_layers = nodesPerLayer.size();
 
+    auto& adj = graph.getAdjLists_mutable();
+    for (size_t l = 0; l < num_layers; ++l) {
+        for (size_t j = 0; j < nodesPerLayer[l].size(); ++j) {
+            adj[ ITuple((int)l, (int)j) ]; // touch: 빈 map 생성
+        }
+    }
+
     // layer 순회
     for(size_t current_layer_idx = 0; current_layer_idx < num_layers; ++current_layer_idx){
         size_t next_layer_idx = (current_layer_idx + 1) % num_layers;
