@@ -32,10 +32,10 @@ int main() {
     // 1. 트랙 데이터 로드 및 전처리
     readDMapFromCSV(map_file_in, gtpl_map); // gen_spline.cpp의 전역 gtpl_map에 로드
     addDVectorToMap(gtpl_map, "bound_r", nullptr);
-    addDVectorToMap(gtpl_map, "bound_l");
-    addDVectorToMap(gtpl_map, "raceline");
-    addDVectorToMap(gtpl_map, "delta_s");
-    writeDMapToCSV(map_file_out, gtpl_map);
+    addDVectorToMap(gtpl_map, "bound_l", nullptr);
+    addDVectorToMap(gtpl_map, "raceline", nullptr);
+    addDVectorToMap(gtpl_map, "delta_s", nullptr);
+    writeDMapToCSV(map_file_out, gtpl_map, ',');
 
     // 2. 레이어 샘플링
     IVector idx_sampling;
@@ -82,9 +82,13 @@ int main() {
     cout << "\n--- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---" << endl;
     directedGraph.printGraph();
 
+    // (8. set_startpos())
     ITuple start_key;
     int next_idx;
     bool out_of_track;
+
+    Vector2d pos_est(0.0, 0.0);
+    double heading_est = 0.0;
 
     set_startpos(pos_est, heading_est, mutable_params, nodesPerLayer,
                 directedGraph, 20.0 * M_PI / 180.0,

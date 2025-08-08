@@ -1,4 +1,5 @@
 #include "graph_planner.hpp"
+#include "config.h"
 
 extern DMap gtpl_map;
 extern DMap sampling_map;
