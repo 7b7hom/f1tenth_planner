@@ -1,7 +1,7 @@
 #include "graph_planner.hpp"
 
 // DMap gtpl_map;
-DMap sampling_map;
+DMap stMap;
 
 IVector samplePointsFromRaceline(const DVector& kappa,
                               const DVector& dist,
@@ -46,25 +46,25 @@ auto genNode(const Offline_Params &params) -> pair<NodeMap, IVector> {
     NodeMap nodesPerLayer;
     IVector raceline_index_array;
     
-    const int N = sampling_map[__alpha].size();
+    const int N = stMap[NORM_L].size();
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
-        int raceline_index = floor((sampling_map[__width_left][i] + sampling_map[__alpha][i] - params.veh_width / 2) / params.lat_resolution);
+        int raceline_index = floor((stMap[WIDTH_L][i] + stMap[NORM_L][i] - params.veh_width / 2) / params.lat_resolution);
         raceline_index_array.push_back(raceline_index);
-        // cout << i << "번째 layer 길이" << (sampling_map[__width_lef][i] + sampling_map[__width_right][i])<< endl;
+        // cout << i << "번째 layer 길이" << (stMap[__width_lef][i] + stMap[WIDTH_R][i])<< endl;
         // cout << "layer 내에서 raceline index:" << raceline_index << endl;
         // cout << "-----" << endl;
 
-        Vector2d ref_xy(sampling_map[__x_ref][i], sampling_map[__y_ref][i]);    // 기준선에서의 위치
-        Vector2d norm_vec(sampling_map[__x_normvec][i], sampling_map[__y_normvec][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
+        Vector2d ref_xy(stMap[POS_X][i], stMap[POS_Y][i]);    // 기준선에서의 위치
+        Vector2d norm_vec(stMap[NORM_X][i], stMap[NORM_Y][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
         
-        double start_alpha = sampling_map[__alpha][i] - raceline_index * params.lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
+        double start_alpha = stMap[NORM_L][i] - raceline_index * params.lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
-        int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - params.veh_width) / params.lat_resolution;  // num_nodes : 좌우 총 가능한 노드 수
+        int num_nodes = (stMap[WIDTH_R][i] + stMap[WIDTH_L][i] - params.veh_width) / params.lat_resolution;  // num_nodes : 좌우 총 가능한 노드 수
         
         nodesPerLayer[i].resize(num_nodes); 
         
@@ -83,7 +83,7 @@ auto genNode(const Offline_Params &params) -> pair<NodeMap, IVector> {
             #if 0 
             if (idx == num_nodes - 1) {
                 cout << i << "번째 레이어의 " << idx << "번째 노드" << endl;
-                cout << sampling_map[x_bound_r][idx] - alpha << endl;
+                cout << stMap[x_bound_r][idx] - alpha << endl;
             }
             #endif
 
@@ -91,25 +91,25 @@ auto genNode(const Offline_Params &params) -> pair<NodeMap, IVector> {
             double psi_interp;
             if (node_idx < raceline_index) {
                 
-                if (abs(sampling_map[__psi_bound_l][i] - sampling_map[__psi][i]) >= M_PI) 
+                if (abs(stMap[LB_PSI][i] - stMap[RL_PSI][i]) >= M_PI) 
                 {   
-                    double bl = sampling_map[__psi_bound_l][i] + 2 * M_PI * (sampling_map[__psi_bound_l][i] < 0);
-                    double p = sampling_map[__psi][i] + 2 * M_PI * (sampling_map[__psi][i] < 0);
+                    double bl = stMap[LB_PSI][i] + 2 * M_PI * (stMap[LB_PSI][i] < 0);
+                    double p = stMap[RL_PSI][i] + 2 * M_PI * (stMap[RL_PSI][i] < 0);
                     psi_interp = bl + (p - bl) * node_idx / raceline_index;          
                 }
                 else {
-                    psi_interp = sampling_map[__psi_bound_l][i] + (sampling_map[__psi][i] - sampling_map[__psi_bound_l][i]) * (node_idx+1) / raceline_index;
+                    psi_interp = stMap[LB_PSI][i] + (stMap[RL_PSI][i] - stMap[LB_PSI][i]) * (node_idx+1) / raceline_index;
                 }
                 node.psi = normalizeAngle(psi_interp);
             }
             else if (node_idx == raceline_index) {
-                psi_interp = sampling_map[__psi][i];
+                psi_interp = stMap[RL_PSI][i];
                 node.psi = psi_interp;
             }
             else {
                 int remain = num_nodes - raceline_index - 1;
                 double t = static_cast<double>(node_idx - raceline_index) / max(remain, 1);  // 0 ~ 1
-                psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
+                psi_interp = stMap[RL_PSI][i] + t * (stMap[RB_PSI][i] - stMap[RL_PSI][i]);
                 node.psi = normalizeAngle(psi_interp);
             }
             // cout << i << "번째 레이어의" <<node_idx << "번째 노드의 psi는" << node.psi << endl;
@@ -175,6 +175,7 @@ void calcOfflineCost(SplineMap& splineMap,
         }
     }
 }
+
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
 
     int num_nodes = 0;
@@ -223,7 +224,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     // 현재 pos, heading 
     double dx, dy;
         
-    Vector2d initial_pos(sampling_map[__x_raceline][1], sampling_map[__y_raceline][1]);
+    Vector2d initial_pos(stMap[RL_X][1], stMap[RL_Y][1]);
     float vel_est = 0.0;
 
     // set start pos 
@@ -316,61 +317,74 @@ int main() {
     string map_file_in  = "inputs/traj_ltpl_cl_" + *track + ".csv";
     string map_file_out = "outputs/" + *track + "_out.csv";
 
-    shared_ptr<DMap> gtpl_map = make_shared<DMap>();
-    auto &gtpl_map_ref = *gtpl_map;
+    //shared_ptr<DMap> gtpl_map = make_shared<DMap>();
+    //auto &gtMap = *gtpl_map;
+    DMap gtMap; 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     // 결과: gtpl_map
-    readDMapFromCSV(map_file_in, gtpl_map_ref);
+    readDMapFromCSV(map_file_in, gtMap);
 
     // 결과: gtpl_map에 삽입
-    addDVectorToMap(gtpl_map_ref, "bound_r");
-    addDVectorToMap(gtpl_map_ref, "bound_l");
-    addDVectorToMap(gtpl_map_ref, "raceline");
-    addDVectorToMap(gtpl_map_ref, "delta_s");
+    // auto [gtMap[RB_X], gtMap[RB_Y]] = computeBoundRight(gtMap[POS_X], gtMap[POS_Y],
+    //                                                     gtMap[NORM_X], gtMap[NORM_Y],
+    //                                                     gtMap[WIDTH_L], gtMap[WIDTH_R])
+    // 할일
+    // 모든 소스 파일들에서 전역 변수들 제거
+    // 리턴값을 정의할 수 있는 모든 함수들은 리턴값 정의 (예: calcHeading)
+    // addDVectorToMap 제거하고, 내부 로직들을 별개 함수들로 독립시킴
+    // Segmentaton Fault 버그 잡기
+    // YAML 파일 읽기 (맵 교체시 재컴파일해서는 안 됨)
+    // cpp 파일들, hpp 파일들 정리하기. cpp와 무관한 hpp 파일을 cpp가 포함하지 않도록 작성하기.
+    // 멀티쓰레딩은 이 스탭이 다끝나고 정리되면 한다.
+
+    addDVectorToMap(gtMap, "bound_r");
+    addDVectorToMap(gtMap, "bound_l");
+    addDVectorToMap(gtMap, "raceline");
+    addDVectorToMap(gtMap, "delta_s");
 
     // 결과: map_file_out 
     // [지민] gtpl_mp은 이미 전역변수라 삽입해줄 필요가 없음.
-    writeDMapToCSV(map_file_out, gtpl_map_ref);
+    writeDMapToCSV(map_file_out, gtMap);
     
     // layer 간격을 위한 raceline points sampling 
 
     Offline_Params params;
     // [지민] 가독성을 위해서 넣기 했으나 빼야될지?
-    IVector idx_sampling = samplePointsFromRaceline(gtpl_map_ref[__kappa],
-                             gtpl_map_ref[__delta_s],
+    IVector idx_sampling = samplePointsFromRaceline(gtMap[RL_KAPPA],
+                             gtMap[RL_dS],
                              params);
 
     // cout << "idx size:" << idx_sampling.size() << endl;
-    // 샘플링한대로 이제 gtpl_map 대신 sampling_map으로 바굼
-    for (const auto& [key, vec] : gtpl_map_ref) {
+    // 샘플링한대로 이제 gtpl_map 대신 stMap으로 바굼
+    for (const auto& [key, vec] : gtMap) {
         for (int idx : idx_sampling) {
             if (idx >= 0 && idx < vec.size()) {
-                sampling_map[key].push_back(vec[idx]);
+                stMap[key].push_back(vec[idx]);
             }
         }
     }
-    // writeDMapToCSV("inputs/sampling_map", sampling_map);
-    // map_size(sampling_map); // (51, 3)
-    // 결과: sampling_map에 delta_s열 추가 
-    addDVectorToMap(sampling_map, "delta_s");
+    // writeDMapToCSV("inputs/stMap", stMap);
+    // map_size(stMap); // (51, 3)
+    // 결과: stMap에 delta_s열 추가 
+    addDVectorToMap(stMap, "delta_s");
     
-    // 결과: sampling_map에 열 추가
-    calcHeading(sampling_map[__x_raceline],
-                sampling_map[__y_raceline],
-                sampling_map[__psi]);
+    // 결과: stMap에 열 추가
+    calcHeading(stMap[RL_X],
+                stMap[RL_Y],
+                stMap[RL_PSI]);
     
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
-    calcHeading(sampling_map[__x_bound_l],
-                sampling_map[__y_bound_l],
-                sampling_map[__psi_bound_l]);
+    calcHeading(stMap[LB_X],
+                stMap[LB_Y],
+                stMap[LB_PSI]);
 
-    calcHeading(sampling_map[__x_bound_r],
-                sampling_map[__y_bound_r],
-                sampling_map[__psi_bound_r]);  
+    calcHeading(stMap[RB_X],
+                stMap[RB_Y],
+                stMap[RB_PSI]);  
 
     auto [nodesPerLayer, raceline_index_array] = genNode(params);
 
-    // writeDMapToCSV("inputs/sampling_map.csv", sampling_map);
+    // writeDMapToCSV("inputs/stMap.csv", stMap);
 
     auto [wayptGraph, splineMap] = genEdges(nodesPerLayer, raceline_index_array, params);
 
@@ -393,7 +407,7 @@ int main() {
     
     // printSplineInfo(splineMap, nodesPerLayer);
     // 결과: 시각화
-    visual(gtpl_map_ref, nodesPerLayer, splineMap);
+    visual(gtMap, nodesPerLayer, splineMap);
 
     return 0;
 }

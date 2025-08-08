@@ -657,7 +657,7 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_millbrook.h
+  include/config_modena.h
 
 CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/stdc-predef.h \
@@ -1315,7 +1315,7 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_millbrook.h
+  include/config_modena.h
 
 CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/stdc-predef.h \
@@ -1973,7 +1973,7 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_millbrook.h
+  include/config_modena.h
 
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -2631,7 +2631,7 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_millbrook.h
+  include/config_modena.h
 
 CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/stdc-predef.h \
@@ -3289,10 +3289,12 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_millbrook.h
+  include/config_modena.h
 
 
 src/visualization.cpp:
+
+include/config_modena.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 
@@ -3665,8 +3667,6 @@ src/visualization.cpp:
 /usr/include/c++/11/initializer_list:
 
 /usr/include/c++/11/iosfwd:
-
-include/config_millbrook.h:
 
 /usr/include/c++/11/streambuf:
 

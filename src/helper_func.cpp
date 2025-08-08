@@ -64,8 +64,8 @@ void addDVectorToMap(DMap &map, string attr) {
     if (!attr.compare("bound_r")) {
         // cout << "addDVectorToMap:" << attr << endl;
         for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__width_right][i];
-            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__width_right][i];
+            x_out[i] = map[POS_X][i] + map[NORM_X][i] * map[WIDTH_R][i];
+            y_out[i] = map[POS_Y][i] + map[NORM_Y][i] * map[WIDTH_R][i];
         }
         map[x_label] = x_out;
         map[y_label] = y_out;
@@ -73,8 +73,8 @@ void addDVectorToMap(DMap &map, string attr) {
     else if (!attr.compare("bound_l")) {
         // cout << "addDVectorToMap:" << attr << endl;
         for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] - map[__x_normvec][i] * map[__width_left][i];
-            y_out[i] = map[__y_ref][i] - map[__y_normvec][i] * map[__width_left][i];
+            x_out[i] = map[POS_X][i] - map[NORM_X][i] * map[WIDTH_L][i];
+            y_out[i] = map[POS_Y][i] - map[NORM_Y][i] * map[WIDTH_L][i];
         }
         map[x_label] = x_out;
         map[y_label] = y_out;
@@ -82,8 +82,8 @@ void addDVectorToMap(DMap &map, string attr) {
     else if (!attr.compare("raceline")) {
         // cout << "addDVectorToMap:" << attr << endl;
         for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__alpha][i];
-            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__alpha][i];
+            x_out[i] = map[POS_X][i] + map[NORM_X][i] * map[NORM_L][i];
+            y_out[i] = map[POS_Y][i] + map[NORM_Y][i] * map[NORM_L][i];
         }
         map[x_label] = x_out;
         map[y_label] = y_out;
@@ -93,7 +93,7 @@ void addDVectorToMap(DMap &map, string attr) {
     else if (!attr.compare("delta_s")) {
         // cout << "addDVectorToMap:" << attr << endl;
         for (size_t i = 0; i < len - 1; ++i) {
-            x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i]; // 마지막 원소는 0
+            x_out[i] = map[RL_S][i+1] - map[RL_S][i]; // 마지막 원소는 0
         }
         map[attr] = x_out; 
     }
@@ -165,22 +165,22 @@ double normalizeAngle(double angle) {
 
 bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
 
-    if (sampling_map.find(__x_bound_l) == sampling_map.end() || 
-    sampling_map.find(__y_bound_l) == sampling_map.end() ||
-    sampling_map.find(__x_bound_r) == sampling_map.end() || 
-    sampling_map.find(__y_bound_r) == sampling_map.end()) {
-    throw invalid_argument("Boundary keys are missing in sampling_map!");
+    if (stMap.find(LB_X) == stMap.end() || 
+    stMap.find(LB_Y) == stMap.end() ||
+    stMap.find(RB_X) == stMap.end() || 
+    stMap.find(RB_Y) == stMap.end()) {
+    throw invalid_argument("Boundary keys are missing in stMap!");
 }
 
-    int n = sampling_map[__x_bound_l].size();
+    int n = stMap[LB_X].size();
     MatrixXd bound_l(n,2);
     MatrixXd bound_r(n,2);
     for (int i = 0; i < n; ++i) {
-        bound_l(i, 0) = sampling_map[__x_bound_l][i];
-        bound_l(i, 1) = sampling_map[__y_bound_l][i];
+        bound_l(i, 0) = stMap[LB_X][i];
+        bound_l(i, 1) = stMap[LB_Y][i];
 
-        bound_r(i, 0) = sampling_map[__x_bound_r][i];
-        bound_r(i, 1) = sampling_map[__y_bound_r][i];
+        bound_r(i, 0) = stMap[RB_X][i];
+        bound_r(i, 1) = stMap[RB_Y][i];
     }
     
     MatrixXd centerline = (bound_l + bound_r) / 2;

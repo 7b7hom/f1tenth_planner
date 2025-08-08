@@ -11,8 +11,8 @@ struct Offline_Params {
     float lat_resolution = 0.9;       // lateral spacing (m) between nodes along each normal
     float variable_heading = true;    // determines if node headings are interpolated between boundary and race line angles (else: match race line)
     
-    float lon_straight_step = 30.0;   // max distance (m) between norm vectors along straights on the reference line
-    float lon_curve_step = 6.5;       // max norm vector spacing (m) on reference-line curves
+    float d_straight = 30.0;   // max distance (m) between norm vectors along straights on the reference line
+    float d_curve = 6.5;       // max norm vector spacing (m) on reference-line curves
                                         
     float curve_thr = 0.01;           // recommend: 0.15 ~ 0.3
     float lat_offset = 3.5;

@@ -165,28 +165,28 @@ void plotSpline(const Spline& spline, const string& color) {
     // plt::show();
 }
 
-void visual(DMap &gtpl_map,
+void visual(DMap &gtMap,
             const NodeMap &nodesPerLayer,
             const SplineMap &splineMap) {
 
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+    plt::plot(gtMap[LB_X], gtMap[LB_Y], {{"color", "orange"}});
+    plt::plot(gtMap[RB_X], gtMap[RB_Y], {{"color", "orange"}});
     
-    // plt::plot(gtpl_map[x_ref], gtpl_map[y_ref], {{"color", "blue"}});
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
+    // plt::plot(gtMap[x_ref], gtMap[y_ref], {{"color", "blue"}});
+    plt::plot(gtMap[RL_X], gtMap[RL_Y], {{"color", "red"}});
 
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
+    plt::scatter(stMap[RL_X], stMap[RL_Y], 30.0, {{"color", "red"}});
 
-    // plotHeading(sampling_map[x_raceline],
-    //             sampling_map[y_raceline],
-    //             sampling_map[__psi]);
+    // plotHeading(stMap[x_raceline],
+    //             stMap[y_raceline],
+    //             stMap[__psi]);
 
-    // plotHeading(sampling_map[x_bound_l],
-    //             sampling_map[y_bound_l],
+    // plotHeading(stMap[x_bound_l],
+    //             stMap[y_bound_l],
     //             psi_bound_l);
 
-    // plotHeading(sampling_map[x_bound_r],
-    //             sampling_map[y_bound_r],
+    // plotHeading(stMap[x_bound_r],
+    //             stMap[y_bound_r],
     //             psi_bound_r);
 
     // 노드마다 psi확인할 수 있는 용도 

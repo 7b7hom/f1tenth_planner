@@ -15,29 +15,37 @@
 #include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
-#include "config_millbrook.h"
+#include "config_modena.h"
 
-#define __x_ref "x_ref_m"
-#define __y_ref " y_ref_m"
-#define __width_right " width_right_m"
-#define __width_left " width_left_m"
-#define __x_normvec " x_normvec_m"
-#define __y_normvec " y_normvec_m"
-#define __alpha " alpha_m"
-#define __kappa " kappa_racetraj_radpm"
-#define __s_racetraj " s_racetraj_m"
-#define __psi " psi_racetraj_rad"
-#define __vx " vx_racetraj_mps"
 
-#define __x_raceline "x_raceline"
-#define __y_raceline "y_raceline"
-#define __x_bound_r "x_bound_r"
-#define __y_bound_r "y_bound_r"
-#define __x_bound_l "x_bound_l"
-#define __y_bound_l "y_bound_l"
-#define __delta_s "delta_s"
-#define __psi_bound_l "psi_bound_l"
-#define __psi_bound_r "psi_bound_r"
+//////////////////////////////////////////////////////////////////////
+// Index names used in gtplMap
+// #define INDEX_NAME  "COLUME_NAME_in_TRAJ_LTPL_CSV_FILE"
+//////////////////////////////////////////////////////////////////////
+
+// Index names originated from TRAJ_LTPL_CSV_FILE
+#define POS_X       "x_ref_m"
+#define POS_Y       " y_ref_m" // Do not delete the first white space in the following!!!
+#define WIDTH_L     " width_left_m"
+#define WIDTH_R     " width_right_m"
+#define NORM_X      " x_normvec_m"
+#define NORM_Y      " y_normvec_m"
+#define NORM_L      " alpha_m"
+#define RL_KAPPA    " kappa_racetraj_radpm"
+#define RL_S        " s_racetraj_m"
+#define RL_PSI      " psi_racetraj_rad"
+#define RL_VX       " vx_racetraj_mps"
+
+// Index names additionally created for this program
+#define RL_dS       "delta_s"
+#define RL_X        "x_raceline"
+#define RL_Y        "y_raceline"
+#define LB_X        "x_bound_l"
+#define LB_Y        "y_bound_l"
+#define RB_X        "x_bound_r"
+#define RB_Y        "y_bound_r"
+#define LB_PSI      "psi_bound_l"
+#define RB_PSI      "psi_bound_r"
 
 using namespace std;
 using namespace rapidcsv;
@@ -72,7 +80,7 @@ typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key�
 typedef map<IPair, map<IPair, Spline>> SplineMap;
 
 // extern DMap gtpl_map;
-extern DMap sampling_map;
+extern DMap stMap;
 
 struct ActionSet {
     string action_id; // "straight"
@@ -135,3 +143,12 @@ pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
                         const float& veh_width,
                         double spline_len = NAN,
                         int no_interp_points = 10);
+
+struct SplineTask {
+    IPair start;
+    IPair end;
+    MatrixXd path;
+    double psi_start;
+    double psi_end;
+    bool is_raceline;
+};

@@ -185,38 +185,6 @@ auto genEdges(NodeMap &nodesPerLayer,
         throw invalid_argument("Too small lateral offset!");
     }
 
-    // 1. 작업 리스트 생성 (싱글스레드)
-    vector<SplineTask> tasks;
-
-    // raceline spline 작업 추가
-    for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) { 
-        int dstLayerIdx = layerIdx+1;
-        if (dstLayerIdx >= nodesPerLayer.size()) {
-            dstLayerIdx -= nodesPerLayer.size();
-        }
-        int startNodeIdx = raceline_index_array[layerIdx];
-        int endNodeIdx = raceline_index_array[dstLayerIdx];
-
-        Node& startNode = nodesPerLayer[layerIdx][startNodeIdx];
-        Node& endNode = nodesPerLayer[dstLayerIdx][endNodeIdx];
-
-        MatrixXd path(2, 2);
-        path(0,0) = startNode.x;
-        path(0,1) = startNode.y;
-        path(1,0) = endNode.x;
-        path(1,1) = endNode.y;
-
-        SplineTask task;
-        task.start = make_pair(layerIdx, startNodeIdx);
-        task.end = make_pair(dstLayerIdx, endNodeIdx);
-        task.path = path;
-        task.psi_start = startNode.psi;
-        task.psi_end = endNode.psi;
-        task.is_raceline = true;
-
-        tasks.push_back(task);
-    }
-
     // raceline 
     for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) { 
         int dstLayerIdx = layerIdx+1;
@@ -247,73 +215,76 @@ auto genEdges(NodeMap &nodesPerLayer,
         wayptGraph.addEdge(startPoint, endPoint);
     }
 
-
-    // 일반 spline 작업 추가
+    // cout << nodesPerLayer.size() << endl; 출력: 51
+    // 레이어 별 loop
+    // raceline spline 먼저 생성해서 splineMap에 등록, 뒤에서 재등록하지 않게 index 겹치면 pass
     for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
+        
         int srcLayerIdx = layerIdx;
         int dstLayerIdx = layerIdx + 1;
+
+        // cout << "srcLayerIdx:" << srcLayerIdx << endl;
+        // cout << "nodesPerLayer.size()" << nodesPerLayer.size() << endl;
+
+        // 마지막 layer의 경우 0번째 layer와 연결시킬 수 있도록 dstLayerIdx 조정 
         if (dstLayerIdx >= nodesPerLayer.size()) {
             dstLayerIdx -= nodesPerLayer.size();
         }
-        for (size_t srcNodeIdx = 0; srcNodeIdx < nodesPerLayer[srcLayerIdx].size(); ++srcNodeIdx) {
-            Node& startNode = nodesPerLayer[srcLayerIdx][srcNodeIdx];
 
+        // start layer 내 노드별 loop
+        for (size_t srcNodeIdx = 0; srcNodeIdx < nodesPerLayer[srcLayerIdx].size(); ++srcNodeIdx) {
+            // 기준 노드
+            Node& startNode = nodesPerLayer[srcLayerIdx][srcNodeIdx];
+            
             int refEndNodeIdx = raceline_index_array[dstLayerIdx] - (raceline_index_array[srcLayerIdx] - srcNodeIdx);
             refEndNodeIdx = max(0, min(refEndNodeIdx, static_cast<int>(nodesPerLayer[dstLayerIdx].size() -1)));
-
+            // refEndNodeIdx = clamp(refEndNodeIdx, 0, static_cast<int>(nodesPerLayer[dstLayerIdx].size() - 1));
+            // int refEndNodeIdx = srcNodeIdx;
+            // int refEndNodeIdx = raceline_index_array[dstLayerIdx];
             Node& endNode = nodesPerLayer[dstLayerIdx][refEndNodeIdx];
 
             Vector2d d_start(startNode.x, startNode.y);
             Vector2d d_end(endNode.x, endNode.y);
 
+            // spline 연결할 노드 선정 기준 : lat_steps
             double dist = (d_end - d_start).norm();
+            // genNode에서 kappa 계산한거 토대로(+기능 추가 완료)
+
             int lat_steps = static_cast<int>(round(dist * params.lat_offset / params.lat_resolution));
-            lat_steps = min(lat_steps, params.max_lat_steps);
-
+            // cout << srcLayerIdx << "의 " << srcNodeIdx << "가 다음 refendNode와의 거리: " << dist << endl;
+            lat_steps = min(lat_steps, params.max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
+            // cout << srcNodeIdx << "번째 노드의 lat_steps" << lat_steps << endl;
+            // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
-                    endNodeIdx <= min(static_cast<int>(nodesPerLayer[dstLayerIdx].size() - 1), refEndNodeIdx + lat_steps); ++endNodeIdx) {
-                if (srcNodeIdx == raceline_index_array[layerIdx] && endNodeIdx == raceline_index_array[dstLayerIdx]) {
-                    continue;
+                endNodeIdx <= min(static_cast<int>(nodesPerLayer[dstLayerIdx].size() - 1), refEndNodeIdx + lat_steps); ++endNodeIdx) {
+                    
+                    if (srcNodeIdx == raceline_index_array[layerIdx] && endNodeIdx == raceline_index_array[dstLayerIdx]) {
+                        continue;
+                    }
+
+                    Node& endNode = nodesPerLayer[dstLayerIdx][endNodeIdx];
+                    
+                    MatrixXd path(2, 2);
+                    path(0,0) = startNode.x;
+                    path(0,1) = startNode.y;
+                    path(1,0) = endNode.x;
+                    path(1,1) = endNode.y;
+
+                    auto result = calcSplines(path, startNode.psi, endNode.psi);
+                    // cout << "result: " << result->el_lengths.size()  << endl;
+                    IPair startPoint = make_pair(srcLayerIdx, srcNodeIdx);
+                    IPair endPoint = make_pair(dstLayerIdx, endNodeIdx);
+
+                    splineMap[startPoint][endPoint] = *result;
+
+                    // graph에 넣는 과정 
+                    wayptGraph.addEdge(startPoint, endPoint);
+
+                    // cout << "startPoint:" << startPoint.first << ", " << startPoint.second << " -> ";
+                    // cout << "endPoint:" << endPoint.first << ", " << endPoint.second << endl;
+                    
                 }
-
-                Node& endNode = nodesPerLayer[dstLayerIdx][endNodeIdx];
-
-                MatrixXd path(2, 2);
-                path(0,0) = startNode.x;
-                path(0,1) = startNode.y;
-                path(1,0) = endNode.x;
-                path(1,1) = endNode.y;
-
-                SplineTask task;
-                task.start = make_pair(srcLayerIdx, srcNodeIdx);
-                task.end = make_pair(dstLayerIdx, endNodeIdx);
-                task.path = path;
-                task.psi_start = startNode.psi;
-                task.psi_end = endNode.psi;
-                task.is_raceline = false;
-
-                tasks.push_back(task);
-            }
         }
-    }
-
-    // 2. 병렬로 spline 계산
-    vector<shared_ptr<Spline>> results(tasks.size());
-
-    #pragma omp parallel for
-    for (int i = 0; i < tasks.size(); ++i) {
-        auto& task = tasks[i];
-        auto result = calcSplines(task.path, task.psi_start, task.psi_end);
-        result->raceline = task.is_raceline;
-        results[i] = std::shared_ptr<Spline>(std::move(result)); 
-    }
-
-    // 3. 싱글스레드로 splineMap/wayptGraph에 등록
-    for (size_t i = 0; i < tasks.size(); ++i) {
-        const auto& task = tasks[i];
-        const auto& result = *results[i];
-        splineMap[task.start][task.end] = result;
-        wayptGraph.addEdge(task.start, task.end);
     }
 
     // visual(wayptGraph, nodesPerLayer, splineMap, "pink");
@@ -348,7 +319,7 @@ auto genEdges(NodeMap &nodesPerLayer,
                 continue;
             }
           
-            double vel_rl = stMap[RL_VX][layer_idx] * params.min_vel_race;
+            double vel_rl = sampling_map[__vx][layer_idx] * params.min_vel_race;
             double min_turn = pow(vel_rl, 2) / params.max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
             bool tooBigKappa = false;
