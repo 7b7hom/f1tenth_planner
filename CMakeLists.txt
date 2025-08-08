@@ -5,6 +5,9 @@ if (NOT CMAKE_CXX_STANDARD)
     set(CMAKE_CXX_STANDARD 17)
 endif()
 
+set(CMAKE_CXX_STANDARD_REQUIRED ON)    # C++17 반드시 사용
+set(CMAKE_CXX_EXTENSIONS OFF)          # GNU 확장 끄기 (순수 C++17)
+
 include(GNUInstallDirs)
 set(PACKAGE_NAME matplotlib_cpp)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/${PACKAGE_NAME}/cmake)

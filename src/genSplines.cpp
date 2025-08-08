@@ -92,34 +92,6 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
     });
 }
 
-void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline,
-                 DVector &psi) {
-
-    size_t N = x_raceline.size();
-    psi.resize(N);
-
-    // 닫힌 회로 가정. 예외 처리 필요
-    double dx, dy;
-    for (size_t i = 0; i < N; ++i) {
-        
-        if (i != N -1) {
-            dx = x_raceline[i+1] - x_raceline[i];
-            dy = y_raceline[i+1] - y_raceline[i];
-        } else {
-            dx = x_raceline[0] - x_raceline[N - 1];
-            dy = y_raceline[0] - y_raceline[N - 1];
-        } 
-    psi[i] = atan2(dy, dx) - M_PI_2;
-        
-    normalizeAngle(psi[i]);
-
-    }
-    // cout << i<< ": " << psi[i] << endl;
-    // cout << psi.size() << endl;
-
-}
-
 VectorXd calcKappa(MatrixXd &coeffs_x,
                          MatrixXd &coeffs_y,
                          VectorXd &t_steps) {
@@ -202,12 +174,13 @@ pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
     
 }
 
-void genEdges(NodeMap &nodesPerLayer, 
-              Graph &wayptGraph,
-              SplineMap &splineMap,
+auto genEdges(NodeMap &nodesPerLayer, 
               const IVector &raceline_index_array,
-              Offline_Params& params) {
-    
+              Offline_Params& params) -> pair<Graph, SplineMap> {
+
+    Graph wayptGraph; // a graph of waypoints
+    SplineMap splineMap;
+
     if (params.lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
     }
@@ -399,5 +372,5 @@ void genEdges(NodeMap &nodesPerLayer,
     cout << "removed " << remove_cnt << " splines due to violation of the specified vehicle's turn radius or velocity aims!" << endl;
     cout << "Ignored " << Invalid_edge_cnt << " splines(outside track bounds!)" << endl;
     // cout << "the end" << endl;
-
+    return {wayptGraph, splineMap};
 }

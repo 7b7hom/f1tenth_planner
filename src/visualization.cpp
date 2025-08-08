@@ -1,5 +1,4 @@
 #include "graph_planner.hpp"
-#include <unordered_set>
 
 void plotHeading(const DVector &x,
                  const DVector &y,
@@ -166,46 +165,29 @@ void plotSpline(const Spline& spline, const string& color) {
     // plt::show();
 }
 
-void visual(const Graph &edgeList,
+void visual(DMap &gtpl_map,
             const NodeMap &nodesPerLayer,
-            const SplineMap &splineMap,
-            DMap &gtpl_map) {
-    DVector x_bound_l = sampling_map[__x_bound_l];
-    DVector y_bound_l = sampling_map[__y_bound_l];
-
-    DVector x_bound_r = sampling_map[__x_bound_r];
-    DVector y_bound_r = sampling_map[__y_bound_r];
-    // 첫 점을 맨 뒤에 추가
-
-    x_bound_l.push_back(x_bound_l.front());
-    y_bound_l.push_back(y_bound_l.front());
-    
-    x_bound_r.push_back(x_bound_r.front());
-    y_bound_r.push_back(y_bound_r.front());
-
-    // plt::plot(x_bound_l, y_bound_l, {{"color", "orange"}});
-    // plt::plot(x_bound_r, y_bound_r, {{"color", "orange"}});
+            const SplineMap &splineMap) {
 
     plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
     plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
     
-    // plt::plot(gtpl_map[__x_ref], gtpl_map[__y_ref], {{"color", "blue"}});
+    // plt::plot(gtpl_map[x_ref], gtpl_map[y_ref], {{"color", "blue"}});
     plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}});
 
     plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}});
 
-    // plotHeading(sampling_map[__x_raceline],
-    //             sampling_map[__y_raceline],
+    // plotHeading(sampling_map[x_raceline],
+    //             sampling_map[y_raceline],
     //             sampling_map[__psi]);
 
-    // plotHeading(sampling_map[__x_bound_l],
-    //             sampling_map[__y_bound_l],
+    // plotHeading(sampling_map[x_bound_l],
+    //             sampling_map[y_bound_l],
     //             psi_bound_l);
 
-    // plotHeading(sampling_map[__x_bound_r],
-    //             sampling_map[__y_bound_r],
+    // plotHeading(sampling_map[x_bound_r],
+    //             sampling_map[y_bound_r],
     //             psi_bound_r);
-
 
     // 노드마다 psi확인할 수 있는 용도 
     plotHeading(nodesPerLayer);

@@ -268,6 +268,9 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/c++/11/bits/atomic_lockfree_defines.h \
   /usr/include/c++/11/backward/auto_ptr.h \
   /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/optional \
+  /usr/include/c++/11/unordered_set \
+  /usr/include/c++/11/bits/unordered_set.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -481,7 +484,6 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
-  include/config_millbrook.h \
   include/rapidcsv.h \
   /usr/include/c++/11/map \
   /usr/include/c++/11/bits/stl_tree.h \
@@ -654,7 +656,8 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
-  /usr/include/x86_64-linux-gnu/bits/signal_ext.h
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
+  include/config_millbrook.h
 
 CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/stdc-predef.h \
@@ -910,15 +913,22 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/c++/11/bits/unordered_map.h \
   /usr/include/c++/11/bits/erase_if.h \
   /usr/include/c++/11/pstl/execution_defs.h \
-  /usr/include/c++/11/set \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_set.h \
-  /usr/include/c++/11/bits/stl_multiset.h \
-  /usr/include/c++/11/queue \
-  /usr/include/c++/11/deque \
-  /usr/include/c++/11/bits/stl_deque.h \
-  /usr/include/c++/11/bits/deque.tcc \
-  /usr/include/c++/11/bits/stl_queue.h \
+  /usr/include/c++/11/memory \
+  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+  /usr/include/c++/11/bits/align.h \
+  /usr/include/c++/11/bit \
+  /usr/include/c++/11/bits/shared_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr_base.h \
+  /usr/include/c++/11/bits/allocated_ptr.h \
+  /usr/include/c++/11/ext/concurrence.h \
+  /usr/include/c++/11/bits/shared_ptr_atomic.h \
+  /usr/include/c++/11/bits/atomic_base.h \
+  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
+  /usr/include/c++/11/backward/auto_ptr.h \
+  /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/optional \
+  /usr/include/c++/11/unordered_set \
+  /usr/include/c++/11/bits/unordered_set.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -1044,8 +1054,6 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
   /usr/include/c++/11/atomic \
-  /usr/include/c++/11/bits/atomic_base.h \
-  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -1134,9 +1142,9 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
-  include/config_millbrook.h \
   include/rapidcsv.h \
   /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_tree.h \
   /usr/include/c++/11/bits/stl_map.h \
   /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
@@ -1271,7 +1279,6 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/python3.10/tracemalloc.h \
   /usr/include/c++/11/numeric \
   /usr/include/c++/11/bits/stl_numeric.h \
-  /usr/include/c++/11/bit \
   /usr/include/c++/11/pstl/glue_numeric_defs.h \
   /usr/include/python3.10/numpy/arrayobject.h \
   /usr/include/python3.10/numpy/ndarrayobject.h \
@@ -1307,7 +1314,8 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
-  /usr/include/x86_64-linux-gnu/bits/signal_ext.h
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
+  include/config_millbrook.h
 
 CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/stdc-predef.h \
@@ -1563,15 +1571,22 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/c++/11/bits/unordered_map.h \
   /usr/include/c++/11/bits/erase_if.h \
   /usr/include/c++/11/pstl/execution_defs.h \
-  /usr/include/c++/11/set \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_set.h \
-  /usr/include/c++/11/bits/stl_multiset.h \
-  /usr/include/c++/11/queue \
-  /usr/include/c++/11/deque \
-  /usr/include/c++/11/bits/stl_deque.h \
-  /usr/include/c++/11/bits/deque.tcc \
-  /usr/include/c++/11/bits/stl_queue.h \
+  /usr/include/c++/11/memory \
+  /usr/include/c++/11/bits/stl_raw_storage_iter.h \
+  /usr/include/c++/11/bits/align.h \
+  /usr/include/c++/11/bit \
+  /usr/include/c++/11/bits/shared_ptr.h \
+  /usr/include/c++/11/bits/shared_ptr_base.h \
+  /usr/include/c++/11/bits/allocated_ptr.h \
+  /usr/include/c++/11/ext/concurrence.h \
+  /usr/include/c++/11/bits/shared_ptr_atomic.h \
+  /usr/include/c++/11/bits/atomic_base.h \
+  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
+  /usr/include/c++/11/backward/auto_ptr.h \
+  /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/optional \
+  /usr/include/c++/11/unordered_set \
+  /usr/include/c++/11/bits/unordered_set.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -1697,8 +1712,6 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
   /usr/include/c++/11/atomic \
-  /usr/include/c++/11/bits/atomic_base.h \
-  /usr/include/c++/11/bits/atomic_lockfree_defines.h \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -1787,9 +1800,9 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
-  include/config_millbrook.h \
   include/rapidcsv.h \
   /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_tree.h \
   /usr/include/c++/11/bits/stl_map.h \
   /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
@@ -1924,7 +1937,6 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/python3.10/tracemalloc.h \
   /usr/include/c++/11/numeric \
   /usr/include/c++/11/bits/stl_numeric.h \
-  /usr/include/c++/11/bit \
   /usr/include/c++/11/pstl/glue_numeric_defs.h \
   /usr/include/python3.10/numpy/arrayobject.h \
   /usr/include/python3.10/numpy/ndarrayobject.h \
@@ -1960,7 +1972,8 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
-  /usr/include/x86_64-linux-gnu/bits/signal_ext.h
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
+  include/config_millbrook.h
 
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -2229,6 +2242,9 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/c++/11/bits/atomic_lockfree_defines.h \
   /usr/include/c++/11/backward/auto_ptr.h \
   /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/optional \
+  /usr/include/c++/11/unordered_set \
+  /usr/include/c++/11/bits/unordered_set.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -2442,7 +2458,6 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
-  include/config_millbrook.h \
   include/rapidcsv.h \
   /usr/include/c++/11/map \
   /usr/include/c++/11/bits/stl_tree.h \
@@ -2615,7 +2630,8 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
-  /usr/include/x86_64-linux-gnu/bits/signal_ext.h
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
+  include/config_millbrook.h
 
 CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/stdc-predef.h \
@@ -2884,6 +2900,9 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/c++/11/bits/atomic_lockfree_defines.h \
   /usr/include/c++/11/backward/auto_ptr.h \
   /usr/include/c++/11/pstl/glue_memory_defs.h \
+  /usr/include/c++/11/optional \
+  /usr/include/c++/11/unordered_set \
+  /usr/include/c++/11/bits/unordered_set.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -3097,7 +3116,6 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
-  include/config_millbrook.h \
   include/rapidcsv.h \
   /usr/include/c++/11/map \
   /usr/include/c++/11/bits/stl_tree.h \
@@ -3271,31 +3289,16 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  /usr/include/c++/11/unordered_set \
-  /usr/include/c++/11/bits/unordered_set.h
+  include/config_millbrook.h
 
 
 src/visualization.cpp:
-
-/usr/include/c++/11/bits/deque.tcc:
-
-/usr/include/c++/11/bits/stl_deque.h:
-
-/usr/include/c++/11/deque:
-
-/usr/include/c++/11/queue:
-
-/usr/include/c++/11/bits/stl_multiset.h:
-
-/usr/include/c++/11/bits/stl_set.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
 
 /usr/include/x86_64-linux-gnu/bits/ss_flags.h:
-
-/usr/include/x86_64-linux-gnu/bits/sigstksz.h:
 
 /usr/include/x86_64-linux-gnu/sys/ucontext.h:
 
@@ -3428,6 +3431,8 @@ src/visualization.cpp:
 /usr/include/python3.10/cpython/tupleobject.h:
 
 /usr/include/python3.10/tupleobject.h:
+
+/usr/include/python3.10/memoryobject.h:
 
 /usr/include/c++/11/bits/stl_raw_storage_iter.h:
 
@@ -3574,12 +3579,6 @@ src/visualization.cpp:
 /usr/include/c++/11/utility:
 
 /usr/include/c++/11/ios:
-
-/usr/include/c++/11/bits/unordered_set.h:
-
-/usr/include/python3.10/setobject.h:
-
-/usr/include/c++/11/bits/stl_vector.h:
 
 /usr/include/c++/11/cstddef:
 
@@ -3859,6 +3858,10 @@ include/config_millbrook.h:
 
 /usr/include/c++/11/exception:
 
+/usr/include/python3.10/rangeobject.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h:
+
 /usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /usr/include/c++/11/complex:
@@ -4111,6 +4114,16 @@ include/graph_planner.hpp:
 
 include/matplotlibcpp.h:
 
+/usr/include/x86_64-linux-gnu/bits/sigstksz.h:
+
+/usr/include/c++/11/optional:
+
+/usr/include/python3.10/setobject.h:
+
+/usr/include/c++/11/bits/stl_vector.h:
+
+/usr/include/c++/11/bits/unordered_set.h:
+
 /usr/include/eigen3/Eigen/Dense:
 
 /usr/include/eigen3/Eigen/src/Core/products/SelfadjointRank2Update.h:
@@ -4219,8 +4232,6 @@ src/genSplines.cpp:
 
 /usr/include/eigen3/Eigen/src/Core/arch/Default/BFloat16.h:
 
-/usr/include/c++/11/bits/stl_queue.h:
-
 /usr/include/eigen3/Eigen/src/Core/products/TriangularSolverMatrix.h:
 
 /usr/include/eigen3/Eigen/src/Core/arch/Default/TypeCasting.h:
@@ -4316,8 +4327,6 @@ include/rapidcsv.h:
 /usr/include/eigen3/Eigen/src/Core/Ref.h:
 
 /usr/include/eigen3/Eigen/src/Core/Block.h:
-
-/usr/include/c++/11/set:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
@@ -4503,6 +4512,10 @@ src/main.cpp:
 
 /usr/include/eigen3/Eigen/src/Geometry/ParametrizedLine.h:
 
+/usr/include/python3.10/cpython/objimpl.h:
+
+/usr/include/eigen3/Eigen/src/Geometry/AlignedBox.h:
+
 /usr/include/c++/11/sstream:
 
 /usr/include/eigen3/Eigen/src/Geometry/Umeyama.h:
@@ -4575,10 +4588,6 @@ src/main.cpp:
 
 /usr/include/python3.10/exports.h:
 
-/usr/include/eigen3/Eigen/src/Geometry/AlignedBox.h:
-
-/usr/include/python3.10/cpython/objimpl.h:
-
 /usr/include/signal.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
@@ -4590,9 +4599,3 @@ src/main.cpp:
 /usr/include/python3.10/cpython/bytesobject.h:
 
 /usr/include/python3.10/cpython/unicodeobject.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h:
-
-/usr/include/python3.10/rangeobject.h:
-
-/usr/include/python3.10/memoryobject.h:

@@ -9,10 +9,12 @@
 #include <algorithm>
 #include <time.h>
 #include <memory>
+#include <optional>
+#include <unordered_set>
 #include <Eigen/Dense>
-#include "config_millbrook.h"
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
+#include "config_millbrook.h"
 
 #define __x_ref "x_ref_m"
 #define __y_ref " y_ref_m"
@@ -97,10 +99,9 @@ void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double 
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
 void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
 void plotSpline(const Spline& spline, const string& color);
-void visual(const Graph &edgeList,
+void visual(DMap &gtpl_map,
             const NodeMap &nodesPerLayer,
-            const SplineMap &splineMap,
-            DMap &gtpl_map);
+            const SplineMap &splineMap);
 
 // helper_func.cpp
 unique_ptr<string> Load(const string& filename);
@@ -108,7 +109,7 @@ double normalizeAngle(double angle);
 void readDMapFromCSV(const string& pathname, DMap& map);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
-void addDVectorToMap(DMap& map, string attr, const IVector* idx_array = nullptr);
+void addDVectorToMap(DMap& map, string attr);
 bool checkInsideBounds(const Vector2d& pos, const float veh_width);
 void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer);
 
@@ -123,9 +124,7 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
 VectorXd calcKappa(MatrixXd &coeffs_x,
                    MatrixXd &coeffs_y,
                    VectorXd &t_steps);
-void genEdges(NodeMap &nodesPerLayer, 
-              Graph &wayptGraph,
-              SplineMap &splineMap,
+pair<Graph, SplineMap> genEdges(NodeMap &nodesPerLayer, 
               const IVector &raceline_index_array,
               Offline_Params& params);
 

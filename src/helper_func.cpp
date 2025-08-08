@@ -32,10 +32,11 @@ unique_ptr<string> Load(const string& filename) {
     throw logic_error("Unreachable exit of the while loop!");
 }
 
-double normalizeAngle(double angle) {
-    while (angle > M_PI)  angle -= 2.0 * M_PI;
-    while (angle < -M_PI) angle += 2.0 * M_PI;
-    return angle;
+// Debug용 함수: map의 columns, rows 개수 print  
+void map_size(DMap& map) {
+    size_t num_cols = map.size();
+    size_t num_rows = map.begin()->second.size();
+    cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
 }
 
 // CSV를 읽어서 DMap으로 변경 
@@ -45,6 +46,58 @@ void readDMapFromCSV(const string& pathname, DMap& map) {
 
     for (const auto& label : labels)
         map[label] = csv.GetColumn<double>(label);
+}
+
+void addDVectorToMap(DMap &map, string attr) {
+
+    int len = 0;
+    if (!map.empty()) {
+        len = static_cast<int>(map.begin()->second.size());
+    } else {
+        throw invalid_argument("Empty Map! - addDVectorToMap");
+    }
+
+    DVector x_out(len), y_out(len);
+    string x_label = "x_" + attr;
+    string y_label = "y_" + attr;
+    
+    if (!attr.compare("bound_r")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__width_right][i];
+            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__width_right][i];
+        }
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    }
+    else if (!attr.compare("bound_l")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] - map[__x_normvec][i] * map[__width_left][i];
+            y_out[i] = map[__y_ref][i] - map[__y_normvec][i] * map[__width_left][i];
+        }
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    }
+    else if (!attr.compare("raceline")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len; ++i) {
+            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__alpha][i];
+            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__alpha][i];
+        }
+        map[x_label] = x_out;
+        map[y_label] = y_out;
+    }
+    // i번째와 i-1번째 point의 delta_s 계산 
+    // delta_s[0] = 0 
+    else if (!attr.compare("delta_s")) {
+        // cout << "addDVectorToMap:" << attr << endl;
+        for (size_t i = 0; i < len - 1; ++i) {
+            x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i]; // 마지막 원소는 0
+        }
+        map[attr] = x_out; 
+    }
+
 }
 
 // DMap을 CSV에 작성 
@@ -76,77 +129,38 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter) {
     file.close();
 }
 
-// Debug용 함수: map의 columns, rows 개수 print  
-void map_size(DMap& map) {
-    size_t num_cols = map.size();
-    size_t num_rows = map.begin()->second.size();
-    cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
+void calcHeading(DVector &x_raceline,
+                 DVector &y_raceline,
+                 DVector &psi) {
+
+    size_t N = x_raceline.size();
+    psi.resize(N);
+
+    // 닫힌 회로 가정. 예외 처리 필요
+    double dx, dy;
+    for (size_t i = 0; i < N; ++i) {
+        
+        if (i != N -1) {
+            dx = x_raceline[i+1] - x_raceline[i];
+            dy = y_raceline[i+1] - y_raceline[i];
+        } else {
+            dx = x_raceline[0] - x_raceline[N - 1];
+            dy = y_raceline[0] - y_raceline[N - 1];
+        } 
+    psi[i] = atan2(dy, dx) - M_PI_2;
+        
+    normalizeAngle(psi[i]);
+
+    }
+    // cout << i<< ": " << psi[i] << endl;
+    // cout << psi.size() << endl;
+
 }
 
-
-void addDVectorToMap(DMap &map,
-                     string attr,
-                     const IVector *idx_array) {
-    size_t len;
-    if (idx_array == nullptr) {
-        len = map[__x_ref].size();
-    } 
-    else {
-        len = idx_array->size();
-    }
-    // cout << "attr: "<< attr << " / len:" << len << endl;
-
-    DVector x_out(len), y_out(len);
-    string x_label = "x_" + attr;
-    string y_label = "y_" + attr;
-    
-    if (!attr.compare("bound_r")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__width_right][i];
-            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__width_right][i];
-        }
-
-        // x_label = "x_" + attr;
-        // y_label = "y_" + attr;
-        map[x_label] = x_out;
-        map[y_label] = y_out;
-    }
-    else if (!attr.compare("bound_l")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] - map[__x_normvec][i] * map[__width_left][i];
-            y_out[i] = map[__y_ref][i] - map[__y_normvec][i] * map[__width_left][i];
-        }
-
-        // x_label = "x_" + attr;
-        // y_label = "y_" + attr;
-        map[x_label] = x_out;
-        map[y_label] = y_out;
-    }
-    else if (!attr.compare("raceline")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[__x_ref][i] + map[__x_normvec][i] * map[__alpha][i];
-            y_out[i] = map[__y_ref][i] + map[__y_normvec][i] * map[__alpha][i];
-        }
-
-        // x_label = "x_" + attr;
-        // y_label = "y_" + attr;
-        map[x_label] = x_out;
-        map[y_label] = y_out;
-    }
-    // i번째와 i-1번째 point의 delta_s 계산 
-    // delta_s[0] = 0 
-    else if (!attr.compare("delta_s")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len - 1; ++i) {
-            x_out[i] = map[__s_racetraj][i+1] - map[__s_racetraj][i]; // 마지막 원소는 0
-        }
-        map[attr] = x_out; 
-    }
-
-    // map_size(map);
+double normalizeAngle(double angle) {
+    while (angle > M_PI)  angle -= 2.0 * M_PI;
+    while (angle < -M_PI) angle += 2.0 * M_PI;
+    return angle;
 }
 
 bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
