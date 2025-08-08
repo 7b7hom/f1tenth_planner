@@ -9,8 +9,9 @@
 #include <algorithm>
 #include <time.h>
 #include <memory>
-#include <optional>
 #include <unordered_set>
+#include <omp.h>
+
 #include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"

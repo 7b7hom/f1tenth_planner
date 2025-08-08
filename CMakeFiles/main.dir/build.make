@@ -157,6 +157,8 @@ bin/main: CMakeFiles/main.dir/src/helper_func.cpp.o
 bin/main: CMakeFiles/main.dir/src/genSplines.cpp.o
 bin/main: CMakeFiles/main.dir/build.make
 bin/main: /usr/lib/x86_64-linux-gnu/libpython3.10.so
+bin/main: /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so
+bin/main: /usr/lib/x86_64-linux-gnu/libpthread.a
 bin/main: CMakeFiles/main.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable bin/main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)

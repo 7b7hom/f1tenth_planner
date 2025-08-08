@@ -129,59 +129,52 @@ auto genNode(const Offline_Params &params) -> pair<NodeMap, IVector> {
 }
 
 void calcOfflineCost(SplineMap& splineMap,
-                   IVector& raceline_index_array,
-                   Offline_Params& params) {
+                     IVector& raceline_index_array,
+                     Offline_Params& params) {
     if (splineMap.size() <= 0) {
         throw invalid_argument("SplineMap's Size is zero!!");
     }
 
-    for (auto& [startPoint, endPoints] : splineMap) {
+    // map은 인덱스 기반이 아니므로, 벡터로 복사
+    vector<pair<IPair, map<IPair, Spline>*>> splineMapVec;
+    for (auto& it : splineMap) {
+        splineMapVec.push_back({it.first, &it.second});
+    }
+
+    // 해당 for 루프의 각 반복을 여러 스레드에 자동 분배 
+    // 각 스레드가 서로 다른 startPoint를 계산 
+    #pragma omp parallel for
+    for (int i = 0; i < splineMapVec.size(); ++i) {
+        auto& [startPoint, endPointsPtr] = splineMapVec[i];
+        auto& endPoints = *endPointsPtr;
         for (auto& [endPoint, spline] : endPoints) {
             double offline_cost = 0.0;
             int end_layer = endPoint.first;
             int end_node = endPoint.second;
 
-            // 디버깅용 
-            // cout << "kappa: ";
-            // for (int i = 0; i < spline.kappa.size(); ++i) cout << spline.kappa[i] << " ";
-            // cout << endl;
-
             if (end_layer < 0 || end_layer >= raceline_index_array.size())
-            {
                 continue;
-            }
 
             if (spline.kappa.size() == 0)
-            {
-                // cerr << "Empty kappa in spline!" << endl;
                 continue;
-            }
 
             double abs_kappa = spline.kappa.array().abs().sum();
             double s_length = spline.el_lengths.sum();
-            // cout << "s_length: " << s_length << endl;
-            // average curvature
-            offline_cost += params.w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
-            // peak curvature
-            double max_min = std::abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
-            offline_cost += params.w_curv_peak * pow(max_min, 2) * s_length;
 
-            // path length
+            offline_cost += params.w_curv_avg * pow(abs_kappa / double(spline.kappa.size()), 2) * s_length;
+            double max_min = abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
+            offline_cost += params.w_curv_peak * pow(max_min, 2) * s_length;
             offline_cost += params.w_length * s_length;
 
-            // raceline cost
-
             double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * params.lat_resolution;
-            double raceline_cost = min(params.w_raceline * s_length * raceline_dist, params.w_raceline_sat * s_length);
+            double raceline_cost = std::min(params.w_raceline * s_length * raceline_dist, params.w_raceline_sat * s_length);
 
             offline_cost += raceline_cost;
 
             spline.cost = offline_cost;
-            // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
-        }   
-    } 
+        }
+    }
 }
-
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
 
     int num_nodes = 0;

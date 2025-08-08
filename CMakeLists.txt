@@ -68,6 +68,11 @@ install(FILES
   "${PROJECT_SOURCE_DIR}/include/matplotlibcpp.h"
   DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+find_package(OpenMP REQUIRED)
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(main PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
 # Install targets file
 install(EXPORT install_targets
   FILE
