@@ -9,13 +9,12 @@ unique_ptr<string> Load(const string& filename) {
     string line;
     bool in_section = false;
     while (getline(file, line)) {
-        // 섹션 시작
+        // line이라는 문자열에서 해당 문자열을 찾지 못하면 npos를 반환
         if (line.find("[DRIVING_TASK]") != string::npos) {
             in_section = true;
             continue;
         }
 
-        // 다른 섹션으로 넘어가면 종료
         if (in_section && line.find('[') != string::npos)
             break;
 
@@ -30,7 +29,7 @@ unique_ptr<string> Load(const string& filename) {
             }
         }
     }
-
+    throw logic_error("Unreachable exit of the while loop!");
 }
 
 double normalizeAngle(double angle) {

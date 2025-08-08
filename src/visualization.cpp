@@ -134,13 +134,13 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, co
         // 선 그리기
         plt::plot(xs, ys, {{"color", color}});
 
-        // 레이어 Text 표시
-        if (plotted_layers.find(startPoint.first) == plotted_layers.end() && !spline_points.empty()) {
-            const auto& pos_pt = spline_points[spline_points.size() / 8];
-            string layer_label = "L" + to_string(startPoint.first);
-            plt::text(pos_pt.x(), pos_pt.y(), layer_label);
-            plotted_layers.insert(startPoint.first);
-        }
+        // // 레이어 Text 표시
+        // if (plotted_layers.find(startPoint.first) == plotted_layers.end() && !spline_points.empty()) {
+        //     const auto& pos_pt = spline_points[spline_points.size() / 8];
+        //     string layer_label = "L" + to_string(startPoint.first);
+        //     plt::text(pos_pt.x(), pos_pt.y(), layer_label);
+        //     plotted_layers.insert(startPoint.first);
+        // }
         }
     }
 
@@ -166,15 +166,17 @@ void plotSpline(const Spline& spline, const string& color) {
     // plt::show();
 }
 
-void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color) {
-    // plt::clf();
-
+void visual(const Graph &edgeList,
+            const NodeMap &nodesPerLayer,
+            const SplineMap &splineMap,
+            DMap &gtpl_map) {
     DVector x_bound_l = sampling_map[__x_bound_l];
     DVector y_bound_l = sampling_map[__y_bound_l];
 
     DVector x_bound_r = sampling_map[__x_bound_r];
     DVector y_bound_r = sampling_map[__y_bound_r];
     // 첫 점을 맨 뒤에 추가
+
     x_bound_l.push_back(x_bound_l.front());
     y_bound_l.push_back(y_bound_l.front());
     
@@ -208,10 +210,10 @@ void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap
     // 노드마다 psi확인할 수 있는 용도 
     plotHeading(nodesPerLayer);
 
-    plotAllSplines(splineMap, nodesPerLayer, color);
+    plotAllSplines(splineMap, nodesPerLayer, "gray");
 
     plt::title("Track");
     plt::grid(true);
     plt::axis("equal");
-    plt::show();  
+    plt::show();
 }

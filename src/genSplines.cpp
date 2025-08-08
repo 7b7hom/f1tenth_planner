@@ -203,20 +203,12 @@ pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
 }
 
 void genEdges(NodeMap &nodesPerLayer, 
-              Graph &graph_wp,
+              Graph &wayptGraph,
               SplineMap &splineMap,
               const IVector &raceline_index_array,
-              const float veh_width,
-              const float lat_offset,
-              const float lat_resolution,
-              const float curve_thr,
-              const int max_lat_steps,
-              const float stepsize_approx,
-              const float min_vel_race,
-              const float max_lateral_accel,
-              const float veh_turn) {
+              Offline_Params& params) {
     
-    if (lat_offset <= 0.0) {
+    if (params.lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
     }
 
@@ -247,7 +239,7 @@ void genEdges(NodeMap &nodesPerLayer,
 
         splineMap[startPoint][endPoint] = *result;
 
-        graph_wp.addEdge(startPoint, endPoint);
+        wayptGraph.addEdge(startPoint, endPoint);
     }
 
     // cout << nodesPerLayer.size() << endl; 출력: 51
@@ -285,9 +277,9 @@ void genEdges(NodeMap &nodesPerLayer,
             double dist = (d_end - d_start).norm();
             // genNode에서 kappa 계산한거 토대로(+기능 추가 완료)
 
-            int lat_steps = static_cast<int>(round(dist * lat_offset / lat_resolution));
+            int lat_steps = static_cast<int>(round(dist * params.lat_offset / params.lat_resolution));
             // cout << srcLayerIdx << "의 " << srcNodeIdx << "가 다음 refendNode와의 거리: " << dist << endl;
-            lat_steps = min(lat_steps, max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
+            lat_steps = min(lat_steps, params.max_lat_steps); // endNode 기준 2*lat_steps + 1개의 노드와 연결한다.
             // cout << srcNodeIdx << "번째 노드의 lat_steps" << lat_steps << endl;
             // startNode와 lat_steps 기준 해당되는 노드들 spline 연결 
             for (int endNodeIdx = max(0, refEndNodeIdx - lat_steps); 
@@ -313,7 +305,7 @@ void genEdges(NodeMap &nodesPerLayer,
                     splineMap[startPoint][endPoint] = *result;
 
                     // graph에 넣는 과정 
-                    graph_wp.addEdge(startPoint, endPoint);
+                    wayptGraph.addEdge(startPoint, endPoint);
 
                     // cout << "startPoint:" << startPoint.first << ", " << startPoint.second << " -> ";
                     // cout << "endPoint:" << endPoint.first << ", " << endPoint.second << endl;
@@ -322,7 +314,7 @@ void genEdges(NodeMap &nodesPerLayer,
         }
     }
 
-    // visual(graph_wp, nodesPerLayer, splineMap, "pink");
+    // visual(wayptGraph, nodesPerLayer, splineMap, "pink");
     int edge_cnt = 0;
     int remove_cnt = 0;
     int Invalid_edge_cnt = 0;
@@ -335,7 +327,7 @@ void genEdges(NodeMap &nodesPerLayer,
         // cout << "node_idx: " << node_idx << endl;
         IPairVector childNodes;
         IPair start = make_pair(layer_idx ,node_idx);
-        graph_wp.getChildNodes(start, childNodes);
+        wayptGraph.getChildNodes(start, childNodes);
         // 연결되어있는 child node에 대하여 
         for (auto& end : childNodes) {
           
@@ -343,7 +335,7 @@ void genEdges(NodeMap &nodesPerLayer,
           MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
           MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
 
-          auto [kappa, psi] = interpSplines(coeffs_x, coeffs_y, stepsize_approx, veh_width);
+          auto [kappa, psi] = interpSplines(coeffs_x, coeffs_y, params.stepsize_approx, params.veh_width);
             if (kappa.size() == 0) {
                 Invalid_edge_cnt++;
                 // cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
@@ -354,21 +346,21 @@ void genEdges(NodeMap &nodesPerLayer,
                 continue;
             }
           
-            double vel_rl = sampling_map[__vx][layer_idx] * min_vel_race;
-            double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
+            double vel_rl = sampling_map[__vx][layer_idx] * params.min_vel_race;
+            double min_turn = pow(vel_rl, 2) / params.max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
             
             bool tooBigKappa = false;
             // cout << layer_idx << ", " << node_idx <<endl;
             for (int j = 0; j < kappa.size(); ++j) {
                 double kappa_val = abs(kappa(j));
-                // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_turn << " || " << 1 / min_turn << endl;
-                if ((kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) && !splineMap[start][end].raceline) {
+                // cout << "kappa_val: " << kappa_val << " || " << 1 / params.veh_trun << " || " << 1 / min_turn << endl;
+                if ((kappa_val > 1 / params.veh_turn || kappa_val > 1 / min_turn) && !splineMap[start][end].raceline) {
                  tooBigKappa = true;
                     break; // 더 볼 필요 없음, 바로 탈출
                 }
             }
 
-            if (tooBigKappa) graph_wp.removeEdge(start, end, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
+            if (tooBigKappa) wayptGraph.removeEdge(start, end, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
             else {edge_cnt++;}
             // delete kappa;
             // kappa = nullptr;
@@ -382,18 +374,18 @@ void genEdges(NodeMap &nodesPerLayer,
             IPair srcNodeIdx = make_pair(layerIdx, nodeIdx);
 
             IPairVector parents;
-            bool isParent = graph_wp.getParentNodes(srcNodeIdx, parents, static_cast<int>(nodesPerLayer.size()));
+            bool isParent = wayptGraph.getParentNodes(srcNodeIdx, parents, static_cast<int>(nodesPerLayer.size()));
 
             if (!isParent) {
                 // cout << layerIdx << ", " << nodeIdx << endl;
                 // cout << "-------" << endl;
                     IPairVector childs;
-                    bool isChild = graph_wp.getChildNodes(srcNodeIdx, childs);
+                    bool isChild = wayptGraph.getChildNodes(srcNodeIdx, childs);
                     if (isChild) {
                         // cout << layerIdx << ", " << nodeIdx << endl;
                         for (auto& child : childs) {
                             // cout << "remove!" << endl;
-                            graph_wp.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
+                            wayptGraph.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
                         }
                     }
 

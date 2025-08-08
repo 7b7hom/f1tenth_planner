@@ -8,10 +8,9 @@
 #include <cmath>
 #include <algorithm>
 #include <time.h>
-#include <set>
-#include <queue>
+#include <memory>
 #include <Eigen/Dense>
-#include "config_modena.h"
+#include "config_millbrook.h"
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
 
@@ -69,7 +68,7 @@ typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vecto
 typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
 typedef map<IPair, map<IPair, Spline>> SplineMap;
 
-extern DMap gtpl_map;
+// extern DMap gtpl_map;
 extern DMap sampling_map;
 
 struct ActionSet {
@@ -98,7 +97,10 @@ void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double 
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
 void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
 void plotSpline(const Spline& spline, const string& color);
-void visual(const Graph& edgeList, const NodeMap& nodesPerLayer, const SplineMap& splineMap, const string &color);
+void visual(const Graph &edgeList,
+            const NodeMap &nodesPerLayer,
+            const SplineMap &splineMap,
+            DMap &gtpl_map);
 
 // helper_func.cpp
 unique_ptr<string> Load(const string& filename);
@@ -122,18 +124,10 @@ VectorXd calcKappa(MatrixXd &coeffs_x,
                    MatrixXd &coeffs_y,
                    VectorXd &t_steps);
 void genEdges(NodeMap &nodesPerLayer, 
-              Graph &edgeList,
+              Graph &wayptGraph,
               SplineMap &splineMap,
               const IVector &raceline_index_array,
-              const float veh_width,
-              const float lat_offset,
-              const float lat_resolution,
-              const float curve_thr,
-              const int max_lat_steps,
-              const float stepsize_approx,
-              const float min_vel_race,
-              const float max_lateral_accel,
-              const float veh_turn);
+              Offline_Params& params);
 
 pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
                         MatrixXd &coeffs_y,
