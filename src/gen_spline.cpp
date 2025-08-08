@@ -4,8 +4,6 @@
 DMap gtpl_map;
 DMap sampling_map;
 
-// --- 실행하기 위해서 main에서 가져온 부분 ---
-
 // CSV를 읽어서 DMap으로 변경
 void readDMapFromCSV(const string& pathname, DMap& map) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
@@ -130,7 +128,7 @@ void calcHeading(DVector &x_raceline, DVector &y_raceline, DVector &psi) {
             dy = y_raceline[0] - y_raceline[N - 1];
         }
         psi[i] = atan2(dy, dx) - M_PI_2;
-        normalizeAngle(psi[i]);
+        psi[i] = normalizeAngle(psi[i]);
     }
 }
 
@@ -183,7 +181,7 @@ void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolutio
             }
             else { 
                 int remain = num_nodes - raceline_index - 1;
-                double t = static_cast<double>(idx - raceline_index) / std::max(remain, 1); 
+                double t = static_cast<double>(idx - raceline_index) / max(remain, 1); 
                 psi_interp = sampling_map[__psi][i] + t * (sampling_map[__psi_bound_r][i] - sampling_map[__psi][i]);
                 current_node_instance.psi = normalizeAngle(psi_interp);
             }
@@ -238,7 +236,6 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     plt::scatter(node_x, node_y, 15.0, {{"color", "purple"}, {"label", "Nodes"}});
 }
 
-
 // --- spline 관련 함수들 ---
 // 여기부터 코딩
 
@@ -253,8 +250,8 @@ VectorXd computeEuclideanDistances(const MatrixXd& path) {
 
 SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 되는 경로 점들의 X, Y 좌표 담고 있는 참조 변수(&: 오버헤드 줄여줌.)
                          const VectorXd* el_lengths_ptr = nullptr, // 유클리드 거리 담고 있는 포인터 변수(nullptr이면 유클리드 거리 직접 계산, 아니면 포인터가 가리키는 VectorXd 객체 거리 사용)
-                         double psi_s = std::numeric_limits<double>::quiet_NaN(), // spline 시작점 heading(NaN이면 헤딩 지정x -> natural spline 조건 따름(2차 미분값 0))
-                         double psi_e = std::numeric_limits<double>::quiet_NaN(), // spline 끝점 heading
+                         double psi_s = numeric_limits<double>::quiet_NaN(), // spline 시작점 heading(NaN이면 헤딩 지정x -> natural spline 조건 따름(2차 미분값 0))
+                         double psi_e = numeric_limits<double>::quiet_NaN(), // spline 끝점 heading
                          bool use_dist_scaling = true){ // spline의 1차 및 2차 미분 연속성 조건에 거리 스케일링 적용할지 여부(기본값 true -> el_lengths 고려하여 미분값들 스케일링)
     
     bool closed = (path.row(0) - path.bottomRows(1)).norm() < 1e-6;
@@ -265,7 +262,7 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
     if(use_dist_scaling && el_lengths_ptr == nullptr){
         el_lengths = computeEuclideanDistances(path);
     }else if(el_lengths_ptr){
-
+        el_lengths = *el_lengths_ptr;
     }
 
     if(use_dist_scaling && closed){
@@ -337,7 +334,7 @@ SplineResult calcSplines(const MatrixXd& path, // spline 생성 시 기준이 �
     for (int i = 0; i < no_splines; ++i) {
         double dx = coeffs_y(i, 1);
         double dy = -coeffs_x(i, 1);
-        double norm = std::sqrt(dx * dx + dy * dy);
+        double norm = sqrt(dx * dx + dy * dy);
         normvec(i, 0) = dx / norm;
         normvec(i, 1) = dy / norm;
     }
@@ -402,7 +399,7 @@ bool isPointInsideTrackBounds(double x, double y){
     }
 
     // (x, y) 점에서 가장 가까운 sampling_map의 기준선 인덱스 찾기
-    double min_dist_sq = std::numeric_limits<double>::max(); // 가능한 가장 큰 수로 초기갑 설정
+    double min_dist_sq = numeric_limits<double>::max(); // 가능한 가장 큰 수로 초기갑 설정
     int closest_ref_idx = -1; // 유효하지 않은 값으로 초기값 설정
 
     for(size_t i = 0; i < sampling_map[__x_ref].size(); ++i){
@@ -462,9 +459,9 @@ bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, 
         }
 
         // 곡률 제약 조건 확인
-        // std::abs(sp.kappa): 현재 spline 점에서의 kappa 절댓값
+        // abs(sp.kappa): 현재 spline 점에서의 kappa 절댓값
         // 4.0 / params.VEH_TURN: 차량이 허용하는 최대 곡률 (최소 회전 반경의 역수)
-        if(std::abs(sp.kappa) > max_allowed_kappa){
+        if(abs(sp.kappa) > max_allowed_kappa){
             cout << "REJECTED (EXCESSIVE CURVATURE): Point (" << sp.x << "," << sp.y << "), kappa=" << sp.kappa << ", max_allowed=" << max_allowed_kappa << endl;
             return false;
         }
@@ -476,19 +473,19 @@ bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, 
     for (int k = 0; k <= num_samples; ++k) {
         double t_eval = static_cast<double>(k) / num_samples;
         SplinePoint sp = evaluateSpline(coeff_x, coeff_y, t_eval, ds_current, true);
-        max_kappa = std::max(max_kappa, std::abs(sp.kappa));
-        min_kappa = std::min(min_kappa, std::abs(sp.kappa));
+        max_kappa = max(max_kappa, abs(sp.kappa));
+        min_kappa = min(min_kappa, abs(sp.kappa));
     }
-    std::cout << "[PASS] SPLINE OK: max_kappa=" << max_kappa
+    /*cout << "[PASS] SPLINE OK: max_kappa=" << max_kappa
               << ", min_kappa=" << min_kappa
               << ", limit=" << max_allowed_kappa
-              << std::endl;
+              << endl;*/
     }
 
     return true;
 }
 
-void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params params){
+void genEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params params){
     const size_t num_layers = nodesPerLayer.size();
 
     // layer 순회
@@ -542,12 +539,12 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
 
                 if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params)){
                     ITuple src_key(current_node.layer_idx, current_node.node_idx);
-                    graph.addEdge(src_key, next_node.node_idx);
-                    cout << "SPLINE PASSED!!!! from (" << current_node.layer_idx << "," << current_node.node_idx
-                         << ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
+                    graph.addEdge(src_key, next_node.node_idx, res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0)); 
+                    //cout << "SPLINE PASSED!!!! from (" << current_node.layer_idx << "," << current_node.node_idx
+                         //<< ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
                 }else{
-                    cout << "SPLINE REJECTED from (" << current_node.layer_idx << "," << current_node.node_idx
-                         << ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
+                    //cout << "SPLINE REJECTED from (" << current_node.layer_idx << "," << current_node.node_idx
+                         //<< ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
                 }
             }
 
@@ -555,208 +552,311 @@ void generateGraphEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offlin
     }
 }
 
+/*void prune_graph(Graph& graph, int num_layers, bool closed = true){
+    int total_removed_edges = 0;
+    int iteration_count = 0;
 
-// -- prune_graph() --
+    while(true){ // 더 이상 엣지가 제거되지 않을 때까지 반복
+        int removed_edges = 0;
+        
+        set<pair<ITuple, int>> edges_to_remove; 
+        set<ITuple> nodes_to_delete_from_map; 
 
-void prune_graph(Graph& graph, int num_layers, bool closed = true){
-    int j = 0;
-    int rmv_cnt_tot = 0;
+        // 1. 제거 대상 edge, node 식별(제거할 목록 만듦)
 
-    vector<ITuple> nodes;
-    for(int layer = 0; layer < num_layers; ++layer){
-        for(const auto& [key, vec] : graph.getAdjLists()){
-            if(get<0>(key) == layer){
-                nodes.push_back(key);
-            }
+        // 현재 Graph의 adjLists 맵의 모든 노드 키 스냅샷 가져옴
+        vector<ITuple> all_current_graph_keys;
+        for(const auto& [key, _] : graph.getAdjLists()){
+            all_current_graph_keys.push_back(key);
         }
-    }
 
-    while(true){
-        int rmv_cnt = 0;
-
-        for(const auto& node : nodes){
-            int layer = get<0>(node);
-            int node_idx = get<1>(node);
+        // 그래프에 더 이상 노드가 없다면 가지치기 멈춤.
+        if (all_current_graph_keys.empty()) {
+            cout << "Graph is empty or no more active nodes, stopping pruning." << endl;
+            break;
+        }
+        
+        // 모든 키 스냅샷을 순회, 가지치기 대상 식별
+        for(const auto& node_key : all_current_graph_keys){
+            int layer = get<0>(node_key);
+            int node_idx = get<1>(node_key);
 
             if(!closed && (layer == 0 || layer == num_layers - 1)){
-                continue;
+                continue; 
             }
 
-            IVector children;
-            vector<ITuple> parents;
+            IVector children; // 현재 노드의 자식 노드 인덱스 목록
+            vector<ITuple> parents; // 현재 노드의 부모 노드 키 목록
 
             try{
-                graph.getChildIdx(node, children);
-            }catch(...){
+                graph.getChildIdx(node_key, children);
+            }catch(const runtime_error& e){
+                children.clear();
+            } catch(...) {
                 children.clear();
             }
             
-            graph.getParentNode(layer, node_idx, parents);
+            // 부모 노드 정보 가져오기
+            graph.getParentNode(layer, node_idx, parents, num_layers); 
 
-            if(children.empty() || parents.empty()){
-                if(children.empty()){
-                    for(const auto& parent : parents){
-                        graph.removeEdge(parent, node_idx);
-                        ++rmv_cnt;
-                    }
-                }else{
-                    for(int child : children){
-                        graph.removeEdge(node, child);
-                        ++rmv_cnt;
-                    }
+            // 자식이 없거나 부모가 없는 노드인 경우 가지치기.
+            if(children.empty()){ // 자식이 없는 경우 이 노드로 들어오는 모든 엣지 제거
+                for(const auto& parent : parents){
+                    edges_to_remove.insert({parent, node_idx});
                 }
+                nodes_to_delete_from_map.insert(node_key); 
+            } else if(parents.empty()){ // 자식이 있지만 부모가 없는 경우
+                for(int child : children){ // 이 노드에서 나가는 모든 엣지 제거
+                    edges_to_remove.insert({node_key, child});
+                }
+                nodes_to_delete_from_map.insert(node_key); 
             }
         }
 
-        if(rmv_cnt == 0){
-            break;
-        }else{
-            rmv_cnt_tot += rmv_cnt;
+        // 2. 식별된 엣지들을 실제로 제거
+
+        for(const auto& edge : edges_to_remove){
+            const ITuple& parent_node_key = edge.first;
+            int child_node_idx = edge.second;
+
+            // edge 제거
+            graph.removeEdge(parent_node_key, child_node_idx);
+            removed_edges++; // 제거된 edge 수 증가
         }
-        ++j;
+
+        cout << "Iteration " << iteration_count << ": Removed " << removed_edges << " edges." << endl;
+
+        if(removed_edges == 0){
+            break; 
+        }else{
+            total_removed_edges += removed_edges;
+        }
+        iteration_count++;
     }
+    cout << "Total edges removed during pruning: " << total_removed_edges << endl;
+}*/
 
-}
+void prune_graph(Graph& graph, int num_layers, bool closed = true) {
+    int total_removed_edges = 0;
+    int iteration_count = 0;
 
-// 트랙의 경계, 레이싱 라인, 샘플링된 포인트, 생성된 노드들, 그리고 그래프 엣지(스플라인)를 시각화
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params) {
-    plt::clf();
+    while (true) {
+        int removed_edges_in_iter = 0;
+        set<pair<ITuple, int>> edges_to_remove;
+        vector<ITuple> all_current_graph_keys;
 
-    // 트랙 경계선
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+        for (const auto& [key, _] : graph.getAdjLists()) {
+            all_current_graph_keys.push_back(key);
+        }
 
-    // 레이싱 라인 및 샘플링된 포인트
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
-    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+        if (all_current_graph_keys.empty()) {
+            cout << "Graph is empty, stopping pruning." << endl;
+            break;
+        }
 
-    // 노드들
-    plotHeading(nodesPerLayer);
+        for (const auto& node_key : all_current_graph_keys) {
+            int layer = get<0>(node_key);
+            int node_idx = get<1>(node_key);
 
-    // --- Graph 엣지 (스플라인) 시각화 ---
-    
-    DVector spline_x_pts; 
-    DVector spline_y_pts;
-
-    for (const auto& layer_nodes : nodesPerLayer) {
-        for (const auto& current_node : layer_nodes) {
-            ITuple src_key(current_node.layer_idx, current_node.node_idx);
-            IVector child_nodes_idx;
-
-            try {
-                graph.getChildIdx(src_key, child_nodes_idx);
-            } catch (const std::runtime_error& e) {
+            if (!closed && (layer == 0 || layer == num_layers - 1)) {
                 continue;
             }
+
+            IVector children_idx;
+            vector<ITuple> parents;
+
+            try {
+                graph.getChildIdx(node_key, children_idx);
+            } catch (...) {
+                children_idx.clear();
+            }
+
+            graph.getParentNode(layer, node_idx, parents, num_layers);
+
+            if (parents.empty()) {
+                for (int child_idx : children_idx) {
+                    edges_to_remove.insert({node_key, child_idx});
+                }
+            }
+            else if (children_idx.empty()) {
+                for (const auto& parent : parents) {
+                    edges_to_remove.insert({parent, node_idx});
+                }
+            }
+        }
+
+        for (const auto& edge : edges_to_remove) {
+            graph.removeEdge(edge.first, edge.second);
+            removed_edges_in_iter++;
+        }
+
+        cout << "Iteration " << iteration_count << ": Removed " << removed_edges_in_iter << " edges." << endl;
+
+        if (removed_edges_in_iter == 0) {
+            break;
+        }
+
+        total_removed_edges += removed_edges_in_iter;
+        iteration_count++;
+    }
+
+    cout << "Total edges removed during pruning: " << total_removed_edges << endl;
+}
+
+
+void gen_offline_cost(Graph& graph, const Offline_Params& params, const NodeMap& nodesPerLayer){
+    int total_edges_count = 0;
+    for(const auto& [srcKey, destMap] : graph.getAdjLists()){
+        total_edges_count += destMap.size();
+    }
+    
+    int processed_edges_count = 0; 
+
+    for(auto& [srcKey, destMap] : graph.getAdjLists_mutable()){ // mutable 접근자 통해 EdgeInfo 수정
+        for(auto& [destIdx, edgeInfo] : destMap){ // EdgeInfo를 참조로 받아 직접 수정
+            double current_offline_cost = 0.0; 
+
+            // spline 곡률 계산을 위한 샘플링
+            vector<double> kappas_on_spline; // 샘플링된 곡률 값 저장할 벡터
+            const int num_samples_for_cost = 20; 
+            double sum_abs_kappa = 0.0;
+            double max_kappa_val = -numeric_limits<double>::infinity(); 
+            double min_kappa_val = numeric_limits<double>::infinity();  
+
+            for(int k = 0; k <= num_samples_for_cost; ++k){
+                double t_eval = static_cast<double>(k) / num_samples_for_cost;
+                // EdgeInfo에 저장된 원본 스플라인 계수 사용
+                SplinePoint sp = evaluateSpline(edgeInfo.coeffs_x_orig, edgeInfo.coeffs_y_orig, t_eval, edgeInfo.spline_len, true);
+                
+                kappas_on_spline.push_back(sp.kappa); // 각 샘플 지점의 곡률 저장
+                sum_abs_kappa += abs(sp.kappa); // 절대 곡률 합계
+                max_kappa_val = max(max_kappa_val, abs(sp.kappa)); // 최대 절대 곡률
+                min_kappa_val = min(min_kappa_val, abs(sp.kappa));  // 최소 절대 곡률
+            }
+
+            // 평균 곡률
+            double avg_abs_kappa = sum_abs_kappa / static_cast<double>(num_samples_for_cost + 1);
+            current_offline_cost += params.W_CURV_AVG * pow(avg_abs_kappa, 2) * edgeInfo.spline_len;
+
+            // 피크 곡률
+            double diff_peak_kappa = abs(max_kappa_val - min_kappa_val); // 최대 절대 곡률 - 최소 절대 곡률
+            current_offline_cost += params.W_CURV_PEAK * pow(diff_peak_kappa, 2) * edgeInfo.spline_len;
+
+            // 경로 길이 비용
+            current_offline_cost += params.W_LENGTH * edgeInfo.spline_len;
+
+            // 레이싱 라인 비용 계산
+            int raceline_idx_at_end_layer = -1;
+
+            // 현재 edge의 끝 node 인덱스가 속한 레이어는 srcKey의 layer + 1
+            // NUM_LAYERS(config.h에 정의) 사용하여 연산으로 다음 layer 인덱스 계산(닫힌 루프 처리)
+            int end_layer_idx = (get<0>(srcKey) + 1) % params.NUM_LAYERS;
             
-            for (int dest_node_idx : child_nodes_idx) {
-                // 각 스플라인 그리기 전에 벡터를 비워줍니다. (이전 스플라인 점 데이터 초기화)
-                spline_x_pts.clear(); 
-                spline_y_pts.clear(); 
-                
-                size_t next_layer_idx = (current_node.layer_idx + 1) % nodesPerLayer.size();
-                // next_node_idx 유효성 검사 추가 (인덱스 범위 체크)
-                if (dest_node_idx < 0 || dest_node_idx >= nodesPerLayer[next_layer_idx].size()) {
-                    // cout << "Warning: Invalid dest_node_idx " << dest_node_idx << " for layer " << next_layer_idx << endl; // 이 라인도 extended character 오류의 원인이 될 수 있습니다.
-                    continue;
-                }
-                const Node& next_node = nodesPerLayer[next_layer_idx][dest_node_idx];
-
-                MatrixXd spline_path(2, 2);
-                spline_path << current_node.x, current_node.y,
-                               next_node.x, next_node.y;
-                
-                double psi_s = current_node.psi;
-                double psi_e = next_node.psi;
-
-                VectorXd el_lengths(1);
-                el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
-
-                SplineResult res;
-                try {
-                    // calcSplines의 마지막 인자인 use_dist_scaling은 true로 가정
-                    res = calcSplines(spline_path, &el_lengths, psi_s, psi_e, true);
-                } catch (const std::exception& e) {
-                    continue;
-                }
-
-                // 계산된 스플라인 계수를 사용하여 곡선 그리기
-                const int num_spline_segments = 10; 
-                for (int k = 0; k <= num_spline_segments; ++k) {
-                    double t_eval = static_cast<double>(k) / num_spline_segments;
-                    SplinePoint sp = evaluateSpline(res.coeffs_x.row(0), res.coeffs_y.row(0), t_eval, res.ds(0), true);
-                    spline_x_pts.push_back(sp.x);
-                    spline_y_pts.push_back(sp.y);
-                }
-
-                plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}});
-                /*if(current_node.layer_idx==0){
-                    if(dest_node_idx==0){
-                        plt::plot(spline_x_pts, spline_y_pts, {{"color", "yellow"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
-                    }else{
-                        plt::plot(spline_x_pts, spline_y_pts, {{"color", "black"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
+            // 레이싱 라인 플래그 true 인 노드 찾기
+            if (end_layer_idx < nodesPerLayer.size()) {
+                for (const auto& node_in_end_layer : nodesPerLayer[end_layer_idx]) {
+                    if (node_in_end_layer.raceline) {
+                        raceline_idx_at_end_layer = node_in_end_layer.node_idx;
+                        break;
                     }
-                }else{
-                    plt::plot(spline_x_pts, spline_y_pts, {{"color", "green"}, {"linewidth", "1"}}); // {"label", "Valid Splines"}
-                }*/
+                }
             }
+            
+            // 레이싱 라인 노드
+            if (raceline_idx_at_end_layer != -1) {
+                double raceline_dist = abs(raceline_idx_at_end_layer - destIdx) * params.LAT_RESOLUTION;
+                current_offline_cost += min(params.W_RACELINE * edgeInfo.spline_len * raceline_dist,
+                                                 params.W_RACELINE_SAT * edgeInfo.spline_len);
+            } else {
+                // cout << "Warning: Raceline node not found for end layer " << end_layer_idx << ". Raceline cost not fully applied." << endl;
+            }
+
+            // 최종 비용 edgeInfo에 저장
+            edgeInfo.offline_cost = current_offline_cost;
+
+            processed_edges_count++;
         }
     }
 
-    plt::title("Track and Planned Graph");
-    plt::grid(true);
-    plt::axis("equal");
-    plt::legend();
-    plt::show();
 }
 
-// 전체 경로 계획 파이프라인을 실행하는 함수
-void runPlanningPipeline(const Offline_Params& params, const std::string& map_file_in, const std::string& map_file_out) {
-    // 1. 트랙 데이터 로드 및 전처리
-    readDMapFromCSV(map_file_in, gtpl_map); // gen_spline.cpp의 전역 gtpl_map에 로드
-    addDVectorToMap(gtpl_map, "bound_r");
-    addDVectorToMap(gtpl_map, "bound_l");
-    addDVectorToMap(gtpl_map, "raceline");
-    addDVectorToMap(gtpl_map, "delta_s");
-    writeDMapToCSV(map_file_out, gtpl_map);
-
-    // 2. 레이어 샘플링
-    IVector idx_sampling;
-    samplePointsFromRaceline(gtpl_map[__kappa], gtpl_map[__delta_s],
-                             params.LON_CURVE_STEP, params.LON_STRAIGHT_STEP,
-                             params.CURVE_THR, idx_sampling);
+void set_startpos(const Vector2d& pos_est, double heading_est, const Offline_Params& params, const NodeMap& nodesPerLayer,
+                  Graph& graph, double max_heading_offset_rad, ITuple& out_start_key, int& out_next_idx, bool& out_of_track){
+    // 레이어 0 노드 선택 > 레이어 1 노드 선택 > 엣지 존재 여부 확인 > 없으면 생성 / 있으면 유지
     
-    // 샘플링된 인덱스를 사용하여 gtpl_map에서 데이터를 복사하여 sampling_map 채우기
-    for (const auto& [key, vec] : gtpl_map) {
-        sampling_map[key].reserve(idx_sampling.size()); 
-        for (int idx : idx_sampling) {
-            if (idx >= 0 && idx < (int)vec.size()) { 
-                sampling_map[key].push_back(vec[idx]);
-            }
-        }
+    if(nodesPerLayer.empty()) throw runtime_error("Graph not initialized.");
+
+    // 1. 트랙 내부 여부
+    const bool in_track = isPointInsideTrackBounds(pos_est.x(), pos_est.y());
+
+    // 2. 가장 가까운 레이어 인덱스
+    int l0_tmp = -1; double best = numeric_limits<double>::max();
+    for(size_t i = 0; i < sampling_map[__x_ref].size(); ++i){
+        double dx = pos_est.x() - sampling_map[__x_ref][i];
+        double dy = pos_est.y() - sampling_map[__y_ref][i];
+        double d2 = dx*dx + dy*dy;
+        if(d2 < best) { best = d2; l0_tmp = (int)i; }
     }
-    addDVectorToMap(sampling_map, "delta_s", &idx_sampling); 
+
+    // l0_tmp 가 유효할 때만 헤딩 비교 가능
+    bool cor_heading = false;
+    if(l0_tmp >= 0 && l0_tmp < (int)sampling_map[__psi].size()){
+        cor_heading = abs(normalizeAngle(heading_est - sampling_map[__psi][l0_tmp])) <= max_heading_offset_rad;
+    }
+
+    // 하나라도 실패하면 그냥 종료
+    if(!in_track || !cor_heading || l0_tmp < 0 || l0_tmp >= (int)nodesPerLayer.size()){
+        out_of_track = true;
+        out_start_key = ITuple(-1, -1);
+        out_next_idx = -1;
+        return;
+    }
+
+    const int l0 = l0_tmp;
+
+    // 3. 레이어 0 노드 인덱스
+    const double ref_x = sampling_map[__x_ref][l0], ref_y = sampling_map[__y_ref][l0];
+    const double nx = sampling_map[__x_normvec][l0], ny = sampling_map[__y_normvec][l0];
+    const double wL = sampling_map[__width_left][l0], wR = sampling_map[__width_right][l0];
+    const double alpha_v = (pos_est.x() - ref_x) * nx + (pos_est.y() - ref_y) * ny;
+
+    const double lat = params.LAT_RESOLUTION, vehW = params.VEH_WIDTH;
+    const int raceline_index = (int)floor((wL + sampling_map[__alpha][l0] - 0.5 * vehW) / lat);
+    const double start_alpha = sampling_map[__alpha][l0] - raceline_index * lat;
+
+    int num_nodes = (int)((wR + wL - vehW) / lat) + 1;
+    num_nodes = max(num_nodes, 1);
+
+    int node_idx0 = (int)llround((alpha_v - start_alpha) / lat);
+    node_idx0 = clamp(node_idx0, 0, min(num_nodes - 1, (int)nodesPerLayer[l0].size() - 1));
+
+    out_start_key = ITuple(l0, node_idx0);
+
+    // 4. 레이어 1 노드
+    const int l1 = (l0 + 1) % (int)nodesPerLayer.size();
+    out_next_idx = clamp(node_idx0, 0, (int)nodesPerLayer[l1].size() - 1);
+
+    // 5. 엣지 없으면 생성
+    const auto& adj = graph.getAdjLists();
+    const auto it = adj.find(out_start_key);
+    const bool has_edge = (it != adj.end()) && (it->second.count(out_next_idx) > 0);
+
+    if(!has_edge){
+        const Node& a = nodesPerLayer[l0][node_idx0];
+        const Node& b = nodesPerLayer[l1][out_next_idx];
+
+        MatrixXd P(2, 2); P << a.x, a.y, b.x, b.y;
+        VectorXd L(1); L(0) = (P.row(1) - P.row(0)).norm();
+
+        try{
+            auto res = calcSplines(P, &L, a.psi, b.psi, true);
+            if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params))
+                graph.addEdge(out_start_key, out_next_idx, res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0));
+        }catch(...){}
+    }
     
-    calcHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
-    calcHeading(sampling_map[__x_bound_l], sampling_map[__y_bound_l], sampling_map[__psi_bound_l]);
-    calcHeading(sampling_map[__x_bound_r], sampling_map[__y_bound_r], sampling_map[__psi_bound_r]);
-
-    // 3. 노드 그리드 생성
-    NodeMap nodesPerLayer;
-    genNode(nodesPerLayer, params.VEH_WIDTH, params.LAT_RESOLUTION);
-
-    // 4. 스플라인 생성 및 유효성 검사, 최종 그래프 구축
-    Graph directedGraph; 
-    generateGraphEdges(directedGraph, nodesPerLayer, params);
-
-    prune_graph(directedGraph, nodesPerLayer.size(), true); 
-
-    // 5. 최종 그래프 연결 확인 (Print Graph)
-    cout << "\n--- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---" << endl;
-    directedGraph.printGraph();
-
-    // 6. 결과 시각화 (Plotting)
-    visual(nodesPerLayer, directedGraph, params); 
+    out_of_track = false;
 }
+
+
 

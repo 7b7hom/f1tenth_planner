@@ -8,6 +8,7 @@
 #include <cmath>
 #include <algorithm>
 #include <Eigen/Dense>
+#include <set>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
 
@@ -47,6 +48,16 @@ struct Node {
     bool raceline;
 };
 
+struct EdgeInfo {
+    double offline_cost;
+    double spline_len;
+    Eigen::RowVector4d coeffs_x_orig; // 이 엣지를 생성한 스플라인의 X 계수
+    Eigen::RowVector4d coeffs_y_orig; // 이 엣지를 생성한 스플라인의 Y 계수
+
+    // 기본 생성자 (필드 초기화)
+    EdgeInfo() : offline_cost(0.0), spline_len(0.0) {}
+};
+
 struct SplineResult {
     MatrixXd coeffs_x;
     MatrixXd coeffs_y;
@@ -67,19 +78,22 @@ typedef map<string, DVector> DMap;
 typedef map<string, IVector> IMap;
 typedef vector<vector<Node>> NodeMap;
 typedef tuple<int, int> ITuple;
-typedef map<ITuple, IVector> TupleMap;
+typedef map<ITuple, std::map<int, EdgeInfo>> GraphAdjListsMap;
 
 class Graph {
 private:
-    TupleMap adjLists;
+    GraphAdjListsMap adjLists;
     bool isDirected;
 
 public:
     Graph(bool directed = true);
     void addEdge(ITuple srcKey, int destIdx);
+    void addEdge(ITuple srcKey, int destIdx, const Eigen::RowVector4d& coeffs_x, const Eigen::RowVector4d& coeffs_y, double spline_len);
     void printGraph();
     void getChildIdx(ITuple srcKey, IVector& childIdx);
-    void getParentNode(int target_layer, int value, vector<ITuple>& parent);
-    void removeEdge(const ITuple& parent, int value); // const 붙임
-    const TupleMap& getAdjLists() const; 
+    void getParentNode(int target_layer, int value, vector<ITuple>& parent, int num_layers);
+    void removeEdge(const ITuple& parent, int value); 
+    const GraphAdjListsMap& getAdjLists() const;
+    GraphAdjListsMap& getAdjLists_mutable(); 
 };
+
