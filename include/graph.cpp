@@ -1,4 +1,5 @@
 #include "graph_planner.hpp"
+#include "graph.h"
 
 Graph::Graph(bool directed) {
     isDirected = directed;

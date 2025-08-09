@@ -657,10 +657,12 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_modena.h
+  include/config_berlin.h \
+  include/graph.h
 
 CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/stdc-predef.h \
+  include/graph.h \
   include/graph_planner.hpp \
   /usr/include/c++/11/iostream \
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -1315,10 +1317,11 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_modena.h
+  include/config_berlin.h
 
 CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/stdc-predef.h \
+  include/graph.h \
   include/graph_planner.hpp \
   /usr/include/c++/11/iostream \
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -1973,10 +1976,11 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_modena.h
+  include/config_berlin.h
 
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/stdc-predef.h \
+  include/graph.h \
   include/graph_planner.hpp \
   /usr/include/c++/11/iostream \
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -2631,10 +2635,11 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_modena.h
+  include/config_berlin.h
 
 CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/stdc-predef.h \
+  include/graph.h \
   include/graph_planner.hpp \
   /usr/include/c++/11/iostream \
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -3289,12 +3294,14 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_modena.h
+  include/config_berlin.h
 
 
 src/visualization.cpp:
 
-include/config_modena.h:
+include/graph.h:
+
+include/config_berlin.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 

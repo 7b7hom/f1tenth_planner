@@ -15,7 +15,7 @@
 #include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
-#include "config_modena.h"
+#include "config_berlin.h"
 
 
 //////////////////////////////////////////////////////////////////////
@@ -79,9 +79,6 @@ typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vecto
 typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
 typedef map<IPair, map<IPair, Spline>> SplineMap;
 
-// extern DMap gtpl_map;
-extern DMap stMap;
-
 struct ActionSet {
     string action_id; // "straight"
     vector<MatrixXd> coeffs; // x_coeff, y_coeff
@@ -90,65 +87,33 @@ struct ActionSet {
     vector<IPair> node_idx; // [0, path.size()-1]
 };
 
-class Graph {
-private:
-    bool isDirected;
-public:
-    IPairAdjList adjLists;
-    Graph(bool directed = true);
-    void addEdge(IPair srcIdx, IPair dstIdx);
-    void printGraph();
-    bool getChildNodes(const IPair& parentIdx, IPairVector& childIdx);
-    bool getParentNodes(const IPair& childIdx, IPairVector& parentIdx, int num_layers);
-    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int& remove_cnt, int num_layers);
-};
-
 // visualization.cpp
 void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
 void plotHeading(const NodeMap& nodesPerLayer, double scale);
 void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
 void plotSpline(const Spline& spline, const string& color);
-void visual(DMap &gtpl_map,
-            const NodeMap &nodesPerLayer,
-            const SplineMap &splineMap);
 
 // helper_func.cpp
 unique_ptr<string> Load(const string& filename);
 double normalizeAngle(double angle);
-void readDMapFromCSV(const string& pathname, DMap& map);
+pair<DVector, DVector> computeBoundRight(DVector &pos_x, DVector &pos_y,
+                                         DVector &norm_x, DVector &norm_y,
+                                         DVector &width_r);
+pair<DVector, DVector> computeBoundLeft(DVector &pos_x, DVector &pos_y,
+                                        DVector &norm_x, DVector &norm_y,
+                                        DVector &width_l);
+pair<DVector, DVector> computeRaceline(DVector &pos_x, DVector &pos_y,
+                                       DVector &norm_x, DVector &norm_y,
+                                       DVector &norm_l);
+
+DVector computeDeltaS(DVector &rl_s);
+DMap readDMapFromCSV(const string& pathname);
 void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
 void map_size(DMap& map);
-void addDVectorToMap(DMap& map, string attr);
-bool checkInsideBounds(const Vector2d& pos, const float veh_width);
+bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width);
 void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer);
+DVector calcHeading(DVector &x_raceline, DVector &y_raceline);
 
 //genSplines.cpp
-void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline, 
-                 DVector &psi);
-unique_ptr<Spline> calcSplines(const MatrixXd &path,
-                                     double psi_s, 
-                                     double psi_e, 
-                                     bool use_dist_scaling=true);
-VectorXd calcKappa(MatrixXd &coeffs_x,
-                   MatrixXd &coeffs_y,
-                   VectorXd &t_steps);
-pair<Graph, SplineMap> genEdges(NodeMap &nodesPerLayer, 
-              const IVector &raceline_index_array,
-              Offline_Params& params);
 
-pair<VectorXd, VectorXd> interpSplines(MatrixXd &coeffs_x,
-                        MatrixXd &coeffs_y,
-                        float stepsize_approx,
-                        const float& veh_width,
-                        double spline_len = NAN,
-                        int no_interp_points = 10);
-
-struct SplineTask {
-    IPair start;
-    IPair end;
-    MatrixXd path;
-    double psi_start;
-    double psi_end;
-    bool is_raceline;
-};
+void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, const SplineMap &splineMap);

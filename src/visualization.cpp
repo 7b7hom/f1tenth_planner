@@ -1,4 +1,5 @@
-#include "graph_planner.hpp"
+// #include "graph_planner.hpp"
+#include "graph.h"
 
 void plotHeading(const DVector &x,
                  const DVector &y,
@@ -166,6 +167,7 @@ void plotSpline(const Spline& spline, const string& color) {
 }
 
 void visual(DMap &gtMap,
+            DMap &stMap,
             const NodeMap &nodesPerLayer,
             const SplineMap &splineMap) {
 

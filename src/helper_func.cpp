@@ -1,4 +1,5 @@
-#include "graph_planner.hpp"
+#include "graph.h"
+// #include "graph_planner.hpp"
 
 unique_ptr<string> Load(const string& filename) {
     ifstream file(filename);
@@ -40,63 +41,88 @@ void map_size(DMap& map) {
 }
 
 // CSV를 읽어서 DMap으로 변경 
-void readDMapFromCSV(const string& pathname, DMap& map) {
+DMap readDMapFromCSV(const string& pathname) {
+    DMap gtMap;
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
     vector<string> labels = csv.GetColumnNames();
 
     for (const auto& label : labels)
-        map[label] = csv.GetColumn<double>(label);
+        gtMap[label] = csv.GetColumn<double>(label);
+    
+    return gtMap;
 }
 
-void addDVectorToMap(DMap &map, string attr) {
-
-    int len = 0;
-    if (!map.empty()) {
-        len = static_cast<int>(map.begin()->second.size());
-    } else {
-        throw invalid_argument("Empty Map! - addDVectorToMap");
+pair<DVector, DVector> computeBoundRight(DVector &pos_x, DVector &pos_y,
+                                         DVector &norm_x, DVector &norm_y,
+                                         DVector &width_r) {
+    if (pos_x.empty() || pos_y.empty() || norm_x.empty() || norm_y.empty() || width_r.empty()) {
+        throw runtime_error("computeBoundRight() - Empty DVector !!");
     }
 
-    DVector x_out(len), y_out(len);
-    string x_label = "x_" + attr;
-    string y_label = "y_" + attr;
+    int len = pos_x.size();
+    DVector x_bound_r(len), y_bound_r(len);
     
-    if (!attr.compare("bound_r")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[POS_X][i] + map[NORM_X][i] * map[WIDTH_R][i];
-            y_out[i] = map[POS_Y][i] + map[NORM_Y][i] * map[WIDTH_R][i];
-        }
-        map[x_label] = x_out;
-        map[y_label] = y_out;
+    for (size_t i = 0; i < len; ++i) {
+        x_bound_r[i] = pos_x[i] + norm_x[i] * width_r[i];
+        y_bound_r[i] = pos_y[i] + norm_y[i] * width_r[i];
     }
-    else if (!attr.compare("bound_l")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[POS_X][i] - map[NORM_X][i] * map[WIDTH_L][i];
-            y_out[i] = map[POS_Y][i] - map[NORM_Y][i] * map[WIDTH_L][i];
-        }
-        map[x_label] = x_out;
-        map[y_label] = y_out;
+    
+    return {x_bound_r, y_bound_r};
+
+}
+
+pair<DVector, DVector> computeBoundLeft(DVector &pos_x, DVector &pos_y,
+                                         DVector &norm_x, DVector &norm_y,
+                                         DVector &width_l) {
+    if (pos_x.empty() || pos_y.empty() || norm_x.empty() || norm_y.empty() || width_l.empty()) {
+        throw runtime_error("computeBoundLeft() - Empty DVector !!");
     }
-    else if (!attr.compare("raceline")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len; ++i) {
-            x_out[i] = map[POS_X][i] + map[NORM_X][i] * map[NORM_L][i];
-            y_out[i] = map[POS_Y][i] + map[NORM_Y][i] * map[NORM_L][i];
-        }
-        map[x_label] = x_out;
-        map[y_label] = y_out;
+
+    int len = pos_x.size();
+    DVector x_bound_l(len), y_bound_l(len);
+    
+    for (size_t i = 0; i < len; ++i) {
+        x_bound_l[i] = pos_x[i] - norm_x[i] * width_l[i];
+        y_bound_l[i] = pos_y[i] - norm_y[i] * width_l[i];
     }
-    // i번째와 i-1번째 point의 delta_s 계산 
-    // delta_s[0] = 0 
-    else if (!attr.compare("delta_s")) {
-        // cout << "addDVectorToMap:" << attr << endl;
-        for (size_t i = 0; i < len - 1; ++i) {
-            x_out[i] = map[RL_S][i+1] - map[RL_S][i]; // 마지막 원소는 0
-        }
-        map[attr] = x_out; 
+    
+    return {x_bound_l, y_bound_l};
+
+}
+
+pair<DVector, DVector> computeRaceline(DVector &pos_x, DVector &pos_y,
+                                         DVector &norm_x, DVector &norm_y,
+                                         DVector &norm_l) {
+    if (pos_x.empty() || pos_y.empty() || norm_x.empty() || norm_y.empty() || norm_l.empty()) {
+        throw runtime_error("computeBoundRaceline() - Empty DVector !!");
     }
+
+    int len = pos_x.size();
+    DVector x_raceline(len), y_raceline(len);
+    
+    for (size_t i = 0; i < len; ++i) {
+        x_raceline[i] = pos_x[i] + norm_x[i] * norm_l[i];
+        y_raceline[i] = pos_y[i] + norm_y[i] * norm_l[i];
+    }
+    
+    return {x_raceline, y_raceline};
+
+}
+
+DVector computeDeltaS(DVector &rl_s) {
+    if (rl_s.empty()) {
+        throw runtime_error("computeDeltaS() - Empty DVector !!");
+    }
+
+    int len = rl_s.size();
+    DVector rl_ds(len);
+
+    // 마지막 원소는 0
+    for (size_t i = 0; i < len - 1; ++i) {
+        rl_ds[i] = rl_s[i+1] - rl_s[i];
+    }
+    
+    return rl_ds;
 
 }
 
@@ -129,10 +155,9 @@ void writeDMapToCSV(const string& pathname, DMap& map, char delimiter) {
     file.close();
 }
 
-void calcHeading(DVector &x_raceline,
-                 DVector &y_raceline,
-                 DVector &psi) {
+DVector calcHeading(DVector &x_raceline, DVector &y_raceline) {
 
+    DVector psi;
     size_t N = x_raceline.size();
     psi.resize(N);
 
@@ -154,7 +179,7 @@ void calcHeading(DVector &x_raceline,
     }
     // cout << i<< ": " << psi[i] << endl;
     // cout << psi.size() << endl;
-
+    return psi;
 }
 
 double normalizeAngle(double angle) {
@@ -163,7 +188,7 @@ double normalizeAngle(double angle) {
     return angle;
 }
 
-bool checkInsideBounds(const Vector2d& pos, const float veh_width) {
+bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width) {
 
     if (stMap.find(LB_X) == stMap.end() || 
     stMap.find(LB_Y) == stMap.end() ||

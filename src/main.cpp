@@ -1,7 +1,5 @@
-#include "graph_planner.hpp"
-
-// DMap gtpl_map;
-DMap stMap;
+#include "graph.h"
+// #include "graph_planner.hpp"
 
 IVector samplePointsFromRaceline(const DVector& kappa,
                               const DVector& dist,
@@ -42,7 +40,7 @@ IVector samplePointsFromRaceline(const DVector& kappa,
     return idx_sampling;
 }
 
-auto genNode(const Offline_Params &params) -> pair<NodeMap, IVector> {
+auto genNode(DMap &stMap, const Offline_Params &params) -> pair<NodeMap, IVector> {
     NodeMap nodesPerLayer;
     IVector raceline_index_array;
     
@@ -129,51 +127,59 @@ auto genNode(const Offline_Params &params) -> pair<NodeMap, IVector> {
 }
 
 void calcOfflineCost(SplineMap& splineMap,
-                     IVector& raceline_index_array,
-                     Offline_Params& params) {
+                   IVector& raceline_index_array,
+                   Offline_Params& params) {
     if (splineMap.size() <= 0) {
         throw invalid_argument("SplineMap's Size is zero!!");
     }
 
-    // map은 인덱스 기반이 아니므로, 벡터로 복사
-    vector<pair<IPair, map<IPair, Spline>*>> splineMapVec;
-    for (auto& it : splineMap) {
-        splineMapVec.push_back({it.first, &it.second});
-    }
-
-    // 해당 for 루프의 각 반복을 여러 스레드에 자동 분배 
-    // 각 스레드가 서로 다른 startPoint를 계산 
-    #pragma omp parallel for
-    for (int i = 0; i < splineMapVec.size(); ++i) {
-        auto& [startPoint, endPointsPtr] = splineMapVec[i];
-        auto& endPoints = *endPointsPtr;
+    for (auto& [startPoint, endPoints] : splineMap) {
         for (auto& [endPoint, spline] : endPoints) {
             double offline_cost = 0.0;
             int end_layer = endPoint.first;
             int end_node = endPoint.second;
 
+            // 디버깅용 
+            // cout << "kappa: ";
+            // for (int i = 0; i < spline.kappa.size(); ++i) cout << spline.kappa[i] << " ";
+            // cout << endl;
+
             if (end_layer < 0 || end_layer >= raceline_index_array.size())
+            {
+                cerr << "[WARNNING] Skipping spline: end_layer=" << end_layer 
+              << " out of bounds (0.." << raceline_index_array.size()-1 << ")\n";
                 continue;
+            }
 
             if (spline.kappa.size() == 0)
+            {
+                // cerr << "[WARNNING] Skipping spline: empty curvature data\n";
                 continue;
+            }
 
             double abs_kappa = spline.kappa.array().abs().sum();
             double s_length = spline.el_lengths.sum();
-
-            offline_cost += params.w_curv_avg * pow(abs_kappa / double(spline.kappa.size()), 2) * s_length;
-            double max_min = abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
+            // cout << "s_length: " << s_length << endl;
+            // average curvature
+            offline_cost += params.w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
+            // peak curvature
+            double max_min = std::abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
             offline_cost += params.w_curv_peak * pow(max_min, 2) * s_length;
+
+            // path length
             offline_cost += params.w_length * s_length;
 
+            // raceline cost
+
             double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * params.lat_resolution;
-            double raceline_cost = std::min(params.w_raceline * s_length * raceline_dist, params.w_raceline_sat * s_length);
+            double raceline_cost = min(params.w_raceline * s_length * raceline_dist, params.w_raceline_sat * s_length);
 
             offline_cost += raceline_cost;
 
             spline.cost = offline_cost;
-        }
-    }
+            // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
+        }   
+    } 
 }
 
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
@@ -217,10 +223,10 @@ void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vec
     }
 }
 
-void setInitialPos(const NodeMap &nodesPerLayer,
-                   const IVector &raceline_index_array, 
-                   Offline_Params& params)
-{
+void setInitialPose(DMap &stMap,
+                    const NodeMap &nodesPerLayer,
+                    const IVector &raceline_index_array,
+                    Offline_Params &params) {
     // 현재 pos, heading 
     double dx, dy;
         
@@ -228,7 +234,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
     float vel_est = 0.0;
 
     // set start pos 
-    if (!checkInsideBounds(initial_pos, params.veh_width)) {
+    if (!checkInsideBounds(stMap, initial_pos, params.veh_width)) {
         throw out_of_range("start pos is not in bounds");
     }
     
@@ -267,7 +273,7 @@ void setInitialPos(const NodeMap &nodesPerLayer,
         path.block<1, 2>(1, 0) = end_pos.transpose();
 
         auto result = calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
-        auto [kappa, psi] = interpSplines(result->coeffs_x, result->coeffs_y, params.stepsize_approx, params.veh_width);
+        auto [kappa, psi] = interpSplines(stMap, result->coeffs_x, result->coeffs_y, params.stepsize_approx, params.veh_width);
 
         // kappa와 psi의 크기 확인
         if (kappa.size() == 0) {
@@ -317,18 +323,30 @@ int main() {
     string map_file_in  = "inputs/traj_ltpl_cl_" + *track + ".csv";
     string map_file_out = "outputs/" + *track + "_out.csv";
 
-    //shared_ptr<DMap> gtpl_map = make_shared<DMap>();
-    //auto &gtMap = *gtpl_map;
-    DMap gtMap; 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     // 결과: gtpl_map
-    readDMapFromCSV(map_file_in, gtMap);
+    DMap gtMap = readDMapFromCSV(map_file_in);
 
     // 결과: gtpl_map에 삽입
-    // auto [gtMap[RB_X], gtMap[RB_Y]] = computeBoundRight(gtMap[POS_X], gtMap[POS_Y],
-    //                                                     gtMap[NORM_X], gtMap[NORM_Y],
-    //                                                     gtMap[WIDTH_L], gtMap[WIDTH_R])
-    // 할일
+    auto [rb_x, rb_y] = computeBoundRight(gtMap[POS_X], gtMap[POS_Y],
+                                          gtMap[NORM_X], gtMap[NORM_Y],
+                                          gtMap[WIDTH_R]);
+    auto [lb_x, lb_y] = computeBoundLeft(gtMap[POS_X], gtMap[POS_Y],
+                                         gtMap[NORM_X], gtMap[NORM_Y],
+                                         gtMap[WIDTH_L]);
+    auto [rl_x, rl_y] = computeRaceline(gtMap[POS_X], gtMap[POS_Y],
+                                        gtMap[NORM_X], gtMap[NORM_Y],
+                                        gtMap[NORM_L]);
+    DVector rl_ds = computeDeltaS(gtMap[RL_S]);
+
+    gtMap[RB_X] = rb_x;
+    gtMap[RB_Y] = rb_y;
+    gtMap[LB_X] = lb_x;
+    gtMap[LB_Y] = lb_y;
+    gtMap[RL_X] = rl_x;
+    gtMap[RL_Y] = rl_y;
+    gtMap[RL_dS] = rl_ds;
+    // 할일 
     // 모든 소스 파일들에서 전역 변수들 제거
     // 리턴값을 정의할 수 있는 모든 함수들은 리턴값 정의 (예: calcHeading)
     // addDVectorToMap 제거하고, 내부 로직들을 별개 함수들로 독립시킴
@@ -337,10 +355,6 @@ int main() {
     // cpp 파일들, hpp 파일들 정리하기. cpp와 무관한 hpp 파일을 cpp가 포함하지 않도록 작성하기.
     // 멀티쓰레딩은 이 스탭이 다끝나고 정리되면 한다.
 
-    addDVectorToMap(gtMap, "bound_r");
-    addDVectorToMap(gtMap, "bound_l");
-    addDVectorToMap(gtMap, "raceline");
-    addDVectorToMap(gtMap, "delta_s");
 
     // 결과: map_file_out 
     // [지민] gtpl_mp은 이미 전역변수라 삽입해줄 필요가 없음.
@@ -351,11 +365,12 @@ int main() {
     Offline_Params params;
     // [지민] 가독성을 위해서 넣기 했으나 빼야될지?
     IVector idx_sampling = samplePointsFromRaceline(gtMap[RL_KAPPA],
-                             gtMap[RL_dS],
-                             params);
+                                                    gtMap[RL_dS],
+                                                    params);
 
     // cout << "idx size:" << idx_sampling.size() << endl;
     // 샘플링한대로 이제 gtpl_map 대신 stMap으로 바굼
+    DMap stMap;
     for (const auto& [key, vec] : gtMap) {
         for (int idx : idx_sampling) {
             if (idx >= 0 && idx < vec.size()) {
@@ -365,28 +380,21 @@ int main() {
     }
     // writeDMapToCSV("inputs/stMap", stMap);
     // map_size(stMap); // (51, 3)
+
     // 결과: stMap에 delta_s열 추가 
-    addDVectorToMap(stMap, "delta_s");
-    
+    stMap[RL_dS] = computeDeltaS(stMap[RL_S]);
+
     // 결과: stMap에 열 추가
-    calcHeading(stMap[RL_X],
-                stMap[RL_Y],
-                stMap[RL_PSI]);
-    
+    stMap[RL_PSI] = calcHeading(stMap[RL_X], stMap[RL_Y]);
     // 여기서 계산되는 sampling된 bound_l, r은 node 생성 시에만 쓰인다. 
-    calcHeading(stMap[LB_X],
-                stMap[LB_Y],
-                stMap[LB_PSI]);
-
-    calcHeading(stMap[RB_X],
-                stMap[RB_Y],
-                stMap[RB_PSI]);  
-
-    auto [nodesPerLayer, raceline_index_array] = genNode(params);
+    stMap[LB_PSI] = calcHeading(stMap[LB_X], stMap[LB_Y]);
+    stMap[RB_PSI] = calcHeading(stMap[RB_X], stMap[RB_Y]);  
+    
+    auto [nodesPerLayer, raceline_index_array] = genNode(stMap, params);
 
     // writeDMapToCSV("inputs/stMap.csv", stMap);
 
-    auto [wayptGraph, splineMap] = genEdges(nodesPerLayer, raceline_index_array, params);
+    auto [wayptGraph, splineMap] = genEdges(stMap, nodesPerLayer, raceline_index_array, params);
 
     // 결과: splineMap의 spline 구조체에 cost저장 
     calcOfflineCost(splineMap,
@@ -394,9 +402,10 @@ int main() {
                    params);
 
     // 결과: 초기경로 시각화
-    setInitialPos(nodesPerLayer,
-                  raceline_index_array, 
-                  params);
+    setInitialPose(stMap,
+                   nodesPerLayer,
+                   raceline_index_array,
+                   params);
 
     f_time = clock();
 
@@ -407,7 +416,7 @@ int main() {
     
     // printSplineInfo(splineMap, nodesPerLayer);
     // 결과: 시각화
-    visual(gtMap, nodesPerLayer, splineMap);
+    visual(gtMap, stMap, nodesPerLayer, splineMap);
 
     return 0;
 }
