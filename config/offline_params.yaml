@@ -1,0 +1,43 @@
+version: 1
+constants:
+  rl_kappa: 9
+  rl_s: 7
+
+lattice:
+  lat_resolution: 0.9
+  variable_heading: true
+  d_straight: 30.0
+  d_curve: 6.5
+  curve_thr: 0.01
+  lat_offset: 3.5
+  max_lat_steps: 2
+  virt_goal_n: true
+  min_vel_race: 0.0
+  max_lateral_accel: 4.0
+  closure_detection_dist: 20.0
+
+planningtarget:
+  vel_decrease_lat: 0.1
+  min_plan_horizon: 40
+  plan_horizon_mode: "distance"
+
+sampling:
+  stepsize_approx: 2.5
+
+vehicle:
+  veh_width: 1.8
+  veh_length: 5.0
+  veh_turn: 6.0
+
+cost:
+  w_raceline: 1.0
+  w_raceline_sat: 1.0
+  w_length: 0.0
+  w_curv_avg: 7500.0
+  w_curv_peak: 2500.0
+  w_virt_goal: 10000.0
+
+custom:
+  max_heading_offset: 0.7853981633974483 
+
+map_name: "traj_ltpl_cl_berlin"

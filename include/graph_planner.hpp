@@ -11,12 +11,11 @@
 #include <memory>
 #include <unordered_set>
 #include <omp.h>
+#include <yaml-cpp/yaml.h>
 
 #include <Eigen/Dense>
 #include "rapidcsv.h"
 #include "matplotlibcpp.h"
-#include "config_berlin.h"
-
 
 //////////////////////////////////////////////////////////////////////
 // Index names used in gtplMap
@@ -79,23 +78,17 @@ typedef vector<IPair> IPairVector; // 엣지 연결 여부 확인용 value vecto
 typedef map<IPair, IPairVector> IPairAdjList; // key: 기준 노드, value: key와 연결된 다음 레이어의 노드 인덱스 IPair
 typedef map<IPair, map<IPair, Spline>> SplineMap;
 
-struct ActionSet {
-    string action_id; // "straight"
-    vector<MatrixXd> coeffs; // x_coeff, y_coeff
-    vector<MatrixXd> path_param; // path, psi, kappa, el_lengths 
-    NodeMap nodes; // [[None, None], start_node]
-    vector<IPair> node_idx; // [0, path.size()-1]
-};
-
-// visualization.cpp
-void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale);
-void plotHeading(const NodeMap& nodesPerLayer, double scale);
-void plotAllSplines(const IPairAdjList& edgeList, const SplineMap& splineMap, const string &color);
-void plotSpline(const Spline& spline, const string& color);
+// struct ActionSet {
+//     string action_id; // "straight"
+//     vector<MatrixXd> coeffs; // x_coeff, y_coeff
+//     vector<MatrixXd> path_param; // path, psi, kappa, el_lengths 
+//     NodeMap nodes; // [[None, None], start_node]
+//     vector<IPair> node_idx; // [0, path.size()-1]
+// };
 
 // helper_func.cpp
-unique_ptr<string> Load(const string& filename);
-double normalizeAngle(double angle);
+unique_ptr<string> Load(const string &filename);
+DMap readDMapFromCSV(const string &pathname);
 pair<DVector, DVector> computeBoundRight(DVector &pos_x, DVector &pos_y,
                                          DVector &norm_x, DVector &norm_y,
                                          DVector &width_r);
@@ -105,15 +98,13 @@ pair<DVector, DVector> computeBoundLeft(DVector &pos_x, DVector &pos_y,
 pair<DVector, DVector> computeRaceline(DVector &pos_x, DVector &pos_y,
                                        DVector &norm_x, DVector &norm_y,
                                        DVector &norm_l);
-
 DVector computeDeltaS(DVector &rl_s);
-DMap readDMapFromCSV(const string& pathname);
-void writeDMapToCSV(const string& pathname, DMap& map, char delimiter = ',');
-void map_size(DMap& map);
-bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width);
-void printSplineInfo(const SplineMap& splineMap, const NodeMap& nodesPerLayer);
-DVector calcHeading(DVector &x_raceline, DVector &y_raceline);
-
-//genSplines.cpp
-
-void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, const SplineMap &splineMap);
+DVector calcHeading(DVector &x_raceline,
+                    DVector &y_raceline);
+double normalizeAngle(double angle);
+void writeDMapToCSV(const string &pathname,
+                    DMap &map,
+                    char delimiter = ',');
+void map_size(DMap &map);
+void printSplineInfo(const SplineMap &splineMap,
+                     const NodeMap &nodesPerLayer);

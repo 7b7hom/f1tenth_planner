@@ -271,6 +271,51 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/c++/11/unordered_set \
   /usr/include/c++/11/bits/unordered_set.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h \
+  /usr/include/yaml-cpp/yaml.h \
+  /usr/include/yaml-cpp/parser.h \
+  /usr/include/yaml-cpp/dll.h \
+  /usr/include/yaml-cpp/emitter.h \
+  /usr/include/c++/11/cstddef \
+  /usr/include/yaml-cpp/binary.h \
+  /usr/include/yaml-cpp/emitterdef.h \
+  /usr/include/yaml-cpp/emittermanip.h \
+  /usr/include/yaml-cpp/null.h \
+  /usr/include/yaml-cpp/ostream_wrapper.h \
+  /usr/include/yaml-cpp/emitterstyle.h \
+  /usr/include/yaml-cpp/stlemitter.h \
+  /usr/include/c++/11/list \
+  /usr/include/c++/11/bits/stl_list.h \
+  /usr/include/c++/11/bits/list.tcc \
+  /usr/include/c++/11/set \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/stl_set.h \
+  /usr/include/c++/11/bits/stl_multiset.h \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
+  /usr/include/yaml-cpp/exceptions.h \
+  /usr/include/yaml-cpp/mark.h \
+  /usr/include/yaml-cpp/noexcept.h \
+  /usr/include/yaml-cpp/traits.h \
+  /usr/include/yaml-cpp/node/node.h \
+  /usr/include/yaml-cpp/node/detail/iterator_fwd.h \
+  /usr/include/yaml-cpp/node/ptr.h \
+  /usr/include/yaml-cpp/node/type.h \
+  /usr/include/yaml-cpp/node/impl.h \
+  /usr/include/yaml-cpp/node/detail/memory.h \
+  /usr/include/yaml-cpp/node/detail/node.h \
+  /usr/include/yaml-cpp/node/detail/node_ref.h \
+  /usr/include/yaml-cpp/node/detail/node_data.h \
+  /usr/include/yaml-cpp/node/detail/node_iterator.h \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
+  /usr/include/yaml-cpp/node/iterator.h \
+  /usr/include/yaml-cpp/node/detail/iterator.h \
+  /usr/include/c++/11/atomic \
+  /usr/include/yaml-cpp/node/convert.h \
+  /usr/include/yaml-cpp/node/detail/impl.h \
+  /usr/include/yaml-cpp/node/parse.h \
+  /usr/include/yaml-cpp/node/emit.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -283,7 +328,6 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/c++/11/stdlib.h \
   /usr/include/c++/11/complex \
   /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h \
-  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cassert \
   /usr/include/assert.h \
   /usr/include/c++/11/cstring \
@@ -395,7 +439,6 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
-  /usr/include/c++/11/atomic \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -485,10 +528,6 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
   include/rapidcsv.h \
-  /usr/include/c++/11/map \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_map.h \
-  /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
   /usr/include/python3.10/Python.h \
   /usr/include/python3.10/patchlevel.h \
@@ -657,10 +696,9 @@ CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_berlin.h \
   include/graph.h
 
-CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
+CMakeFiles/main.dir/include/spline.cpp.o: include/spline.cpp \
   /usr/include/stdc-predef.h \
   include/graph.h \
   include/graph_planner.hpp \
@@ -931,6 +969,51 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/c++/11/unordered_set \
   /usr/include/c++/11/bits/unordered_set.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h \
+  /usr/include/yaml-cpp/yaml.h \
+  /usr/include/yaml-cpp/parser.h \
+  /usr/include/yaml-cpp/dll.h \
+  /usr/include/yaml-cpp/emitter.h \
+  /usr/include/c++/11/cstddef \
+  /usr/include/yaml-cpp/binary.h \
+  /usr/include/yaml-cpp/emitterdef.h \
+  /usr/include/yaml-cpp/emittermanip.h \
+  /usr/include/yaml-cpp/null.h \
+  /usr/include/yaml-cpp/ostream_wrapper.h \
+  /usr/include/yaml-cpp/emitterstyle.h \
+  /usr/include/yaml-cpp/stlemitter.h \
+  /usr/include/c++/11/list \
+  /usr/include/c++/11/bits/stl_list.h \
+  /usr/include/c++/11/bits/list.tcc \
+  /usr/include/c++/11/set \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/stl_set.h \
+  /usr/include/c++/11/bits/stl_multiset.h \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
+  /usr/include/yaml-cpp/exceptions.h \
+  /usr/include/yaml-cpp/mark.h \
+  /usr/include/yaml-cpp/noexcept.h \
+  /usr/include/yaml-cpp/traits.h \
+  /usr/include/yaml-cpp/node/node.h \
+  /usr/include/yaml-cpp/node/detail/iterator_fwd.h \
+  /usr/include/yaml-cpp/node/ptr.h \
+  /usr/include/yaml-cpp/node/type.h \
+  /usr/include/yaml-cpp/node/impl.h \
+  /usr/include/yaml-cpp/node/detail/memory.h \
+  /usr/include/yaml-cpp/node/detail/node.h \
+  /usr/include/yaml-cpp/node/detail/node_ref.h \
+  /usr/include/yaml-cpp/node/detail/node_data.h \
+  /usr/include/yaml-cpp/node/detail/node_iterator.h \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
+  /usr/include/yaml-cpp/node/iterator.h \
+  /usr/include/yaml-cpp/node/detail/iterator.h \
+  /usr/include/c++/11/atomic \
+  /usr/include/yaml-cpp/node/convert.h \
+  /usr/include/yaml-cpp/node/detail/impl.h \
+  /usr/include/yaml-cpp/node/parse.h \
+  /usr/include/yaml-cpp/node/emit.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -943,7 +1026,6 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/c++/11/stdlib.h \
   /usr/include/c++/11/complex \
   /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h \
-  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cassert \
   /usr/include/assert.h \
   /usr/include/c++/11/cstring \
@@ -1055,7 +1137,6 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
-  /usr/include/c++/11/atomic \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -1145,10 +1226,6 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
   include/rapidcsv.h \
-  /usr/include/c++/11/map \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_map.h \
-  /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
   /usr/include/python3.10/Python.h \
   /usr/include/python3.10/patchlevel.h \
@@ -1317,7 +1394,7 @@ CMakeFiles/main.dir/src/genSplines.cpp.o: src/genSplines.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_berlin.h
+  include/spline.h
 
 CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/stdc-predef.h \
@@ -1590,6 +1667,51 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/c++/11/unordered_set \
   /usr/include/c++/11/bits/unordered_set.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h \
+  /usr/include/yaml-cpp/yaml.h \
+  /usr/include/yaml-cpp/parser.h \
+  /usr/include/yaml-cpp/dll.h \
+  /usr/include/yaml-cpp/emitter.h \
+  /usr/include/c++/11/cstddef \
+  /usr/include/yaml-cpp/binary.h \
+  /usr/include/yaml-cpp/emitterdef.h \
+  /usr/include/yaml-cpp/emittermanip.h \
+  /usr/include/yaml-cpp/null.h \
+  /usr/include/yaml-cpp/ostream_wrapper.h \
+  /usr/include/yaml-cpp/emitterstyle.h \
+  /usr/include/yaml-cpp/stlemitter.h \
+  /usr/include/c++/11/list \
+  /usr/include/c++/11/bits/stl_list.h \
+  /usr/include/c++/11/bits/list.tcc \
+  /usr/include/c++/11/set \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/stl_set.h \
+  /usr/include/c++/11/bits/stl_multiset.h \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
+  /usr/include/yaml-cpp/exceptions.h \
+  /usr/include/yaml-cpp/mark.h \
+  /usr/include/yaml-cpp/noexcept.h \
+  /usr/include/yaml-cpp/traits.h \
+  /usr/include/yaml-cpp/node/node.h \
+  /usr/include/yaml-cpp/node/detail/iterator_fwd.h \
+  /usr/include/yaml-cpp/node/ptr.h \
+  /usr/include/yaml-cpp/node/type.h \
+  /usr/include/yaml-cpp/node/impl.h \
+  /usr/include/yaml-cpp/node/detail/memory.h \
+  /usr/include/yaml-cpp/node/detail/node.h \
+  /usr/include/yaml-cpp/node/detail/node_ref.h \
+  /usr/include/yaml-cpp/node/detail/node_data.h \
+  /usr/include/yaml-cpp/node/detail/node_iterator.h \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
+  /usr/include/yaml-cpp/node/iterator.h \
+  /usr/include/yaml-cpp/node/detail/iterator.h \
+  /usr/include/c++/11/atomic \
+  /usr/include/yaml-cpp/node/convert.h \
+  /usr/include/yaml-cpp/node/detail/impl.h \
+  /usr/include/yaml-cpp/node/parse.h \
+  /usr/include/yaml-cpp/node/emit.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -1602,7 +1724,6 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/c++/11/stdlib.h \
   /usr/include/c++/11/complex \
   /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h \
-  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cassert \
   /usr/include/assert.h \
   /usr/include/c++/11/cstring \
@@ -1714,7 +1835,6 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
-  /usr/include/c++/11/atomic \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -1804,10 +1924,6 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
   include/rapidcsv.h \
-  /usr/include/c++/11/map \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_map.h \
-  /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
   /usr/include/python3.10/Python.h \
   /usr/include/python3.10/patchlevel.h \
@@ -1975,8 +2091,7 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
-  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_berlin.h
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h
 
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/stdc-predef.h \
@@ -2249,6 +2364,51 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/c++/11/unordered_set \
   /usr/include/c++/11/bits/unordered_set.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h \
+  /usr/include/yaml-cpp/yaml.h \
+  /usr/include/yaml-cpp/parser.h \
+  /usr/include/yaml-cpp/dll.h \
+  /usr/include/yaml-cpp/emitter.h \
+  /usr/include/c++/11/cstddef \
+  /usr/include/yaml-cpp/binary.h \
+  /usr/include/yaml-cpp/emitterdef.h \
+  /usr/include/yaml-cpp/emittermanip.h \
+  /usr/include/yaml-cpp/null.h \
+  /usr/include/yaml-cpp/ostream_wrapper.h \
+  /usr/include/yaml-cpp/emitterstyle.h \
+  /usr/include/yaml-cpp/stlemitter.h \
+  /usr/include/c++/11/list \
+  /usr/include/c++/11/bits/stl_list.h \
+  /usr/include/c++/11/bits/list.tcc \
+  /usr/include/c++/11/set \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/stl_set.h \
+  /usr/include/c++/11/bits/stl_multiset.h \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
+  /usr/include/yaml-cpp/exceptions.h \
+  /usr/include/yaml-cpp/mark.h \
+  /usr/include/yaml-cpp/noexcept.h \
+  /usr/include/yaml-cpp/traits.h \
+  /usr/include/yaml-cpp/node/node.h \
+  /usr/include/yaml-cpp/node/detail/iterator_fwd.h \
+  /usr/include/yaml-cpp/node/ptr.h \
+  /usr/include/yaml-cpp/node/type.h \
+  /usr/include/yaml-cpp/node/impl.h \
+  /usr/include/yaml-cpp/node/detail/memory.h \
+  /usr/include/yaml-cpp/node/detail/node.h \
+  /usr/include/yaml-cpp/node/detail/node_ref.h \
+  /usr/include/yaml-cpp/node/detail/node_data.h \
+  /usr/include/yaml-cpp/node/detail/node_iterator.h \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
+  /usr/include/yaml-cpp/node/iterator.h \
+  /usr/include/yaml-cpp/node/detail/iterator.h \
+  /usr/include/c++/11/atomic \
+  /usr/include/yaml-cpp/node/convert.h \
+  /usr/include/yaml-cpp/node/detail/impl.h \
+  /usr/include/yaml-cpp/node/parse.h \
+  /usr/include/yaml-cpp/node/emit.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -2261,7 +2421,6 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/c++/11/stdlib.h \
   /usr/include/c++/11/complex \
   /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h \
-  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cassert \
   /usr/include/assert.h \
   /usr/include/c++/11/cstring \
@@ -2373,7 +2532,6 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
-  /usr/include/c++/11/atomic \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -2463,10 +2621,6 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
   include/rapidcsv.h \
-  /usr/include/c++/11/map \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_map.h \
-  /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
   /usr/include/python3.10/Python.h \
   /usr/include/python3.10/patchlevel.h \
@@ -2635,7 +2789,7 @@ CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
   /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_berlin.h
+  include/spline.h
 
 CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/stdc-predef.h \
@@ -2908,6 +3062,51 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/c++/11/unordered_set \
   /usr/include/c++/11/bits/unordered_set.h \
   /usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h \
+  /usr/include/yaml-cpp/yaml.h \
+  /usr/include/yaml-cpp/parser.h \
+  /usr/include/yaml-cpp/dll.h \
+  /usr/include/yaml-cpp/emitter.h \
+  /usr/include/c++/11/cstddef \
+  /usr/include/yaml-cpp/binary.h \
+  /usr/include/yaml-cpp/emitterdef.h \
+  /usr/include/yaml-cpp/emittermanip.h \
+  /usr/include/yaml-cpp/null.h \
+  /usr/include/yaml-cpp/ostream_wrapper.h \
+  /usr/include/yaml-cpp/emitterstyle.h \
+  /usr/include/yaml-cpp/stlemitter.h \
+  /usr/include/c++/11/list \
+  /usr/include/c++/11/bits/stl_list.h \
+  /usr/include/c++/11/bits/list.tcc \
+  /usr/include/c++/11/set \
+  /usr/include/c++/11/bits/stl_tree.h \
+  /usr/include/c++/11/bits/stl_set.h \
+  /usr/include/c++/11/bits/stl_multiset.h \
+  /usr/include/c++/11/map \
+  /usr/include/c++/11/bits/stl_map.h \
+  /usr/include/c++/11/bits/stl_multimap.h \
+  /usr/include/yaml-cpp/exceptions.h \
+  /usr/include/yaml-cpp/mark.h \
+  /usr/include/yaml-cpp/noexcept.h \
+  /usr/include/yaml-cpp/traits.h \
+  /usr/include/yaml-cpp/node/node.h \
+  /usr/include/yaml-cpp/node/detail/iterator_fwd.h \
+  /usr/include/yaml-cpp/node/ptr.h \
+  /usr/include/yaml-cpp/node/type.h \
+  /usr/include/yaml-cpp/node/impl.h \
+  /usr/include/yaml-cpp/node/detail/memory.h \
+  /usr/include/yaml-cpp/node/detail/node.h \
+  /usr/include/yaml-cpp/node/detail/node_ref.h \
+  /usr/include/yaml-cpp/node/detail/node_data.h \
+  /usr/include/yaml-cpp/node/detail/node_iterator.h \
+  /usr/include/c++/11/iterator \
+  /usr/include/c++/11/bits/stream_iterator.h \
+  /usr/include/yaml-cpp/node/iterator.h \
+  /usr/include/yaml-cpp/node/detail/iterator.h \
+  /usr/include/c++/11/atomic \
+  /usr/include/yaml-cpp/node/convert.h \
+  /usr/include/yaml-cpp/node/detail/impl.h \
+  /usr/include/yaml-cpp/node/parse.h \
+  /usr/include/yaml-cpp/node/emit.h \
   /usr/include/eigen3/Eigen/Dense \
   /usr/include/eigen3/Eigen/Core \
   /usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h \
@@ -2920,7 +3119,6 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/c++/11/stdlib.h \
   /usr/include/c++/11/complex \
   /usr/include/eigen3/Eigen/src/Core/util/MKL_support.h \
-  /usr/include/c++/11/cstddef \
   /usr/include/c++/11/cassert \
   /usr/include/assert.h \
   /usr/include/c++/11/cstring \
@@ -3032,7 +3230,6 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralBlockPanelKernel.h \
   /usr/include/eigen3/Eigen/src/Core/products/Parallelizer.h \
-  /usr/include/c++/11/atomic \
   /usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixVector.h \
   /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h \
@@ -3122,10 +3319,6 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/eigen3/Eigen/src/Eigenvalues/RealQZ.h \
   /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h \
   include/rapidcsv.h \
-  /usr/include/c++/11/map \
-  /usr/include/c++/11/bits/stl_tree.h \
-  /usr/include/c++/11/bits/stl_map.h \
-  /usr/include/c++/11/bits/stl_multimap.h \
   include/matplotlibcpp.h \
   /usr/include/python3.10/Python.h \
   /usr/include/python3.10/patchlevel.h \
@@ -3293,15 +3486,16 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
   /usr/include/x86_64-linux-gnu/bits/ss_flags.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h \
   /usr/include/x86_64-linux-gnu/bits/sigthread.h \
-  /usr/include/x86_64-linux-gnu/bits/signal_ext.h \
-  include/config_berlin.h
+  /usr/include/x86_64-linux-gnu/bits/signal_ext.h
 
 
 src/visualization.cpp:
 
-include/graph.h:
+include/spline.h:
 
-include/config_berlin.h:
+include/spline.cpp:
+
+include/graph.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 
@@ -3314,8 +3508,6 @@ include/config_berlin.h:
 /usr/include/x86_64-linux-gnu/sys/ucontext.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/stack_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigaction.h:
 
@@ -3445,6 +3637,62 @@ include/config_berlin.h:
 
 /usr/include/python3.10/memoryobject.h:
 
+/usr/include/python3.10/complexobject.h:
+
+/usr/include/python3.10/floatobject.h:
+
+/usr/include/python3.10/boolobject.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigevent-consts.h:
+
+/usr/include/python3.10/longintrepr.h:
+
+/usr/include/python3.10/longobject.h:
+
+/usr/include/python3.10/unicodeobject.h:
+
+/usr/include/python3.10/cpython/bytesobject.h:
+
+/usr/include/python3.10/classobject.h:
+
+/usr/include/python3.10/bytesobject.h:
+
+/usr/include/python3.10/bytearrayobject.h:
+
+/usr/include/python3.10/pyhash.h:
+
+/usr/include/python3.10/objimpl.h:
+
+/usr/include/python3.10/cpython/object.h:
+
+/usr/include/python3.10/enumobject.h:
+
+/usr/include/python3.10/object.h:
+
+/usr/include/python3.10/cpython/pymem.h:
+
+/usr/include/python3.10/exports.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_statx.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h:
+
+/usr/include/asm-generic/posix_types.h:
+
+/usr/include/x86_64-linux-gnu/asm/posix_types.h:
+
+/usr/include/linux/stddef.h:
+
+/usr/include/linux/posix_types.h:
+
+/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
+
+/usr/include/asm-generic/types.h:
+
+/usr/include/linux/types.h:
+
+/usr/include/x86_64-linux-gnu/bits/statx.h:
+
 /usr/include/c++/11/bits/stl_raw_storage_iter.h:
 
 /usr/include/c++/11/memory:
@@ -3465,8 +3713,6 @@ include/config_berlin.h:
 
 /usr/include/c++/11/bits/refwrap.h:
 
-/usr/include/linux/stddef.h:
-
 /usr/include/c++/11/bits/stl_heap.h:
 
 /usr/include/c++/11/bits/std_abs.h:
@@ -3474,8 +3720,6 @@ include/config_berlin.h:
 /usr/include/c++/11/pstl/execution_defs.h:
 
 /usr/include/c++/11/tr1/riemann_zeta.tcc:
-
-/usr/include/python3.10/floatobject.h:
 
 /usr/include/c++/11/tr1/legendre_function.tcc:
 
@@ -3493,21 +3737,19 @@ include/config_berlin.h:
 
 /usr/include/c++/11/bits/specfun.h:
 
+/usr/include/c++/11/bits/stl_list.h:
+
 /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
 
 /usr/include/c++/11/bits/postypes.h:
 
 /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
 
-/usr/include/c++/11/string_view:
-
 /usr/include/eigen3/Eigen/src/LU/Determinant.h:
 
 /usr/include/c++/11/bits/stl_algo.h:
 
 /usr/include/eigen3/Eigen/src/Core/BooleanRedux.h:
-
-/usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h:
 
 /usr/include/c++/11/bits/quoted_string.h:
 
@@ -3547,15 +3789,11 @@ include/config_berlin.h:
 
 /usr/include/c++/11/vector:
 
-/usr/include/asm-generic/posix_types.h:
-
 /usr/include/x86_64-linux-gnu/c++/11/bits/c++io.h:
 
 /usr/include/c++/11/bits/istream.tcc:
 
 /usr/include/eigen3/Eigen/src/Core/Diagonal.h:
-
-/usr/include/python3.10/cpython/object.h:
 
 /usr/include/c++/11/istream:
 
@@ -3565,19 +3803,13 @@ include/config_berlin.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/ctype_inline.h:
 
-/usr/include/linux/types.h:
-
 /usr/include/c++/11/bits/streambuf_iterator.h:
 
 /usr/include/c++/11/cwctype:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_statx_timestamp.h:
-
 /usr/include/c++/11/tr1/poly_hermite.tcc:
 
 /usr/include/c++/11/bits/locale_facets.h:
-
-/usr/include/python3.10/cpython/pymem.h:
 
 /usr/include/c++/11/tr1/bessel_function.tcc:
 
@@ -3598,8 +3830,6 @@ include/config_berlin.h:
 /usr/include/c++/11/bits/node_handle.h:
 
 /usr/include/c++/11/bits/basic_string.tcc:
-
-/usr/include/eigen3/Eigen/src/Core/StableNorm.h:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
 
@@ -3651,8 +3881,6 @@ include/config_berlin.h:
 
 /usr/include/x86_64-linux-gnu/bits/byteswap.h:
 
-/usr/include/python3.10/pymacro.h:
-
 /usr/include/c++/11/bits/locale_classes.tcc:
 
 /usr/include/c++/11/ext/aligned_buffer.h:
@@ -3662,10 +3890,6 @@ include/config_berlin.h:
 /usr/include/eigen3/Eigen/src/Core/SolveTriangular.h:
 
 /usr/include/x86_64-linux-gnu/bits/waitflags.h:
-
-/usr/include/python3.10/classobject.h:
-
-/usr/include/python3.10/bytesobject.h:
 
 /usr/include/stdlib.h:
 
@@ -3681,19 +3905,11 @@ include/config_berlin.h:
 
 /usr/include/c++/11/bits/concept_check.h:
 
-/usr/include/asm-generic/types.h:
-
-/usr/include/x86_64-linux-gnu/c++/11/bits/gthr.h:
-
 /usr/include/c++/11/bits/string_view.tcc:
 
 /usr/include/c++/11/bits/hash_bytes.h:
 
 /usr/include/c++/11/bits/move.h:
-
-/usr/include/x86_64-linux-gnu/bits/sigevent-consts.h:
-
-/usr/include/python3.10/longintrepr.h:
 
 /usr/include/c++/11/typeinfo:
 
@@ -3705,19 +3921,21 @@ include/config_berlin.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/atomic_word.h:
 
-/usr/include/python3.10/bytearrayobject.h:
-
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
 /usr/include/c++/11/ext/string_conversions.h:
 
-/usr/include/python3.10/enumobject.h:
+/usr/include/yaml-cpp/node/detail/node_ref.h:
 
-/usr/include/python3.10/object.h:
+/usr/include/yaml-cpp/dll.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
+
+/usr/include/python3.10/cpython/unicodeobject.h:
+
+/usr/include/c++/11/iterator:
 
 /usr/include/c++/11/tr1/poly_laguerre.tcc:
 
@@ -3735,8 +3953,6 @@ include/config_berlin.h:
 
 /usr/include/unistd.h:
 
-/usr/include/x86_64-linux-gnu/bits/statx.h:
-
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stdint.h:
 
 /usr/include/c++/11/cwchar:
@@ -3753,11 +3969,7 @@ include/config_berlin.h:
 
 /usr/include/eigen3/Eigen/src/Core/DiagonalProduct.h:
 
-/usr/include/python3.10/pyhash.h:
-
 /usr/include/x86_64-linux-gnu/asm/errno.h:
-
-/usr/include/python3.10/unicodeobject.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
@@ -3821,6 +4033,10 @@ include/config_berlin.h:
 
 /usr/include/c++/11/tr1/gamma.tcc:
 
+/usr/include/eigen3/Eigen/src/Core/StableNorm.h:
+
+/usr/include/yaml-cpp/ostream_wrapper.h:
+
 /usr/include/c++/11/ext/type_traits.h:
 
 /usr/include/c++/11/ctime:
@@ -3840,6 +4056,8 @@ include/config_berlin.h:
 /usr/include/endian.h:
 
 /usr/include/c++/11/bits/cpp_type_traits.h:
+
+/usr/include/yaml-cpp/stlemitter.h:
 
 /usr/include/ctype.h:
 
@@ -3865,8 +4083,6 @@ include/config_berlin.h:
 
 /usr/include/c++/11/cstdint:
 
-/usr/include/c++/11/exception:
-
 /usr/include/python3.10/rangeobject.h:
 
 /usr/include/x86_64-linux-gnu/c++/11/bits/cpu_defines.h:
@@ -3876,6 +4092,8 @@ include/config_berlin.h:
 /usr/include/c++/11/complex:
 
 /usr/include/x86_64-linux-gnu/bits/timesize.h:
+
+/usr/include/yaml-cpp/node/detail/node_iterator.h:
 
 /usr/include/eigen3/Eigen/src/Core/Solve.h:
 
@@ -3896,6 +4114,8 @@ include/config_berlin.h:
 /usr/include/x86_64-linux-gnu/bits/uio_lim.h:
 
 /usr/include/c++/11/bits/cxxabi_init_exception.h:
+
+/usr/include/yaml-cpp/parser.h:
 
 /usr/include/x86_64-linux-gnu/bits/statx-generic.h:
 
@@ -3918,6 +4138,8 @@ include/config_berlin.h:
 /usr/include/c++/11/bits/stl_iterator.h:
 
 /usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
+
+/usr/include/yaml-cpp/node/ptr.h:
 
 /usr/include/python3.10/cpython/pythonrun.h:
 
@@ -3957,8 +4179,6 @@ include/config_berlin.h:
 
 /usr/include/c++/11/unordered_map:
 
-/usr/include/c++/11/cctype:
-
 /usr/include/c++/11/iomanip:
 
 /usr/include/eigen3/Eigen/src/Core/util/XprHelper.h:
@@ -3990,8 +4210,6 @@ include/config_berlin.h:
 /usr/include/eigen3/Eigen/src/Core/StlIterators.h:
 
 /usr/include/eigen3/Eigen/src/misc/Image.h:
-
-/usr/include/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h:
 
@@ -4029,7 +4247,11 @@ src/helper_func.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
 
-/usr/include/python3.10/boolobject.h:
+/usr/include/python3.10/pymem.h:
+
+/usr/include/x86_64-linux-gnu/asm/posix_types_64.h:
+
+/usr/include/eigen3/Eigen/src/Cholesky/LDLT.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
 
@@ -4055,8 +4277,6 @@ src/helper_func.cpp:
 
 /usr/include/c++/11/backward/binders.h:
 
-/usr/include/x86_64-linux-gnu/asm/bitsperlong.h:
-
 /usr/include/eigen3/Eigen/src/plugins/IndexedViewMethods.h:
 
 /usr/include/python3.10/cpython/sysmodule.h:
@@ -4074,12 +4294,6 @@ src/helper_func.cpp:
 /usr/include/c++/11/fstream:
 
 /usr/include/c++/11/tr1/exp_integral.tcc:
-
-/usr/include/x86_64-linux-gnu/asm/posix_types_64.h:
-
-/usr/include/eigen3/Eigen/src/Cholesky/LDLT.h:
-
-/usr/include/python3.10/pymem.h:
 
 include/graph.cpp:
 
@@ -4109,13 +4323,21 @@ include/graph_planner.hpp:
 
 /usr/include/c++/11/bits/atomic_base.h:
 
+/usr/include/yaml-cpp/node/type.h:
+
 /usr/include/c++/11/bits/atomic_lockfree_defines.h:
+
+/usr/include/yaml-cpp/noexcept.h:
 
 /usr/include/python3.10/cpython/ceval.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
 
 /usr/include/c++/11/backward/auto_ptr.h:
+
+/usr/include/linux/stat.h:
+
+/usr/include/c++/11/pstl/glue_memory_defs.h:
 
 /usr/include/eigen3/Eigen/src/Core/CwiseBinaryOp.h:
 
@@ -4129,7 +4351,155 @@ include/matplotlibcpp.h:
 
 /usr/include/c++/11/bits/unordered_set.h:
 
+/usr/include/yaml-cpp/node/detail/iterator.h:
+
+/usr/include/yaml-cpp/yaml.h:
+
+/usr/include/eigen3/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:
+
+/usr/include/yaml-cpp/binary.h:
+
+/usr/include/yaml-cpp/emitter.h:
+
+/usr/include/c++/11/exception:
+
+/usr/include/yaml-cpp/emitterdef.h:
+
+/usr/include/yaml-cpp/emittermanip.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h:
+
+/usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h:
+
+/usr/include/yaml-cpp/null.h:
+
+/usr/include/time.h:
+
+/usr/include/yaml-cpp/emitterstyle.h:
+
+/usr/include/python3.10/context.h:
+
+/usr/include/eigen3/Eigen/src/Core/NumTraits.h:
+
+/usr/include/x86_64-linux-gnu/asm/types.h:
+
+/usr/include/eigen3/Eigen/src/plugins/CommonCwiseUnaryOps.h:
+
+/usr/include/eigen3/Eigen/src/Core/functors/BinaryFunctors.h:
+
+/usr/include/x86_64-linux-gnu/c++/11/bits/gthr.h:
+
+/usr/include/c++/11/bits/list.tcc:
+
+/usr/include/python3.10/tracemalloc.h:
+
+/usr/include/eigen3/Eigen/src/Core/Reshaped.h:
+
+/usr/include/c++/11/bits/stl_tree.h:
+
+/usr/include/c++/11/bits/stl_set.h:
+
+/usr/include/eigen3/Eigen/src/Core/Map.h:
+
+/usr/include/eigen3/Eigen/src/Core/ConditionEstimator.h:
+
+/usr/include/signal.h:
+
+/usr/include/python3.10/cpython/pydebug.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/struct_stat.h:
+
+/usr/include/c++/11/bits/stl_multiset.h:
+
+/usr/include/c++/11/map:
+
+/usr/include/c++/11/bits/stl_map.h:
+
+/usr/include/c++/11/bits/stl_multimap.h:
+
+/usr/include/eigen3/Eigen/src/Core/MathFunctionsImpl.h:
+
+/usr/include/eigen3/Eigen/Geometry:
+
+/usr/include/c++/11/cctype:
+
+/usr/include/yaml-cpp/exceptions.h:
+
+/usr/include/eigen3/Eigen/src/Core/PermutationMatrix.h:
+
+/usr/include/yaml-cpp/mark.h:
+
+/usr/include/yaml-cpp/traits.h:
+
+/usr/include/eigen3/Eigen/src/Core/functors/UnaryFunctors.h:
+
+/usr/include/yaml-cpp/node/node.h:
+
+/usr/include/yaml-cpp/node/detail/iterator_fwd.h:
+
+/usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedEigenSolver.h:
+
+/usr/include/yaml-cpp/node/detail/node.h:
+
+/usr/include/c++/11/string_view:
+
+/usr/include/yaml-cpp/node/impl.h:
+
+/usr/include/c++/11/bits/codecvt.h:
+
+/usr/include/eigen3/Eigen/src/Geometry/RotationBase.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
+
+/usr/include/yaml-cpp/node/detail/memory.h:
+
+/usr/include/yaml-cpp/node/detail/node_data.h:
+
+/usr/include/c++/11/bits/stream_iterator.h:
+
+/usr/include/asm-generic/int-ll64.h:
+
+/usr/include/c++/11/atomic:
+
+/usr/include/eigen3/Eigen/QR:
+
+/usr/include/yaml-cpp/node/convert.h:
+
+/usr/include/python3.10/pymacro.h:
+
+/usr/include/yaml-cpp/node/detail/impl.h:
+
+/usr/include/yaml-cpp/node/parse.h:
+
+/usr/include/x86_64-linux-gnu/bits/environments.h:
+
+/usr/include/eigen3/Eigen/src/Core/util/SymbolicIndex.h:
+
+/usr/include/eigen3/Eigen/src/Core/SolverBase.h:
+
+/usr/include/yaml-cpp/node/emit.h:
+
+/usr/include/c++/11/unordered_set:
+
+/usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h:
+
+/usr/include/eigen3/Eigen/src/SVD/UpperBidiagonalization.h:
+
+/usr/include/c++/11/bits/std_function.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
+
+/usr/include/eigen3/Eigen/src/SVD/JacobiSVD.h:
+
 /usr/include/eigen3/Eigen/Dense:
+
+/usr/include/python3.10/typeslots.h:
+
+/usr/include/asm-generic/errno-base.h:
+
+/usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h:
 
 /usr/include/eigen3/Eigen/src/Core/products/SelfadjointRank2Update.h:
 
@@ -4138,6 +4508,8 @@ include/matplotlibcpp.h:
 /usr/include/eigen3/Eigen/src/Core/util/ConfigureVectorization.h:
 
 /usr/include/python3.10/numpy/arrayobject.h:
+
+/usr/include/c++/11/list:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/mmintrin.h:
 
@@ -4177,8 +4549,6 @@ include/matplotlibcpp.h:
 
 /usr/include/eigen3/Eigen/src/Householder/HouseholderSequence.h:
 
-/usr/include/python3.10/complexobject.h:
-
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
 
 /usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
@@ -4186,6 +4556,8 @@ include/matplotlibcpp.h:
 /usr/include/x86_64-linux-gnu/bits/xopen_lim.h:
 
 /usr/include/eigen3/Eigen/src/Core/util/Constants.h:
+
+/usr/include/yaml-cpp/node/iterator.h:
 
 /usr/include/eigen3/Eigen/src/Geometry/Translation.h:
 
@@ -4195,8 +4567,6 @@ include/matplotlibcpp.h:
 
 /usr/include/eigen3/Eigen/src/Core/util/ForwardDeclarations.h:
 
-src/genSplines.cpp:
-
 /usr/include/python3.10/pymath.h:
 
 /usr/include/eigen3/Eigen/src/Core/util/StaticAssert.h:
@@ -4205,16 +4575,6 @@ src/genSplines.cpp:
 
 /usr/include/eigen3/Eigen/src/Eigenvalues/ComplexSchur.h:
 
-/usr/include/x86_64-linux-gnu/bits/environments.h:
-
-/usr/include/eigen3/Eigen/src/Core/util/SymbolicIndex.h:
-
-/usr/include/eigen3/Eigen/src/Core/SolverBase.h:
-
-/usr/include/python3.10/context.h:
-
-/usr/include/eigen3/Eigen/src/Core/NumTraits.h:
-
 /usr/include/linux/limits.h:
 
 /usr/include/eigen3/Eigen/src/Core/MathFunctions.h:
@@ -4222,14 +4582,6 @@ src/genSplines.cpp:
 /usr/include/c++/11/bits/functexcept.h:
 
 /usr/include/x86_64-linux-gnu/bits/getopt_core.h:
-
-/usr/include/eigen3/Eigen/src/Core/MathFunctionsImpl.h:
-
-/usr/include/eigen3/Eigen/Geometry:
-
-/usr/include/c++/11/bits/stl_multimap.h:
-
-/usr/include/python3.10/longobject.h:
 
 /usr/include/eigen3/Eigen/src/Core/arch/Default/Settings.h:
 
@@ -4258,8 +4610,6 @@ src/genSplines.cpp:
 /usr/include/eigen3/Eigen/src/Core/arch/Default/GenericPacketMathFunctions.h:
 
 /usr/include/eigen3/Eigen/src/Core/MapBase.h:
-
-/usr/include/eigen3/Eigen/src/Core/functors/UnaryFunctors.h:
 
 /usr/include/eigen3/Eigen/src/Core/functors/NullaryFunctors.h:
 
@@ -4323,10 +4673,6 @@ include/rapidcsv.h:
 
 /usr/include/c++/11/math.h:
 
-/usr/include/eigen3/Eigen/src/Core/Map.h:
-
-/usr/include/eigen3/Eigen/src/Core/ConditionEstimator.h:
-
 /usr/include/x86_64-linux-gnu/sys/single_threaded.h:
 
 /usr/include/eigen3/Eigen/src/Core/Ref.h:
@@ -4335,11 +4681,9 @@ include/rapidcsv.h:
 
 /usr/include/x86_64-linux-gnu/gnu/stubs.h:
 
+/usr/include/c++/11/set:
+
 /usr/include/eigen3/Eigen/src/Geometry/Transform.h:
-
-/usr/include/python3.10/tracemalloc.h:
-
-/usr/include/eigen3/Eigen/src/Core/Reshaped.h:
 
 /usr/include/eigen3/Eigen/src/Core/Transpose.h:
 
@@ -4355,31 +4699,7 @@ include/rapidcsv.h:
 
 /usr/include/eigen3/Eigen/src/Core/Inverse.h:
 
-/usr/include/eigen3/Eigen/src/Core/PermutationMatrix.h:
-
 /usr/include/eigen3/Eigen/src/Core/TriangularMatrix.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/11/include/omp.h:
-
-/usr/include/eigen3/Eigen/src/Core/SelfAdjointView.h:
-
-/usr/include/asm-generic/int-ll64.h:
-
-/usr/include/c++/11/atomic:
-
-/usr/include/eigen3/Eigen/QR:
-
-/usr/include/c++/11/unordered_set:
-
-/usr/include/eigen3/Eigen/src/Core/ProductEvaluators.h:
-
-/usr/include/eigen3/Eigen/src/SVD/UpperBidiagonalization.h:
-
-/usr/include/c++/11/bits/std_function.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
-
-/usr/include/eigen3/Eigen/src/SVD/JacobiSVD.h:
 
 /usr/include/eigen3/Eigen/src/Core/products/GeneralMatrixMatrix.h:
 
@@ -4429,17 +4749,9 @@ src/main.cpp:
 
 /usr/include/eigen3/Eigen/src/Core/Replicate.h:
 
-/usr/include/eigen3/Eigen/src/plugins/CommonCwiseUnaryOps.h:
-
-/usr/include/eigen3/Eigen/src/Core/functors/BinaryFunctors.h:
-
-/usr/include/x86_64-linux-gnu/asm/types.h:
-
 /usr/include/eigen3/Eigen/src/Core/Reverse.h:
 
 /usr/include/eigen3/Eigen/src/Core/util/ReenableStupidWarnings.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_statx.h:
 
 /usr/include/eigen3/Eigen/src/misc/Kernel.h:
 
@@ -4489,21 +4801,11 @@ src/main.cpp:
 
 /usr/include/eigen3/Eigen/src/Geometry/OrthoMethods.h:
 
-/usr/include/asm-generic/errno-base.h:
-
-/usr/include/eigen3/Eigen/src/Core/util/DisableStupidWarnings.h:
-
-/usr/include/python3.10/typeslots.h:
-
 /usr/include/eigen3/Eigen/src/Geometry/EulerAngles.h:
 
 /usr/include/asm-generic/bitsperlong.h:
 
 /usr/include/eigen3/Eigen/src/Geometry/Homogeneous.h:
-
-/usr/include/c++/11/bits/codecvt.h:
-
-/usr/include/eigen3/Eigen/src/Geometry/RotationBase.h:
 
 /usr/include/eigen3/Eigen/src/Geometry/Quaternion.h:
 
@@ -4518,6 +4820,10 @@ src/main.cpp:
 /usr/include/c++/11/cstring:
 
 /usr/include/eigen3/Eigen/src/Geometry/ParametrizedLine.h:
+
+/usr/include/python3.10/cpython/objimpl.h:
+
+/usr/include/eigen3/Eigen/src/Geometry/AlignedBox.h:
 
 /usr/include/c++/11/sstream:
 
@@ -4535,8 +4841,6 @@ src/main.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/posix_opt.h:
 
-/usr/include/eigen3/Eigen/src/Eigenvalues/SelfAdjointEigenSolver.h:
-
 /usr/include/python3.10/cpython/pyfpe.h:
 
 /usr/include/eigen3/Eigen/src/Eigenvalues/GeneralizedSelfAdjointEigenSolver.h:
@@ -4545,17 +4849,9 @@ src/main.cpp:
 
 /usr/include/eigen3/Eigen/src/Eigenvalues/MatrixBaseEigenvalues.h:
 
-/usr/include/c++/11/map:
-
-/usr/include/c++/11/bits/stl_tree.h:
-
-/usr/include/c++/11/bits/stl_map.h:
-
 /usr/include/eigen3/Eigen/src/Core/Select.h:
 
 /usr/include/python3.10/patchlevel.h:
-
-/usr/include/python3.10/objimpl.h:
 
 /usr/lib/gcc/x86_64-linux-gnu/11/include/stddef.h:
 
@@ -4580,29 +4876,3 @@ src/main.cpp:
 /usr/include/eigen3/Eigen/src/Core/products/SelfadjointMatrixVector.h:
 
 /usr/include/x86_64-linux-gnu/sys/stat.h:
-
-/usr/include/c++/11/pstl/glue_memory_defs.h:
-
-/usr/include/linux/stat.h:
-
-/usr/include/linux/posix_types.h:
-
-/usr/include/x86_64-linux-gnu/asm/posix_types.h:
-
-/usr/include/python3.10/exports.h:
-
-/usr/include/eigen3/Eigen/src/Geometry/AlignedBox.h:
-
-/usr/include/python3.10/cpython/objimpl.h:
-
-/usr/include/signal.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/struct_stat.h:
-
-/usr/include/python3.10/cpython/pydebug.h:
-
-/usr/include/python3.10/cpython/bytesobject.h:
-
-/usr/include/python3.10/cpython/unicodeobject.h:

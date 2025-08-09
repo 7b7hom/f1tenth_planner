@@ -1,9 +1,13 @@
 #include "graph.h"
+#include "spline.h"
 // #include "graph_planner.hpp"
+
+void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, const SplineMap &splineMap);
+void plotSpline(const Spline& spline, const string& color);
 
 IVector samplePointsFromRaceline(const DVector& kappa,
                               const DVector& dist,
-                              Offline_Params& params) {
+                              const YAML::Node& params) {
 
     IVector idx_sampling;
     const size_t n = kappa.size();
@@ -11,9 +15,14 @@ IVector samplePointsFromRaceline(const DVector& kappa,
     double next_dist = 0.0;
     double next_dist_min = 0.0;
 
+    // params
+    float curve_thr = params["lattice"]["curve_thr"].as<float>();
+    float d_straight = params["lattice"]["d_straight"].as<float>();
+    float d_curve = params["lattice"]["d_curve"].as<float>();
+
     for (size_t i = 0; i < n; ++i) {
         // 곡선이면 최소 거리 갱신
-        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > params.curve_thr) {
+        if ((cur_dist + dist[i]) > next_dist_min && fabs(kappa[i]) > curve_thr) {
             next_dist = cur_dist;
         }
         // cout << fabs(kappa[i]) << endl;
@@ -21,13 +30,13 @@ IVector samplePointsFromRaceline(const DVector& kappa,
         if ((cur_dist + dist[i]) > next_dist) {
             idx_sampling.push_back(static_cast<int>(i));
 
-            if (fabs(kappa[i]) < params.curve_thr) {  // 직선 구간
-                next_dist += params.d_straight;
+            if (fabs(kappa[i]) < curve_thr) {  // 직선 구간
+                next_dist += d_straight;
             } else {  // 곡선 구간
-                next_dist += params.d_curve;
+                next_dist += d_curve;
             }
 
-            next_dist_min = cur_dist + params.d_curve;
+            next_dist_min = cur_dist + d_curve;
         }
 
         cur_dist += dist[i];
@@ -40,36 +49,38 @@ IVector samplePointsFromRaceline(const DVector& kappa,
     return idx_sampling;
 }
 
-auto genNode(DMap &stMap, const Offline_Params &params) -> pair<NodeMap, IVector> {
+
+auto genNode(DMap &stMap, const YAML::Node &params) -> pair<NodeMap, IVector> {
     NodeMap nodesPerLayer;
     IVector raceline_index_array;
     
     const int N = stMap[NORM_L].size();
     Vector2d node_pos;
     nodesPerLayer.resize(N);    // N개 레이어 기준, nodesPerLayer 벡터를 N 크기로 초기화 (각 레이어에 노드 저장)
+    
+    // params
+    float veh_width = params["vehicle"]["veh_width"].as<float>();
+    float lat_resolution = params["lattice"]["lat_resolution"].as<float>();
+    
     // layer 별로 loop 돈다. for 루프 안이 한 레이어 내에서 하는 작업 내용물.
     for (size_t i = 0; i < N; ++i){ 
         Node node;
         // raceline이 layer 내에서 몇 번째 인덱스인지 확인. 이를 기준으로 node의 첫 번째 기준을 삼을 예정(s).
-        int raceline_index = floor((stMap[WIDTH_L][i] + stMap[NORM_L][i] - params.veh_width / 2) / params.lat_resolution);
+        int raceline_index = floor((stMap[WIDTH_L][i] + stMap[NORM_L][i] - veh_width / 2) / lat_resolution);
         raceline_index_array.push_back(raceline_index);
-        // cout << i << "번째 layer 길이" << (stMap[__width_lef][i] + stMap[WIDTH_R][i])<< endl;
-        // cout << "layer 내에서 raceline index:" << raceline_index << endl;
-        // cout << "-----" << endl;
 
         Vector2d ref_xy(stMap[POS_X][i], stMap[POS_Y][i]);    // 기준선에서의 위치
         Vector2d norm_vec(stMap[NORM_X][i], stMap[NORM_Y][i]);  // 기준선에서 수직한 노멀 벡터 따라 노드 배치
         
-        double start_alpha = stMap[NORM_L][i] - raceline_index * params.lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
+        double start_alpha = stMap[NORM_L][i] - raceline_index * lat_resolution;    // 제일 왼쪽 노드가 노멀 벡터를 따라 얼마나 떨어져 있는지
         int node_idx = 0;
-        int num_nodes = (stMap[WIDTH_R][i] + stMap[WIDTH_L][i] - params.veh_width) / params.lat_resolution;  // num_nodes : 좌우 총 가능한 노드 수
+        int num_nodes = (stMap[WIDTH_R][i] + stMap[WIDTH_L][i] - veh_width) / lat_resolution;  // num_nodes : 좌우 총 가능한 노드 수
         
         nodesPerLayer[i].resize(num_nodes); 
         
-        // cout << i << "번째 layer의 node 개수는 " << num_nodes << endl;  
         // node별 loop 
         for (int idx = 0; idx < num_nodes; ++idx) {
-            double alpha = start_alpha + idx * params.lat_resolution;
+            double alpha = start_alpha + idx * lat_resolution;
             // cout << idx << "번째 노드" << endl;
             // node의 좌표 계산.
             node_pos = ref_xy + alpha * norm_vec;
@@ -78,13 +89,6 @@ auto genNode(DMap &stMap, const Offline_Params &params) -> pair<NodeMap, IVector
             node.y = node_pos.y();      
             node.raceline = (node_idx == raceline_index);
             
-            #if 0 
-            if (idx == num_nodes - 1) {
-                cout << i << "번째 레이어의 " << idx << "번째 노드" << endl;
-                cout << stMap[x_bound_r][idx] - alpha << endl;
-            }
-            #endif
-
             // psi 재계산  
             double psi_interp;
             if (node_idx < raceline_index) {
@@ -118,20 +122,22 @@ auto genNode(DMap &stMap, const Offline_Params &params) -> pair<NodeMap, IVector
         }
 
     }
-        // cout << i << "번째 Layer의" << endl;
-        // for (size_t i =0; i < node_pos.size(); ++i) {        
-        //     cout << i << "번째 Node" << endl;
-        //     cout << node_pos[i] << endl;
-        // }
     return {nodesPerLayer, raceline_index_array};
 }
 
 void calcOfflineCost(SplineMap& splineMap,
                    IVector& raceline_index_array,
-                   Offline_Params& params) {
+                   YAML::Node& params) {
     if (splineMap.size() <= 0) {
         throw invalid_argument("SplineMap's Size is zero!!");
     }
+
+    float w_raceline = params["cost"]["w_raceline"].as<float>();
+    float w_raceline_sat = params["cost"]["w_raceline_sat"].as<float>();
+    float w_length = params["cost"]["w_length"].as<float>();
+    float w_curv_avg = params["cost"]["w_curv_avg"].as<float>();
+    float w_curv_peak = params["cost"]["w_curv_peak"].as<float>();
+    float lat_resolution = params["lattice"]["lat_resolution"].as<float>();
 
     for (auto& [startPoint, endPoints] : splineMap) {
         for (auto& [endPoint, spline] : endPoints) {
@@ -161,18 +167,18 @@ void calcOfflineCost(SplineMap& splineMap,
             double s_length = spline.el_lengths.sum();
             // cout << "s_length: " << s_length << endl;
             // average curvature
-            offline_cost += params.w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
+            offline_cost += w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
             // peak curvature
-            double max_min = std::abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
-            offline_cost += params.w_curv_peak * pow(max_min, 2) * s_length;
+            double max_min = abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
+            offline_cost += w_curv_peak * pow(max_min, 2) * s_length;
 
             // path length
-            offline_cost += params.w_length * s_length;
+            offline_cost += w_length * s_length;
 
             // raceline cost
 
-            double raceline_dist = std::abs(raceline_index_array[end_layer] - end_node) * params.lat_resolution;
-            double raceline_cost = min(params.w_raceline * s_length * raceline_dist, params.w_raceline_sat * s_length);
+            double raceline_dist = abs(raceline_index_array[end_layer] - end_node) * lat_resolution;
+            double raceline_cost = min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
 
             offline_cost += raceline_cost;
 
@@ -226,15 +232,19 @@ void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vec
 void setInitialPose(DMap &stMap,
                     const NodeMap &nodesPerLayer,
                     const IVector &raceline_index_array,
-                    Offline_Params &params) {
+                    YAML::Node &params) {
     // 현재 pos, heading 
     double dx, dy;
         
     Vector2d initial_pos(stMap[RL_X][1], stMap[RL_Y][1]);
     float vel_est = 0.0;
 
+    float veh_width = params["vehicle"]["veh_width"].as<float>();
+    double max_heading_offset = params["custom"]["max_heading_offset"].as<double>();
+    float stepsize_approx = params["sampling"]["stepsize_approx"].as<float>();
+    
     // set start pos 
-    if (!checkInsideBounds(stMap, initial_pos, params.veh_width)) {
+    if (!checkInsideBounds(stMap, initial_pos, veh_width)) {
         throw out_of_range("start pos is not in bounds");
     }
     
@@ -263,7 +273,7 @@ void setInitialPose(DMap &stMap,
             heading_diff = abs(2*M_PI - heading_diff);
 
         }
-        if (heading_diff > params.max_heading_offset) {
+        if (heading_diff > max_heading_offset) {
             // cout << "heading_diff: " << heading_diff << ", " << max_heading_offset << endl;
             // cerr << "Heading mismatch between vehicle and track grid, check if vehicle oriented correctly!" << endl;
         }
@@ -273,7 +283,7 @@ void setInitialPose(DMap &stMap,
         path.block<1, 2>(1, 0) = end_pos.transpose();
 
         auto result = calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
-        auto [kappa, psi] = interpSplines(stMap, result->coeffs_x, result->coeffs_y, params.stepsize_approx, params.veh_width);
+        auto [kappa, psi] = interpSplines(stMap, result->coeffs_x, result->coeffs_y, stepsize_approx, veh_width);
 
         // kappa와 psi의 크기 확인
         if (kappa.size() == 0) {
@@ -318,10 +328,13 @@ int main() {
     clock_t s_time, f_time;
     s_time = clock();
 
-    unique_ptr<string> track = Load("include/driving_task.ini");
+    string yaml_path = "config/offline_params.yaml";
+    YAML::Node params = YAML::LoadFile(yaml_path);
+    
+    // unique_ptr<string> track = Load("include/driving_task.ini");
     // 자동 경로 설정
-    string map_file_in  = "inputs/traj_ltpl_cl_" + *track + ".csv";
-    string map_file_out = "outputs/" + *track + "_out.csv";
+    string map_file_in = "maps/" + params["map_name"].as<string>() + ".csv";
+    string map_file_out = "outputs/"+ params["map_name"].as<string>() + "_out.csv";
 
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     // 결과: gtpl_map
@@ -346,28 +359,16 @@ int main() {
     gtMap[RL_X] = rl_x;
     gtMap[RL_Y] = rl_y;
     gtMap[RL_dS] = rl_ds;
-    // 할일 
-    // 모든 소스 파일들에서 전역 변수들 제거
-    // 리턴값을 정의할 수 있는 모든 함수들은 리턴값 정의 (예: calcHeading)
-    // addDVectorToMap 제거하고, 내부 로직들을 별개 함수들로 독립시킴
-    // Segmentaton Fault 버그 잡기
-    // YAML 파일 읽기 (맵 교체시 재컴파일해서는 안 됨)
-    // cpp 파일들, hpp 파일들 정리하기. cpp와 무관한 hpp 파일을 cpp가 포함하지 않도록 작성하기.
-    // 멀티쓰레딩은 이 스탭이 다끝나고 정리되면 한다.
-
 
     // 결과: map_file_out 
     // [지민] gtpl_mp은 이미 전역변수라 삽입해줄 필요가 없음.
     writeDMapToCSV(map_file_out, gtMap);
     
     // layer 간격을 위한 raceline points sampling 
-
-    Offline_Params params;
-    // [지민] 가독성을 위해서 넣기 했으나 빼야될지?
     IVector idx_sampling = samplePointsFromRaceline(gtMap[RL_KAPPA],
                                                     gtMap[RL_dS],
                                                     params);
-
+    
     // cout << "idx size:" << idx_sampling.size() << endl;
     // 샘플링한대로 이제 gtpl_map 대신 stMap으로 바굼
     DMap stMap;
@@ -391,16 +392,16 @@ int main() {
     stMap[RB_PSI] = calcHeading(stMap[RB_X], stMap[RB_Y]);  
     
     auto [nodesPerLayer, raceline_index_array] = genNode(stMap, params);
-
+    
     // writeDMapToCSV("inputs/stMap.csv", stMap);
 
     auto [wayptGraph, splineMap] = genEdges(stMap, nodesPerLayer, raceline_index_array, params);
-
+    
     // 결과: splineMap의 spline 구조체에 cost저장 
     calcOfflineCost(splineMap,
                    raceline_index_array,
                    params);
-
+    
     // 결과: 초기경로 시각화
     setInitialPose(stMap,
                    nodesPerLayer,

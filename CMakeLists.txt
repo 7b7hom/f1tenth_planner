@@ -13,6 +13,7 @@ set(PACKAGE_NAME matplotlib_cpp)
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/${PACKAGE_NAME}/cmake)
 
 find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(yaml-cpp REQUIRED)
 
 include_directories(${Python_INCLUDE_DIRS})
 
@@ -59,8 +60,8 @@ endif()
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 # main
-add_executable(main src/main.cpp include/graph.cpp src/visualization.cpp src/helper_func.cpp src/genSplines.cpp)
-target_link_libraries(main PRIVATE matplotlib_cpp Eigen3::Eigen)
+add_executable(main src/main.cpp include/graph.cpp src/visualization.cpp src/helper_func.cpp include/spline.cpp)
+target_link_libraries(main PRIVATE matplotlib_cpp Eigen3::Eigen yaml-cpp)
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 # Install headers

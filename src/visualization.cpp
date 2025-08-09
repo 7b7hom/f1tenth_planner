@@ -200,4 +200,5 @@ void visual(DMap &gtMap,
     plt::grid(true);
     plt::axis("equal");
     plt::show();
+ 
 }
