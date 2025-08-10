@@ -46,9 +46,9 @@ DMap readDMapFromCSV(const string& pathname) {
     Document csv(pathname, LabelParams(0, -1), SeparatorParams(';'));
     vector<string> labels = csv.GetColumnNames();
 
-    for (const auto& label : labels)
+    for (const auto& label : labels) 
         gtMap[label] = csv.GetColumn<double>(label);
-    
+
     return gtMap;
 }
 
