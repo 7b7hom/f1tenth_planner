@@ -5,31 +5,31 @@ constants:
   rl_s: 7
 
 lattice:
-  lat_resolution: 0.9
+  lat_resolution: 0.5
   variable_heading: true
-  d_straight: 30.0
-  d_curve: 6.5
-  curve_thr: 0.01
-  lat_offset: 3.5
-  max_lat_steps: 2
+  d_straight: 4.0
+  d_curve: 0.9
+  curve_thr: 0.21
+  lat_offset: 2.0
+  max_lat_steps: 3
   virt_goal_n: true
   min_vel_race: 0.0
-  max_lateral_accel: 4.0
-  closure_detection_dist: 20.0
+  max_lateral_accel: 10.0
+  closure_detection_dist: 0.5
 
 planningtarget:
   initial_layer: 4
   vel_decrease_lat: 0.1
-  min_plan_horizon: 40
+  min_plan_horizon: 300
   plan_horizon_mode: "distance"
 
 sampling:
   stepsize_approx: 2.5
 
 vehicle:
-  veh_width: 1.8
-  veh_length: 5.0
-  veh_turn: 6.0
+  veh_width: 1.0
+  veh_length: 4.7
+  veh_turn: 5.0
 
 cost:
   w_raceline: 1.0
@@ -42,4 +42,4 @@ cost:
 custom:
   max_heading_offset: 0.7853981633974483
 
-map_name: "traj_ltpl_cl_berlin"
+map_name: "traj_ltpl_cl_millbrook"

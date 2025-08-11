@@ -7,9 +7,9 @@ constants:
 lattice:
   lat_resolution: 0.9
   variable_heading: true
-  d_straight: 30.0
-  d_curve: 6.5
-  curve_thr: 0.01
+  d_straight: 15.0
+  d_curve: 7.0
+  curve_thr: 0.07
   lat_offset: 3.5
   max_lat_steps: 2
   virt_goal_n: true
@@ -29,7 +29,7 @@ sampling:
 vehicle:
   veh_width: 1.8
   veh_length: 5.0
-  veh_turn: 6.0
+  veh_turn: 7.0
 
 cost:
   w_raceline: 1.0
@@ -42,4 +42,4 @@ cost:
 custom:
   max_heading_offset: 0.7853981633974483
 
-map_name: "traj_ltpl_cl_berlin"
+map_name: "traj_ltpl_cl_modena"

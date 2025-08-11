@@ -242,6 +242,7 @@ void setInitialPose(DMap &stMap,
     float veh_width = params["vehicle"]["veh_width"].as<float>();
     double max_heading_offset = params["custom"]["max_heading_offset"].as<double>();
     float stepsize_approx = params["sampling"]["stepsize_approx"].as<float>();
+    int initial_layer = params["planningtarget"]["initial_layer"].as<int>();
     
     // set start pos 
     if (!checkInsideBounds(stMap, initial_pos, veh_width)) {
@@ -254,7 +255,7 @@ void setInitialPose(DMap &stMap,
     int start_node = closest_idx.second;
     double start_heading = nodesPerLayer[closest_idx.first][closest_idx.second].psi;
 
-    int end_layer = (closest_idx.first + 4) % (nodesPerLayer.size() - 1);
+    int end_layer = (closest_idx.first + initial_layer) % (nodesPerLayer.size() - 1);
 
     for (int layer_idx = start_layer; layer_idx < end_layer;++layer_idx) {
         if (layer_idx != start_layer) {
