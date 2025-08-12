@@ -1,5 +1,5 @@
 #include "graph_planner.hpp"
-#include "config.h"
+#include "config_modena.h"
 
 extern DMap gtpl_map;
 extern DMap sampling_map;
@@ -27,8 +27,8 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
 int main() {
     Offline_Params params;
 
-    std::string map_file_in = "/home/uiiiqns/f1tenth_planner/inputs/gtpl_levine.csv";
-    std::string map_file_out = "/home/uiiiqns/f1tenth_planner/inputs/gtpl_levine_out.csv";
+    std::string map_file_in = "/home/uiiiqns/f1tenth_planner/inputs/traj_ltpl_cl_modena.csv";
+    std::string map_file_out = "/home/uiiiqns/f1tenth_planner/inputs/traj_ltpl_cl_modena_out.csv";
 
     // 1. 트랙 데이터 로드 및 전처리
     readDMapFromCSV(map_file_in, gtpl_map); // gen_spline.cpp의 전역 gtpl_map에 로드
@@ -41,8 +41,8 @@ int main() {
     // 2. 레이어 샘플링
     IVector idx_sampling;
     samplePointsFromRaceline(gtpl_map[__kappa], gtpl_map[__delta_s],
-                             params.LON_CURVE_STEP, params.LON_STRAIGHT_STEP,
-                             params.CURVE_THR, idx_sampling);
+                             params.d_curve, params.d_straight,
+                             params.curve_thr, idx_sampling);
     
     // 샘플링된 인덱스를 사용하여 gtpl_map에서 데이터를 복사하여 sampling_map 채우기
     for (const auto& [key, vec] : gtpl_map) {
@@ -61,11 +61,11 @@ int main() {
 
     // 3. 노드 그리드 생성
     NodeMap nodesPerLayer;
-    genNode(nodesPerLayer, params.VEH_WIDTH, params.LAT_RESOLUTION);
+    genNode(nodesPerLayer, params.veh_width, params.lat_resolution);
 
     // Offline_Params에 총 레이어 수 설정 (gen_offline_cost와 prune_graph에서 사용)
     Offline_Params mutable_params = params; 
-    mutable_params.NUM_LAYERS = nodesPerLayer.size();
+    //mutable_params.num_layers = nodesPerLayer.size();
 
     // 4. 스플라인 생성 및 유효성 검사, 최종 그래프 구축
     Graph directedGraph(nodesPerLayer.size()); 

@@ -656,7 +656,7 @@ CMakeFiles/main.dir/include/graph.cpp.o: /home/uiiiqns/f1tenth_planner/include/g
   /usr/lib/python3/dist-packages/numpy/core/include/numpy/utils.h
 
 CMakeFiles/main.dir/src/gen_spline.cpp.o: /home/uiiiqns/f1tenth_planner/src/gen_spline.cpp \
-  /home/uiiiqns/f1tenth_planner/include/config.h \
+  /home/uiiiqns/f1tenth_planner/include/config_modena.h \
   /home/uiiiqns/f1tenth_planner/include/graph_planner.hpp \
   /home/uiiiqns/f1tenth_planner/include/matplotlibcpp.h \
   /home/uiiiqns/f1tenth_planner/include/rapidcsv.h \
@@ -1311,7 +1311,7 @@ CMakeFiles/main.dir/src/gen_spline.cpp.o: /home/uiiiqns/f1tenth_planner/src/gen_
   /usr/lib/python3/dist-packages/numpy/core/include/numpy/utils.h
 
 CMakeFiles/main.dir/src/main.cpp.o: /home/uiiiqns/f1tenth_planner/src/main.cpp \
-  /home/uiiiqns/f1tenth_planner/include/config.h \
+  /home/uiiiqns/f1tenth_planner/include/config_modena.h \
   /home/uiiiqns/f1tenth_planner/include/graph_planner.hpp \
   /home/uiiiqns/f1tenth_planner/include/matplotlibcpp.h \
   /home/uiiiqns/f1tenth_planner/include/rapidcsv.h \
@@ -1966,7 +1966,7 @@ CMakeFiles/main.dir/src/main.cpp.o: /home/uiiiqns/f1tenth_planner/src/main.cpp \
   /usr/lib/python3/dist-packages/numpy/core/include/numpy/utils.h
 
 CMakeFiles/main.dir/src/visualization.cpp.o: /home/uiiiqns/f1tenth_planner/src/visualization.cpp \
-  /home/uiiiqns/f1tenth_planner/include/config.h \
+  /home/uiiiqns/f1tenth_planner/include/config_modena.h \
   /home/uiiiqns/f1tenth_planner/include/graph_planner.hpp \
   /home/uiiiqns/f1tenth_planner/include/matplotlibcpp.h \
   /home/uiiiqns/f1tenth_planner/include/rapidcsv.h \
@@ -2623,7 +2623,7 @@ CMakeFiles/main.dir/src/visualization.cpp.o: /home/uiiiqns/f1tenth_planner/src/v
 
 /home/uiiiqns/f1tenth_planner/src/main.cpp:
 
-/home/uiiiqns/f1tenth_planner/include/config.h:
+/home/uiiiqns/f1tenth_planner/include/config_modena.h:
 
 /usr/lib/python3/dist-packages/numpy/core/include/numpy/utils.h:
 

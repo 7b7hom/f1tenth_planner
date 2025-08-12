@@ -1,5 +1,5 @@
 #include "graph_planner.hpp"
-#include "config.h"
+#include "config_modena.h"
 
 DMap gtpl_map;
 DMap sampling_map;
@@ -402,7 +402,7 @@ bool checkSplineValidity(const RowVector4d coeff_x, const RowVector4d& coeff_y, 
     // spline 경로 샘플링
     const int num_samples = 10;
 
-    double max_allowed_kappa = 30.0 / params.VEH_TURN;
+    double max_allowed_kappa = 30.0 / params.veh_turn;
 
     for(int k = 0; k <= num_samples; ++k){
         double t_eval = static_cast<double>(k) / num_samples; // 파라미터 t 값을 균등하게 분할
@@ -470,16 +470,16 @@ void genEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params p
             double dist_between_layers = (Vector2d(refEndNode.x, refEndNode.y) - Vector2d(current_node.x, current_node.y)).norm();
 
             double ratio = 0.0;
-            if(params.CURVE_THR > 1e-9){
-                ratio = min(abs(current_node.kappa) / params.CURVE_THR, 2.0); // 현재 노드의 곡률을 CURVE_THR로 정규화
+            if(params.curve_thr > 1e-9){
+                ratio = min(abs(current_node.kappa) / params.curve_thr, 2.0); // 현재 노드의 곡률을 CURVE_THR로 정규화
             }
             // factor -> 직선보다 곡선에서 더 넓은 노드 탐색을 가능하게 하는 계수
             double factor = 1.0 / (1.0 + 0.5 * ratio); // 곡률 높을수록 lat_steps 줄이기
 
             // 곡률이 높고 거리가 멀수록 더 많은 노드를 살펴봄
-            int lat_steps = static_cast<int>(round(factor * dist_between_layers * params.LAT_OFFSET / params.LAT_RESOLUTION));
+            int lat_steps = static_cast<int>(round(factor * dist_between_layers * params.lat_offset / params.lat_resolution));
 
-            lat_steps = min(lat_steps, (int)params.MAX_LAT_STEPS);
+            lat_steps = min(lat_steps, (int)params.max_lat_steps);
 
             for(int dest_node_idx = max(0, refDestIdx - lat_steps); dest_node_idx <= min(static_cast<int>(next_nodes_in_layer.size() - 1), refDestIdx + lat_steps); ++dest_node_idx){
                 const Node& next_node = next_nodes_in_layer[dest_node_idx];
@@ -615,21 +615,20 @@ void gen_offline_cost(Graph& graph, const Offline_Params& params, const NodeMap&
 
             // 평균 곡률
             double avg_abs_kappa = sum_abs_kappa / static_cast<double>(num_samples_for_cost + 1);
-            current_offline_cost += params.W_CURV_AVG * pow(avg_abs_kappa, 2) * edgeInfo.spline_len;
+            current_offline_cost += params.w_curv_avg * pow(avg_abs_kappa, 2) * edgeInfo.spline_len;
 
             // 피크 곡률
             double diff_peak_kappa = abs(max_kappa_val - min_kappa_val); // 최대 절대 곡률 - 최소 절대 곡률
-            current_offline_cost += params.W_CURV_PEAK * pow(diff_peak_kappa, 2) * edgeInfo.spline_len;
+            current_offline_cost += params.w_curv_peak * pow(diff_peak_kappa, 2) * edgeInfo.spline_len;
 
             // 경로 길이 비용
-            current_offline_cost += params.W_LENGTH * edgeInfo.spline_len;
+            current_offline_cost += params.w_length * edgeInfo.spline_len;
 
             // 레이싱 라인 비용 계산
             int raceline_idx_at_end_layer = -1;
 
             // 현재 edge의 끝 node 인덱스가 속한 레이어는 srcKey의 layer + 1
-            // NUM_LAYERS(config.h에 정의) 사용하여 연산으로 다음 layer 인덱스 계산(닫힌 루프 처리)
-            int end_layer_idx = (get<0>(srcKey) + 1) % params.NUM_LAYERS;
+            int end_layer_idx =  (static_cast<int>(get<0>(srcKey)) + 1) % static_cast<int>(nodesPerLayer.size());
             
             // 레이싱 라인 플래그 true 인 노드 찾기
             if (end_layer_idx < nodesPerLayer.size()) {
@@ -643,9 +642,9 @@ void gen_offline_cost(Graph& graph, const Offline_Params& params, const NodeMap&
             
             // 레이싱 라인 노드
             if (raceline_idx_at_end_layer != -1) {
-                double raceline_dist = abs(raceline_idx_at_end_layer - destIdx) * params.LAT_RESOLUTION;
-                current_offline_cost += min(params.W_RACELINE * edgeInfo.spline_len * raceline_dist,
-                                                 params.W_RACELINE_SAT * edgeInfo.spline_len);
+                double raceline_dist = abs(raceline_idx_at_end_layer - destIdx) * params.lat_resolution;
+                current_offline_cost += min(params.w_raceline * edgeInfo.spline_len * raceline_dist,
+                                                 params.w_raceline_sat * edgeInfo.spline_len);
             } else {
                 // cout << "Warning: Raceline node not found for end layer " << end_layer_idx << ". Raceline cost not fully applied." << endl;
             }
@@ -699,7 +698,7 @@ void set_startpos(const Vector2d& pos_est, double heading_est, const Offline_Par
     const double wL = sampling_map[__width_left][l0], wR = sampling_map[__width_right][l0];
     const double alpha_v = (pos_est.x() - ref_x) * nx + (pos_est.y() - ref_y) * ny;
 
-    const double lat = params.LAT_RESOLUTION, vehW = params.VEH_WIDTH;
+    const double lat = params.lat_resolution, vehW = params.veh_width;
     const int raceline_index = (int)floor((wL + sampling_map[__alpha][l0] - 0.5 * vehW) / lat);
     const double start_alpha = sampling_map[__alpha][l0] - raceline_index * lat;
 

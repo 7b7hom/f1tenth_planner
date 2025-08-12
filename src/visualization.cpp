@@ -1,5 +1,5 @@
 #include "graph_planner.hpp"
-#include "config.h"
+#include "config_modena.h"
 
 extern DMap gtpl_map;
 extern DMap sampling_map;
