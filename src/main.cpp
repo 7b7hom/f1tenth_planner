@@ -88,7 +88,6 @@ int main() {
     int next_idx;
     bool out_of_track;
 
-    std::cout << "First raceline heading: " << sampling_map[__psi][0] << " rad" << std::endl;
     Vector2d pos_est(143.45, -130.90); 
     double heading_est = -2.21; // rad
 

@@ -567,12 +567,6 @@ void prune_graph(Graph& graph, int num_layers, bool closed = true) {
         for (const auto& [key, _] : graph.getAdjLists()) {
             all_current_graph_keys.push_back(key);
         }
-
-        if (all_current_graph_keys.empty()) {
-            cout << "Graph is empty, stopping pruning." << endl;
-            break;
-        }
-
         for (const auto& node_key : all_current_graph_keys) {
             int layer = get<0>(node_key);
             int node_idx = get<1>(node_key);
