@@ -1,4 +1,4 @@
-#include "graph.h"
+#include "graph.hpp"
 #include "spline.h"
 // #include "graph_planner.hpp"
 
@@ -277,11 +277,6 @@ auto genEdges(DMap &stMap,
     float lat_offset = params["lattice"]["lat_offset"].as<float>();
     float lat_resolution = params["lattice"]["lat_resolution"].as<float>();
     int max_lat_steps = params["lattice"]["max_lat_steps"].as<int>();
-    float stepsize_approx = params["sampling"]["stepsize_approx"].as<float>();  
-    float veh_width = params["vehicle"]["veh_width"].as<float>();  
-    float veh_turn = params["vehicle"]["veh_turn"].as<float>();  
-    float min_vel_race = params["lattice"]["min_vel_race"].as<float>();  
-    float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();  
 
     if (lat_offset <= 0.0) {
         throw invalid_argument("Too small lateral offset!");
@@ -388,6 +383,22 @@ auto genEdges(DMap &stMap,
                 }
         }
     }
+    return {wayptGraph, splineMap};
+}
+    ///////////////////////////////////////////////////////////////////
+    /////////////////제거 과정////////////////////
+    ///////////////////////////////////////////////////////////////////
+pair<Graph, SplineMap> pruneEdges(DMap &stMap,  
+                NodeMap &nodesPerLayer,
+                Graph &wayptGraph,
+                SplineMap &splineMap,
+                YAML::Node &params) {
+
+    float stepsize_approx = params["sampling"]["stepsize_approx"].as<float>();  
+    float veh_width = params["vehicle"]["veh_width"].as<float>();  
+    float veh_turn = params["vehicle"]["veh_turn"].as<float>();  
+    float min_vel_race = params["lattice"]["min_vel_race"].as<float>();  
+    float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();  
 
     // visual(wayptGraph, nodesPerLayer, splineMap, "pink");
     int edge_cnt = 0;

@@ -83,24 +83,10 @@ CMakeFiles/main.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/src/main.cpp.s"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/seop/misys/f1tenth_planner/src/main.cpp -o CMakeFiles/main.dir/src/main.cpp.s
 
-CMakeFiles/main.dir/include/graph.cpp.o: CMakeFiles/main.dir/flags.make
-CMakeFiles/main.dir/include/graph.cpp.o: include/graph.cpp
-CMakeFiles/main.dir/include/graph.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/include/graph.cpp.o"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/include/graph.cpp.o -MF CMakeFiles/main.dir/include/graph.cpp.o.d -o CMakeFiles/main.dir/include/graph.cpp.o -c /home/seop/misys/f1tenth_planner/include/graph.cpp
-
-CMakeFiles/main.dir/include/graph.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/main.dir/include/graph.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/seop/misys/f1tenth_planner/include/graph.cpp > CMakeFiles/main.dir/include/graph.cpp.i
-
-CMakeFiles/main.dir/include/graph.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/main.dir/include/graph.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/seop/misys/f1tenth_planner/include/graph.cpp -o CMakeFiles/main.dir/include/graph.cpp.s
-
 CMakeFiles/main.dir/src/visualization.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp
 CMakeFiles/main.dir/src/visualization.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/visualization.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/main.dir/src/visualization.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/visualization.cpp.o -MF CMakeFiles/main.dir/src/visualization.cpp.o.d -o CMakeFiles/main.dir/src/visualization.cpp.o -c /home/seop/misys/f1tenth_planner/src/visualization.cpp
 
 CMakeFiles/main.dir/src/visualization.cpp.i: cmake_force
@@ -114,7 +100,7 @@ CMakeFiles/main.dir/src/visualization.cpp.s: cmake_force
 CMakeFiles/main.dir/src/helper_func.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp
 CMakeFiles/main.dir/src/helper_func.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/src/helper_func.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/main.dir/src/helper_func.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/src/helper_func.cpp.o -MF CMakeFiles/main.dir/src/helper_func.cpp.o.d -o CMakeFiles/main.dir/src/helper_func.cpp.o -c /home/seop/misys/f1tenth_planner/src/helper_func.cpp
 
 CMakeFiles/main.dir/src/helper_func.cpp.i: cmake_force
@@ -128,7 +114,7 @@ CMakeFiles/main.dir/src/helper_func.cpp.s: cmake_force
 CMakeFiles/main.dir/include/spline.cpp.o: CMakeFiles/main.dir/flags.make
 CMakeFiles/main.dir/include/spline.cpp.o: include/spline.cpp
 CMakeFiles/main.dir/include/spline.cpp.o: CMakeFiles/main.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object CMakeFiles/main.dir/include/spline.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object CMakeFiles/main.dir/include/spline.cpp.o"
 	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/main.dir/include/spline.cpp.o -MF CMakeFiles/main.dir/include/spline.cpp.o.d -o CMakeFiles/main.dir/include/spline.cpp.o -c /home/seop/misys/f1tenth_planner/include/spline.cpp
 
 CMakeFiles/main.dir/include/spline.cpp.i: cmake_force
@@ -142,7 +128,6 @@ CMakeFiles/main.dir/include/spline.cpp.s: cmake_force
 # Object files for target main
 main_OBJECTS = \
 "CMakeFiles/main.dir/src/main.cpp.o" \
-"CMakeFiles/main.dir/include/graph.cpp.o" \
 "CMakeFiles/main.dir/src/visualization.cpp.o" \
 "CMakeFiles/main.dir/src/helper_func.cpp.o" \
 "CMakeFiles/main.dir/include/spline.cpp.o"
@@ -151,7 +136,6 @@ main_OBJECTS = \
 main_EXTERNAL_OBJECTS =
 
 bin/main: CMakeFiles/main.dir/src/main.cpp.o
-bin/main: CMakeFiles/main.dir/include/graph.cpp.o
 bin/main: CMakeFiles/main.dir/src/visualization.cpp.o
 bin/main: CMakeFiles/main.dir/src/helper_func.cpp.o
 bin/main: CMakeFiles/main.dir/include/spline.cpp.o
@@ -161,7 +145,7 @@ bin/main: /usr/lib/x86_64-linux-gnu/libpython3.10.so
 bin/main: /usr/lib/gcc/x86_64-linux-gnu/11/libgomp.so
 bin/main: /usr/lib/x86_64-linux-gnu/libpthread.a
 bin/main: CMakeFiles/main.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Linking CXX executable bin/main"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/seop/misys/f1tenth_planner/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Linking CXX executable bin/main"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/main.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

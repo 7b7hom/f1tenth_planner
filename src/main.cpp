@@ -1,4 +1,3 @@
-#include "graph.h"
 #include "spline.h"
 // #include "graph_planner.hpp"
 
@@ -397,7 +396,7 @@ int main() {
     // writeDMapToCSV("inputs/stMap.csv", stMap);
 
     auto [wayptGraph, splineMap] = genEdges(stMap, nodesPerLayer, raceline_index_array, params);
-    
+    tie(wayptGraph, splineMap) = pruneEdges(stMap, nodesPerLayer, wayptGraph, splineMap, params);
     // 결과: splineMap의 spline 구조체에 cost저장 
     calcOfflineCost(splineMap,
                    raceline_index_array,

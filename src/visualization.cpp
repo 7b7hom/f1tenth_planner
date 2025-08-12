@@ -1,5 +1,4 @@
-// #include "graph_planner.hpp"
-#include "graph.h"
+#include "graph_planner.hpp"
 
 void plotHeading(const DVector &x,
                  const DVector &y,

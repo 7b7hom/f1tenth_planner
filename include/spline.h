@@ -1,6 +1,6 @@
 #pragma once
-#include "graph_planner.hpp"
-#include "graph.h"
+// #include "graph_planner.hpp"
+#include "graph.hpp"
 
 unique_ptr<Spline> calcSplines(const MatrixXd &path,
                                double psi_s,
@@ -24,3 +24,9 @@ pair<VectorXd, VectorXd> interpSplines(DMap &stMap,
 bool checkInsideBounds(DMap &stMap,
                        const Vector2d &pos,
                        const float veh_width);
+
+pair<Graph, SplineMap>  pruneEdges(DMap &stMap,
+                NodeMap &nodesPerLayer,
+                Graph &wayptGraph,
+                SplineMap &splineMap,
+                YAML::Node &params);  

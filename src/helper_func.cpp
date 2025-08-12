@@ -1,5 +1,4 @@
-#include "graph.h"
-// #include "graph_planner.hpp"
+#include "graph_planner.hpp"
 
 unique_ptr<string> Load(const string& filename) {
     ifstream file(filename);

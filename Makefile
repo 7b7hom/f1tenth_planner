@@ -174,30 +174,6 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-include/graph.o: include/graph.cpp.o
-.PHONY : include/graph.o
-
-# target to build an object file
-include/graph.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.o
-.PHONY : include/graph.cpp.o
-
-include/graph.i: include/graph.cpp.i
-.PHONY : include/graph.i
-
-# target to preprocess a source file
-include/graph.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.i
-.PHONY : include/graph.cpp.i
-
-include/graph.s: include/graph.cpp.s
-.PHONY : include/graph.s
-
-# target to generate assembly for a file
-include/graph.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/graph.cpp.s
-.PHONY : include/graph.cpp.s
-
 include/spline.o: include/spline.cpp.o
 .PHONY : include/spline.o
 
@@ -307,9 +283,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... main"
-	@echo "... include/graph.o"
-	@echo "... include/graph.i"
-	@echo "... include/graph.s"
 	@echo "... include/spline.o"
 	@echo "... include/spline.i"
 	@echo "... include/spline.s"
