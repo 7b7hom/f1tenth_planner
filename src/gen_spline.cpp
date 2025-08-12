@@ -42,7 +42,7 @@ void map_size(DMap& map) {
     cout << "mapsize(" << num_rows << "," << num_cols << ")" << endl;
 }
 
-// DVector를 Map 구조로 추가(연산)
+// DVector를 Map 구조로 추가
 void addDVectorToMap(DMap &map, string attr, const IVector *idx_array = nullptr) {
     size_t len;
     if (idx_array == nullptr) {
@@ -147,6 +147,7 @@ void genNode(NodeMap& nodesPerLayer, const double veh_width, float lat_resolutio
         double start_alpha = sampling_map[__alpha][i] - raceline_index * lat_resolution;
         int num_nodes = (sampling_map[__width_right][i] + sampling_map[__width_left][i] - veh_width) / lat_resolution + 1;
         nodesPerLayer[i].resize(num_nodes); // 현재 레이어의 노드 벡터 크기 조정 (NodeMap은 vector<vector<Node>> 이므로 inner vector의 resize)
+        
         // cout << i << "번째 레이어의 노드 개수: " << num_nodes << endl;
         for (int idx = 0; idx < num_nodes; ++idx) { 
             double alpha = start_alpha + idx * lat_resolution; // 현재 노드의 횡방향 오프셋 계산
@@ -451,6 +452,45 @@ void genEdges(Graph& graph, const NodeMap& nodesPerLayer, const Offline_Params p
         }
     }
 
+    // raceline 추종 엣지 살리기
+    for(size_t current_layer_idx = 0; current_layer_idx < num_layers; ++current_layer_idx){
+        size_t next_layer_idx = (current_layer_idx + 1) % num_layers;
+
+        // 현재 layer의 레이스 라인 노드 찾기
+        const Node* current_raceline_node = nullptr;
+        for(const auto& node : nodesPerLayer[current_layer_idx]){
+            if(node.raceline){
+                current_raceline_node = &node;
+                break;
+            }
+        }
+
+        // 다음 layer의 레이스 라인 노드 찾기
+        const Node* next_raceline_node = nullptr;
+        for(const auto& node : nodesPerLayer[next_layer_idx]){
+            if(node.raceline){
+                next_raceline_node = &node;
+                break;
+            }
+        }
+
+        // 두 레이어 모두 레이스 라인 노드가 존재하면 edge 생성 시도
+        if(current_raceline_node && next_raceline_node){
+            MatrixXd spline_path(2, 2);
+            spline_path << current_raceline_node->x, current_raceline_node->y, next_raceline_node->x, next_raceline_node->y;
+            VectorXd el_lengths(1);
+            el_lengths(0) = (spline_path.row(1) - spline_path.row(0)).norm();
+
+            try{
+                SplineResult res = calcSplines(spline_path, &el_lengths, current_raceline_node->psi, next_raceline_node->psi, true);
+                if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params)){
+                    ITuple src_key(current_raceline_node->layer_idx, current_raceline_node->node_idx);
+                    graph.addEdge(src_key, next_raceline_node->node_idx, res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0));
+                }                
+            }catch(const exception& e){}
+        }
+    }
+
     // layer 순회
     for(size_t current_layer_idx = 0; current_layer_idx < num_layers; ++current_layer_idx){
         size_t next_layer_idx = (current_layer_idx + 1) % num_layers;
@@ -713,6 +753,8 @@ void set_startpos(const Vector2d& pos_est, double heading_est, const Offline_Par
     // 4. 레이어 1 노드
     const int l1 = (l0 + 1) % (int)nodesPerLayer.size();
     out_next_idx = clamp(node_idx0, 0, (int)nodesPerLayer[l1].size() - 1);
+    // 시작 노드와 같은 횡방향 인덱스(node_idx0)를 가진 다음 레이어(l1)의 노드를 목적지로 선택
+    // 트랙을 따라 자연스럽게 진행하는 경로를 가정
 
     // 5. 엣지 없으면 생성
     const auto& adj = graph.getAdjLists();

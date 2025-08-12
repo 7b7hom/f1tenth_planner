@@ -20,15 +20,16 @@ void set_startpos(const Eigen::Vector2d& pos_est, double heading_est, const Offl
                   const NodeMap& nodesPerLayer, Graph& graph, double max_heading_offset_rad,
                   ITuple& out_start_key, int& out_next_idx, bool& out_of_track);
 
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params);
-
+void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params,
+            const Vector2d& pos_est, double heading_est,
+            const ITuple& start_key, int next_idx);
 
 // 전체 경로 계획 파이프라인을 실행하는 함수
 int main() {
     Offline_Params params;
 
-    std::string map_file_in = "/home/uiiiqns/f1tenth_planner/inputs/traj_ltpl_cl_modena.csv";
-    std::string map_file_out = "/home/uiiiqns/f1tenth_planner/inputs/traj_ltpl_cl_modena_out.csv";
+    std::string map_file_in = "/home/subin/subin/AID/planner_project/f1tenth_planner/inputs/traj_ltpl_cl_modena.csv";
+    std::string map_file_out = "/home/subin/subin/AID/planner_project/f1tenth_planner/inputs/traj_ltpl_cl_modena_out.csv";
 
     // 1. 트랙 데이터 로드 및 전처리
     readDMapFromCSV(map_file_in, gtpl_map); // gen_spline.cpp의 전역 gtpl_map에 로드
@@ -79,18 +80,19 @@ int main() {
     // 6. calc cost
     gen_offline_cost(directedGraph, mutable_params, nodesPerLayer); 
 
-    // 7. 최종 그래프 연결 확인 (Print Graph)
     cout << "\n--- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---" << endl;
     directedGraph.printGraph();
 
-    // (8. set_startpos())
+    // (7. set_startpos())
     ITuple start_key;
     int next_idx;
     bool out_of_track;
 
-    Vector2d pos_est(0.0, 0.0);
-    double heading_est = 0.0;
+    std::cout << "First raceline heading: " << sampling_map[__psi][0] << " rad" << std::endl;
+    Vector2d pos_est(143.45, -130.90); 
+    double heading_est = -2.21; // rad
 
+    // set_startpos 함수를 호출하여 가장 가까운 노드를 찾고 엣지를 생성합니다.
     set_startpos(pos_est, heading_est, mutable_params, nodesPerLayer,
                 directedGraph, 20.0 * M_PI / 180.0,
                 start_key, next_idx, out_of_track);
@@ -111,5 +113,5 @@ int main() {
     }
 
     // 8. 결과 시각화 (Plotting)
-    visual(nodesPerLayer, directedGraph, params); 
+    visual(nodesPerLayer, directedGraph, params, pos_est, heading_est, start_key, next_idx);
 }
