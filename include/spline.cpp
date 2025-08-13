@@ -386,8 +386,9 @@ auto genEdges(DMap &stMap,
     return {wayptGraph, splineMap};
 }
     ///////////////////////////////////////////////////////////////////
-    /////////////////제거 과정////////////////////
+    /////////////////////////////제거 과정///////////////////////////////
     ///////////////////////////////////////////////////////////////////
+    
 pair<Graph, SplineMap> pruneEdges(DMap &stMap,  
                 NodeMap &nodesPerLayer,
                 Graph &wayptGraph,
@@ -417,7 +418,6 @@ pair<Graph, SplineMap> pruneEdges(DMap &stMap,
         // 연결되어있는 child node에 대하여 
         for (auto& end : childNodes) {
           
-
           MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
           MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
 
