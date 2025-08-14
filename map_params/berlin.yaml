@@ -25,6 +25,7 @@ planningtarget:
 
 sampling:
   stepsize_approx: 2.5
+  no_interp_points: 20
 
 vehicle:
   veh_width: 1.8
