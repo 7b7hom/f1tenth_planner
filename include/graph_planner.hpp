@@ -62,7 +62,8 @@ struct Spline {
     MatrixXd coeffs_x;          
     MatrixXd coeffs_y;          
     VectorXd kappa;
-    VectorXd el_lengths;   
+    VectorXd el_lengths;
+    vector<Vector2d> points_xy;
     double cost;
     bool raceline;
 };

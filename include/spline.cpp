@@ -81,6 +81,7 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
     // cout << coeffs_x.cols() << endl;
 
     VectorXd kappa;
+    vector<Vector2d> points_xy;
     double cost = 0.0;
     bool raceline = false;
     // 결과 반환
@@ -89,36 +90,10 @@ unique_ptr<Spline> calcSplines(const MatrixXd &path,
         coeffs_y,  // (4, 1)
         kappa,
         el_lengths,
+        points_xy,
         cost,
         raceline,
     });
-}
-
-VectorXd calcKappa(MatrixXd &coeffs_x,
-                         MatrixXd &coeffs_y,
-                         VectorXd &t_steps) {
-    int N = t_steps.size();
-    VectorXd psi(N);
-    VectorXd kappa(N);
-    // 샘플링 개수만큼 loop
-
-    for (int i = 0; i < N; ++i) {
-        double t = t_steps(i);
-
-        // 단일 스플라인이므로 항상 0번째 row 사용
-        double x_d = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t * t;
-        double y_d = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
-
-        psi(i) = atan2(y_d, x_d) - M_PI_2;
-
-        double x_dd = 2 * coeffs_x(0, 2) + 6 * coeffs_x(0, 3) * t;
-        double y_dd = 2 * coeffs_y(0, 2) + 6 * coeffs_y(0, 3) * t;
-
-        double denom = pow(x_d * x_d + y_d * y_d, 1.5);
-        kappa(i)= (x_d * y_dd - y_d * x_dd) / denom;
-    }
-
-    return kappa;
 }
 
 bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width) {
@@ -209,67 +184,10 @@ bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width) 
     return within_bounds;
 }
 
-// 단일 스플라인에 대한 spline에 대한 샘플링
-pair<VectorXd, VectorXd> interpSplines(DMap &stMap,
-                                       MatrixXd &coeffs_x,
-                                       MatrixXd &coeffs_y,
-                                       float stepsize_approx,
-                                       const float &veh_width,
-                                       double spline_len,
-                                       int no_interp_points) {
-    if (coeffs_x.rows() != coeffs_y.rows())
-    {
-        throw invalid_argument("Coefficient matrices must have the same length!");
-    }
-
-    if (coeffs_x.cols() == 2 && coeffs_y.cols() == 2) {
-        throw invalid_argument("Coefficient matrices do not have two dimensions!");
-    }
-
-    if (isnan(stepsize_approx)) {
-        throw invalid_argument("Provide one of 'stepsize_approx' and 'stepnum_fixed' and set the other to 'None'!");
-    }
-
-    // spline 계산 
-    // 샘플링할 점 개수
-    if (isnan(spline_len)) {
-        int no_splines = coeffs_x.rows();
-        // cout << no_splines << endl;
-        VectorXd t_steps(no_interp_points);
-        double step = 1.0 / (no_interp_points - 1);
-
-        for (size_t i = 0; i < no_interp_points; ++i) {
-            t_steps[i] = i*step;
-        }
-
-        VectorXd kappa = calcKappa(coeffs_x, coeffs_y, t_steps);
-
-         // psi 계산
-        VectorXd psi(no_interp_points);
-        for (int i = 0; i < no_interp_points; ++i) {
-            double t = t_steps[i];
-            double dx_dt = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t * t;
-            double dy_dt = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t * t;
-        
-            Vector2d pos(coeffs_x(0, 0) + dx_dt * t, coeffs_y(0, 0) + dy_dt * t);
-            if (!checkInsideBounds(stMap, pos, veh_width)) {
-                // cerr << "[WARNING] Spline point is outside track bounds!" << endl;
-                return make_pair(VectorXd(), VectorXd());
-            }
-
-            psi[i] = atan2(dy_dt, dx_dt);
-        }
-        return make_pair(kappa,psi);
-    }
-
-    return make_pair(VectorXd(), VectorXd());
-}
-
 auto genEdges(DMap &stMap,
               NodeMap &nodesPerLayer,
               const IVector &raceline_index_array,
-              YAML::Node &params) -> pair<Graph, SplineMap>
-{
+              YAML::Node &params) -> pair<Graph, SplineMap> {
 
     Graph wayptGraph; // a graph of waypoints
     SplineMap splineMap;
@@ -385,76 +303,66 @@ auto genEdges(DMap &stMap,
     }
     return {wayptGraph, splineMap};
 }
+
+// 단일 스플라인에 대한 spline에 대한 샘플링
+// 샘플링한 점에 대해서 kappa 계산
+auto samplingSpline(MatrixXd &coeffs_x, MatrixXd &coeffs_y, YAML::Node &params) -> pair<vector<Vector2d>, VectorXd> {
+
+    if (coeffs_x.rows() != coeffs_y.rows())
+        {
+            throw invalid_argument("Coefficient matrices must have the same length!");
+        }
+
+    if (coeffs_x.cols() == 2 && coeffs_y.cols() == 2) {
+        throw invalid_argument("Coefficient matrices do not have two dimensions!");
+    }
+    int no_interp_points =  params["sampling"]["no_interp_points"].as<int>();
+
+    VectorXd t_steps(no_interp_points);
+    double step = 1.0 / (no_interp_points - 1);
+    for (size_t i = 0; i < no_interp_points; ++i) {
+        t_steps[i] = i*step;
+    }
+    
+    vector<Vector2d> points_xy;
+    VectorXd kappa(no_interp_points+1);
+    // kappa.reserve(no_interp_points + 1);
+
+    for (int i = 0; i < no_interp_points; ++i) {
+        double t = t_steps(i);
+        double t2 = t * t;
+        double t3 = t2 * t;
+
+        // 좌표 계산
+        double x = coeffs_x(0, 0) + coeffs_x(0, 1) * t + coeffs_x(0, 2) * t2 + coeffs_x(0, 3) * t3;
+        double y = coeffs_y(0, 0) + coeffs_y(0, 1) * t + coeffs_y(0, 2) * t2 + coeffs_y(0, 3) * t3;
+
+        // 1차 미분
+        double x_d  = coeffs_x(0, 1) + 2 * coeffs_x(0, 2) * t + 3 * coeffs_x(0, 3) * t2;
+        double y_d  = coeffs_y(0, 1) + 2 * coeffs_y(0, 2) * t + 3 * coeffs_y(0, 3) * t2;
+
+        // 2차 미분
+        double x_dd = 2 * coeffs_x(0, 2) + 6 * coeffs_x(0, 3) * t;
+        double y_dd = 2 * coeffs_y(0, 2) + 6 * coeffs_y(0, 3) * t;
+
+        double denom = pow(x_d * x_d + y_d * y_d, 1.5);
+
+        kappa(i) = (x_d * y_dd - y_d * x_dd) / denom;
+        points_xy.emplace_back(x, y);
+        
+    }
+
+    return {points_xy, kappa};
+}
+
     ///////////////////////////////////////////////////////////////////
     /////////////////////////////제거 과정///////////////////////////////
     ///////////////////////////////////////////////////////////////////
-    
-pair<Graph, SplineMap> pruneEdges(DMap &stMap,  
-                NodeMap &nodesPerLayer,
-                Graph &wayptGraph,
-                SplineMap &splineMap,
-                YAML::Node &params) {
 
-    float stepsize_approx = params["sampling"]["stepsize_approx"].as<float>();  
-    float veh_width = params["vehicle"]["veh_width"].as<float>();  
-    float veh_turn = params["vehicle"]["veh_turn"].as<float>();  
-    float min_vel_race = params["lattice"]["min_vel_race"].as<float>();  
-    float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();  
+void pruneEdge(SplineMap &splineMap,
+               Graph &wayptGraph,
+               NodeMap &nodesPerLayer) {
 
-    // visual(wayptGraph, nodesPerLayer, splineMap, "pink");
-    int edge_cnt = 0;
-    int remove_cnt = 0;
-    int Invalid_edge_cnt = 0;
-    // layer 개수만큼 loop
-    for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
-      int srcLayerIdx = layer_idx;
-    //   cout << "start Layer: " << srcLayerIdx << endl;
-      // srcLayerIdx에서의 노드 개수만큼 loop
-      for (size_t node_idx = 0; node_idx < nodesPerLayer[srcLayerIdx].size(); ++node_idx) {
-        // cout << "node_idx: " << node_idx << endl;
-        IPairVector childNodes;
-        IPair start = make_pair(layer_idx ,node_idx);
-        wayptGraph.getChildNodes(start, childNodes);
-        // 연결되어있는 child node에 대하여 
-        for (auto& end : childNodes) {
-          
-          MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
-          MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
-
-          auto [kappa, psi] = interpSplines(stMap, coeffs_x, coeffs_y, stepsize_approx, veh_width);
-            if (kappa.size() == 0) {
-                Invalid_edge_cnt++;
-                // cerr << "[ERROR] interpSplines() returned nullptr!!" << endl;
-                continue;
-            }
-            splineMap[start][end].kappa = kappa;
-            if (splineMap[start][end].raceline) {
-                continue;
-            }
-          
-            double vel_rl = stMap[RL_VX][layer_idx] * min_vel_race;
-            double min_turn = pow(vel_rl, 2) / max_lateral_accel; // max_lateral_accel: 허용가능한 최대 횡가속도(m/s^2)
-            
-            bool tooBigKappa = false;
-            // cout << layer_idx << ", " << node_idx <<endl;
-            for (int j = 0; j < kappa.size(); ++j) {
-                double kappa_val = abs(kappa(j));
-                // cout << "kappa_val: " << kappa_val << " || " << 1 / veh_trun << " || " << 1 / min_turn << endl;
-                if ((kappa_val > 1 / veh_turn || kappa_val > 1 / min_turn) && !splineMap[start][end].raceline) {
-                 tooBigKappa = true;
-                    break; // 더 볼 필요 없음, 바로 탈출
-                }
-            }
-
-            if (tooBigKappa) wayptGraph.removeEdge(start, end, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-            else {edge_cnt++;}
-            // delete kappa;
-            // kappa = nullptr;
-        }
-      }
-    //   cout << "node loop!" << endl;
-    }
-    
     for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
         for (int nodeIdx = 0; nodeIdx < nodesPerLayer[layerIdx].size(); ++nodeIdx) {
             IPair srcNodeIdx = make_pair(layerIdx, nodeIdx);
@@ -465,25 +373,16 @@ pair<Graph, SplineMap> pruneEdges(DMap &stMap,
             if (!isParent) {
                 // cout << layerIdx << ", " << nodeIdx << endl;
                 // cout << "-------" << endl;
-                    IPairVector childs;
-                    bool isChild = wayptGraph.getChildNodes(srcNodeIdx, childs);
-                    if (isChild) {
-                        // cout << layerIdx << ", " << nodeIdx << endl;
-                        for (auto& child : childs) {
-                            // cout << "remove!" << endl;
-                            wayptGraph.removeEdge(srcNodeIdx, child, &splineMap, remove_cnt, static_cast<int>(nodesPerLayer.size()));
-                        }
+                IPairVector childs;
+                bool isChild = wayptGraph.getChildNodes(srcNodeIdx, childs);
+                if (isChild) {
+                    // cout << layerIdx << ", " << nodeIdx << endl;
+                    for (auto& child : childs) {
+                        // cout << "remove!" << endl;
+                        wayptGraph.removeEdge(srcNodeIdx, child, &splineMap, static_cast<int>(nodesPerLayer.size()));
                     }
-
-                
+                }
             }
         }
     }
-
-    // cout << "---remove 후---" << endl
-    cout << "Added " << edge_cnt << " splines to the graph!" << endl;
-    cout << "removed " << remove_cnt << " splines due to violation of the specified vehicle's turn radius or velocity aims!" << endl;
-    cout << "Ignored " << Invalid_edge_cnt << " splines(outside track bounds!)" << endl;
-    // cout << "the end" << endl;
-    return {wayptGraph, splineMap};
 }

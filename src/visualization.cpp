@@ -95,37 +95,16 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
-vector<Vector2d> generateSplinePoints(const Spline& spline, int num_points = 20) {
-    vector<Vector2d> points;
-    points.reserve(num_points + 1);
-
-    for (int i = 0; i <= num_points; ++i) {
-        double t = static_cast<double>(i) / num_points;  
-
-        double t2 = t * t;
-        double t3 = t2 * t;
-
-        double x = spline.coeffs_x(0, 0) + spline.coeffs_x(0, 1) * t + spline.coeffs_x(0, 2) * t2 + spline.coeffs_x(0, 3) * t3;
-        double y = spline.coeffs_y(0, 0) + spline.coeffs_y(0, 1) * t + spline.coeffs_y(0, 2) * t2 + spline.coeffs_y(0, 3) * t3;
-
-        points.emplace_back(x, y);
-    }
-    
-    return points;
-}
-
-void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, const string &color) {
+void plotAllSplines(SplineMap& splineMap, const NodeMap& nodesPerLayer, const string &color) {
     unordered_set<int> plotted_layers;
-    for (const auto& [startPoint, endPoints] : splineMap) {
-        for (const auto& [endPoint, spline]: endPoints) {
+    for (auto& [startPoint, endPoints] : splineMap) {
+        for (auto& [endPoint, spline]: endPoints) {
 
         const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
         const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
 
-        vector<Vector2d> spline_points = generateSplinePoints(spline);
-
         DVector xs, ys;
-        for (const auto& pt : spline_points) {
+        for (auto& pt : splineMap[startPoint][endPoint].points_xy) {
             xs.push_back(pt.x());
             ys.push_back(pt.y());
         }
@@ -147,10 +126,10 @@ void plotAllSplines(const SplineMap& splineMap, const NodeMap& nodesPerLayer, co
 
 void plotSpline(const Spline& spline, const string& color) {
     // Spline 점 생성
-    vector<Vector2d> spline_points = generateSplinePoints(spline);
+    // vector<Vector2d> spline_points = generateSplinePoints(spline);
 
     DVector xs, ys;
-    for (const auto& pt : spline_points) {
+    for (const auto& pt : spline.points_xy) {
         xs.push_back(pt.x());
         ys.push_back(pt.y());
     }
@@ -168,7 +147,7 @@ void plotSpline(const Spline& spline, const string& color) {
 void visual(DMap &gtMap,
             DMap &stMap,
             const NodeMap &nodesPerLayer,
-            const SplineMap &splineMap) {
+            SplineMap &splineMap) {
 
     plt::plot(gtMap[LB_X], gtMap[LB_Y], {{"color", "orange"}});
     plt::plot(gtMap[RB_X], gtMap[RB_Y], {{"color", "orange"}});

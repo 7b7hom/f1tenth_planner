@@ -1,7 +1,7 @@
 #include "spline.h"
 // #include "graph_planner.hpp"
 
-void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, const SplineMap &splineMap);
+void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, SplineMap &splineMap);
 void plotSpline(const Spline& spline, const string& color);
 
 IVector samplePointsFromRaceline(const DVector& kappa,
@@ -283,17 +283,12 @@ void setInitialPose(DMap &stMap,
         path.block<1, 2>(1, 0) = end_pos.transpose();
 
         auto result = calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
-        auto [kappa, psi] = interpSplines(stMap, result->coeffs_x, result->coeffs_y, stepsize_approx, veh_width);
+        auto [points_xy, kappa] = samplingSpline(result->coeffs_x, result->coeffs_y, params);
 
-        // kappa와 psi의 크기 확인
-        if (kappa.size() == 0) {
-            cerr << "Error: kappa is empty!" << endl;
+        if (kappa.size() == 0 || points_xy.size() == 0) {
+            throw invalid_argument("Points or Kappa's Size is zero!! - interpSplines()");
         }
 
-        if (psi.size() == 0) {
-            cerr << "Error: psi is empty!" << endl;
-            return;
-        }
         plotSpline(*result, "blue");    
     }
     cout << "Goal node: layer=" << end_layer << ", idx= " << raceline_index_array[end_layer] << endl;
@@ -396,8 +391,68 @@ int main() {
     // writeDMapToCSV("inputs/stMap.csv", stMap);
 
     auto [wayptGraph, splineMap] = genEdges(stMap, nodesPerLayer, raceline_index_array, params);
-    
-    tie(wayptGraph, splineMap) = pruneEdges(stMap, nodesPerLayer, wayptGraph, splineMap, params);
+    cout << "Initial generated splines: ";
+    wayptGraph.printGraph();
+    float veh_turn = params["vehicle"]["veh_turn"].as<float>();
+    float min_vel_race = params["lattice"]["min_vel_race"].as<float>();
+    float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();
+
+    for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
+      int srcLayerIdx = layer_idx;
+      for (size_t node_idx = 0; node_idx < nodesPerLayer[srcLayerIdx].size(); ++node_idx) {
+        IPairVector childNodes;
+        IPair start = make_pair(layer_idx ,node_idx);
+        wayptGraph.getChildNodes(start, childNodes);
+
+        // 연결된 노드와 loop
+        for (auto& end : childNodes) {
+            MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
+            MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
+            // spline 위의 점들을 샘플링(no_interp_points개수만큼)
+            auto [points_xy, kappa] = samplingSpline(coeffs_x, coeffs_y, params);
+            // 점들을 기준으로 pruneEdges에 가서 1.곡률 2.트랙내 여부 에 따라 remove를 한다.
+            if (kappa.size() == 0 || points_xy.size() == 0) {
+                cerr << "Invalid spline sampling" << endl;
+                continue;
+            }
+            // 해당 spline위에서 샘플링한 점이 track을 벗어나면 pruneEdges()에 갈 수 있도록.
+            splineMap[start][end].kappa = kappa;
+            splineMap[start][end].points_xy = points_xy;
+
+            if (!splineMap[start][end].raceline) {
+
+                int layer_idx = start.first;
+                double vel_rl = stMap[RL_VX][layer_idx] * min_vel_race;
+                double min_turn = pow(vel_rl, 2) / max_lateral_accel;
+
+                bool toRemove = false;
+
+                for (int j = 0; j < kappa.size(); ++j) {
+                    double kappa_val = abs(kappa(j));
+
+                    if ((kappa_val > 1.0 / veh_turn || kappa_val > 1.0 / min_turn) && !splineMap[start][end].raceline)
+                    {
+                        // 허용 곡률 초과 → 엣지 삭제
+                        toRemove = true;
+                        break;
+                    }
+                    // splineMap에 저장되어있는 points_xy가 track 내에 있는지.
+                    // toRemove = true;
+
+                }
+                if (toRemove)
+                    wayptGraph.removeEdge(start, end, &splineMap, static_cast<int>(nodesPerLayer.size()));
+
+                }
+            }
+        }
+    }
+    cout << "Removed based on curvature: ";
+    wayptGraph.printGraph();
+    pruneEdge(splineMap, wayptGraph, nodesPerLayer);
+    cout << "Removed isolated node: ";
+    wayptGraph.printGraph();
+
     // 결과: splineMap의 spline 구조체에 cost저장 
     calcOfflineCost(splineMap,
                    raceline_index_array,
