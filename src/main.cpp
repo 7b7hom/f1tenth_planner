@@ -396,6 +396,7 @@ int main() {
     float veh_turn = params["vehicle"]["veh_turn"].as<float>();
     float min_vel_race = params["lattice"]["min_vel_race"].as<float>();
     float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();
+    float veh_width = params["vehicle"]["veh_width"].as<float>();
 
     for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
       int srcLayerIdx = layer_idx;
@@ -428,17 +429,15 @@ int main() {
                 bool toRemove = false;
 
                 for (int j = 0; j < kappa.size(); ++j) {
-                    double kappa_val = abs(kappa(j));
 
-                    if ((kappa_val > 1.0 / veh_turn || kappa_val > 1.0 / min_turn) && !splineMap[start][end].raceline)
+                    double kappa_val = abs(kappa(j));
+                    
+                    if ((kappa_val > 1.0 / veh_turn || kappa_val > 1.0 / min_turn) ||
+                        !checkInside(stMap, points_xy[j], veh_width))
                     {
-                        // 허용 곡률 초과 → 엣지 삭제
                         toRemove = true;
                         break;
                     }
-                    // splineMap에 저장되어있는 points_xy가 track 내에 있는지.
-                    // toRemove = true;
-
                 }
                 if (toRemove)
                     wayptGraph.removeEdge(start, end, &splineMap, static_cast<int>(nodesPerLayer.size()));
@@ -447,24 +446,23 @@ int main() {
             }
         }
     }
-    cout << "Removed based on curvature: ";
+    cout << "After Removing based on curvature: ";
     wayptGraph.printGraph();
     pruneEdge(splineMap, wayptGraph, nodesPerLayer);
-    cout << "Removed isolated node: ";
+    cout << "After Removing isolated node: ";
     wayptGraph.printGraph();
 
     // 결과: splineMap의 spline 구조체에 cost저장 
     calcOfflineCost(splineMap,
                    raceline_index_array,
                    params);
+    f_time = clock();
     
     // 결과: 초기경로 시각화
     setInitialPose(stMap,
                    nodesPerLayer,
                    raceline_index_array,
                    params);
-
-    f_time = clock();
 
     // wayptGraph.printGraph();
 

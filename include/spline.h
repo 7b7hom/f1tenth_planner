@@ -20,3 +20,5 @@ bool checkInsideBounds(DMap &stMap,
 void pruneEdge(SplineMap &splineMap,
                Graph &wayptGraph,
                NodeMap &nodesPerLayer);
+
+bool checkInside(const DMap& stMap, const Vector2d& pos, double veh_width);

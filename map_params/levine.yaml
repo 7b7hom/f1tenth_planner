@@ -7,8 +7,8 @@ constants:
 lattice:
   lat_resolution: 0.15
   variable_heading: true
-  lon_straight_step: 2.0
-  lon_curve_step: 0.6
+  d_straight: 2.0
+  d_curve: 0.6
   curve_thr: 0.21
   lat_offset: 0.64
   max_lat_steps: 3
