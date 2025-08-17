@@ -97,44 +97,47 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
 
 void plotAllSplines(SplineMap& splineMap, const NodeMap& nodesPerLayer, const string &color) {
     unordered_set<int> plotted_layers;
+
     for (auto& [startPoint, endPoints] : splineMap) {
-        for (auto& [endPoint, spline]: endPoints) {
+        for (auto& [endPoint, spline] : endPoints) {
 
-        const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
-        const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
+            const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
+            const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
 
-        DVector xs, ys;
-        for (auto& pt : splineMap[startPoint][endPoint].points_xy) {
-            xs.push_back(pt.x());
-            ys.push_back(pt.y());
-        }
+            DVector xs, ys;
+            for (auto& pt : spline.points_xy) {
+                xs.push_back(pt.x());
+                ys.push_back(pt.y());
+            }
 
-        // 선 그리기
-        plt::plot(xs, ys, {{"color", color}});
+            // 선 그리기
+            plt::plot(xs, ys, {{"color", color}});
 
-        // // 레이어 Text 표시
-        // if (plotted_layers.find(startPoint.first) == plotted_layers.end() && !spline_points.empty()) {
-        //     const auto& pos_pt = spline_points[spline_points.size() / 8];
-        //     string layer_label = "L" + to_string(startPoint.first);
-        //     plt::text(pos_pt.x(), pos_pt.y(), layer_label);
-        //     plotted_layers.insert(startPoint.first);
-        // }
+            // 레이어 Text 표시
+            if (plotted_layers.find(startPoint.first) == plotted_layers.end() && !spline.points_xy.empty()) {
+                const auto& pos_pt = spline.points_xy[spline.points_xy.size() / 8];
+                string layer_label = "L" + to_string(startPoint.first);
+                plt::text(pos_pt.x(), pos_pt.y(), layer_label);
+                plotted_layers.insert(startPoint.first);
+            }
         }
     }
-
 }
 
+
 void plotSpline(const Spline& spline, const string& color) {
-    // Spline 점 생성
-    // vector<Vector2d> spline_points = generateSplinePoints(spline);
+
+    if (spline.points_xy.empty()) {
+        cerr << "Warning: spline.points_xy is empty! Nothing to plot." << endl;
+        return;
+    }
 
     DVector xs, ys;
     for (const auto& pt : spline.points_xy) {
         xs.push_back(pt.x());
         ys.push_back(pt.y());
     }
-    // cout << "I'm in plotSpline!" << endl;
-    // Spline 그리기
+
     plt::plot(xs, ys, {{"color", color}, {"linewidth", "4.0"}});
 
     // plt::title("Spline Path");

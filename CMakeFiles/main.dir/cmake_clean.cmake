@@ -1,6 +1,4 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/main.dir/include/spline.cpp.o"
-  "CMakeFiles/main.dir/include/spline.cpp.o.d"
   "CMakeFiles/main.dir/src/helper_func.cpp.o"
   "CMakeFiles/main.dir/src/helper_func.cpp.o.d"
   "CMakeFiles/main.dir/src/main.cpp.o"

@@ -37,7 +37,6 @@ add_executable(main
     src/main.cpp
     src/visualization.cpp
     src/helper_func.cpp
-    include/spline.cpp
 )
 target_link_libraries(main PRIVATE
     matplotlib_cpp

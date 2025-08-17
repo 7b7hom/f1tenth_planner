@@ -1,4 +1,4 @@
-#include "spline.h"
+#include "spline.hpp"
 // #include "graph_planner.hpp"
 
 void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, SplineMap &splineMap);
@@ -187,6 +187,94 @@ void calcOfflineCost(SplineMap& splineMap,
     } 
 }
 
+bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width) {
+
+    if (stMap.find(LB_X) == stMap.end() || 
+    stMap.find(LB_Y) == stMap.end() ||
+    stMap.find(RB_X) == stMap.end() || 
+    stMap.find(RB_Y) == stMap.end()) {
+    throw invalid_argument("Boundary keys are missing in stMap!");
+}
+
+    int n = stMap[LB_X].size();
+    MatrixXd bound_l(n,2);
+    MatrixXd bound_r(n,2);
+    for (int i = 0; i < n; ++i) {
+        bound_l(i, 0) = stMap[LB_X][i];
+        bound_l(i, 1) = stMap[LB_Y][i];
+
+        bound_r(i, 0) = stMap[RB_X][i];
+        bound_r(i, 1) = stMap[RB_Y][i];
+    }
+    
+    MatrixXd centerline = (bound_l + bound_r) / 2;
+
+    // 가장 가까운 segment 인덱스 찾기
+    int closest_idx = -1;
+    double min_dist2 = numeric_limits<double>::max();
+    for (int i = 0; i < centerline.rows() - 1; ++i) {
+        // segment 중심 계산
+        Vector2d mid = (centerline.row(i) + centerline.row(i + 1)) / 2.0;
+        double dist2 = (mid - pos).squaredNorm();
+        if (dist2 < min_dist2) {
+            min_dist2 = dist2;
+            closest_idx = i;
+        }
+    }
+
+    if (closest_idx < 0 || closest_idx >= bound_l.rows() - 1)
+        return false; // 예외 처리
+
+    // bound_l, bound_r, centerline 보간 (선형 보간 10개 지점)
+    int interp_points = 10;
+    MatrixXd bl_interp(interp_points, 2);
+    MatrixXd br_interp(interp_points, 2);
+    MatrixXd center_interp(interp_points, 2);
+
+    for (int i = 0; i < interp_points; ++i) {
+        double t = static_cast<double>(i) / (interp_points - 1);
+        bl_interp.row(i) = (1 - t) * bound_l.row(closest_idx) + t * bound_l.row(closest_idx + 1);
+        br_interp.row(i) = (1 - t) * bound_r.row(closest_idx) + t * bound_r.row(closest_idx + 1);
+        center_interp.row(i) = (1 - t) * centerline.row(closest_idx) + t * centerline.row(closest_idx + 1);
+    }
+
+    // pos에 가장 가까운 center_interp 인덱스 찾기
+    int nearest_idx = -1;
+    double best_dist2 = numeric_limits<double>::max();
+    for (int i = 0; i < interp_points; ++i) {
+        double d2 = (center_interp.row(i) - pos.transpose()).squaredNorm();
+        if (d2 < best_dist2) {
+            best_dist2 = d2;
+            nearest_idx = i;
+        }
+    }
+
+    // bound 사이 거리 (제곱)
+    double d_track2 = (bl_interp.row(nearest_idx) - br_interp.row(nearest_idx)).squaredNorm();
+
+    // 차량에서 각 bound까지 거리 (제곱)
+    double d_bl_2 = (bl_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
+    double d_br_2 = (br_interp.row(nearest_idx) - pos.transpose()).squaredNorm();
+
+    double dist_to_left_bound = sqrt(d_bl_2);
+    double dist_to_right_bound = sqrt(d_br_2);
+
+
+    // cout << "-------here" << endl;
+    // cout << dist_to_left_bound << endl;
+    // cout << dist_to_right_bound << endl;
+    // VEH_WIDTH 조건 확인
+    if (dist_to_left_bound < veh_width || dist_to_right_bound < veh_width)
+    {
+        // throw invalid_argument("Spline point violates VEH_WIDTH constraints!");
+        return false;
+    }
+
+    // bound 밖에 있는지 여부 확인
+    bool within_bounds = !(d_bl_2 > d_track2 || d_br_2 > d_track2);
+    return within_bounds;
+}
+
 void getClosestNodes(const NodeMap& nodesPerLayer, IPair& closest_idx, const Vector2d& pos, int limit=1) {
 
     int num_nodes = 0;
@@ -234,7 +322,8 @@ void setInitialPose(DMap &stMap,
                     YAML::Node &params) {
     // 현재 pos, heading 
     double dx, dy;
-        
+    SplineHandler handler;
+
     Vector2d initial_pos(stMap[RL_X][1], stMap[RL_Y][1]);
     float vel_est = 0.0;
 
@@ -282,8 +371,8 @@ void setInitialPose(DMap &stMap,
         path.block<1, 2>(0, 0) = start_pos.transpose();
         path.block<1, 2>(1, 0) = end_pos.transpose();
 
-        auto result = calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
-        auto [points_xy, kappa] = samplingSpline(result->coeffs_x, result->coeffs_y, params);
+        auto result = handler.calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
+        auto [points_xy, kappa] = handler.samplingSpline(result->coeffs_x, result->coeffs_y, params);
 
         if (kappa.size() == 0 || points_xy.size() == 0) {
             throw invalid_argument("Points or Kappa's Size is zero!! - interpSplines()");
@@ -389,8 +478,9 @@ int main() {
     auto [nodesPerLayer, raceline_index_array] = genNode(stMap, params);
     
     // writeDMapToCSV("inputs/stMap.csv", stMap);
+    SplineHandler splineHandler;
 
-    auto [wayptGraph, splineMap] = genEdges(stMap, nodesPerLayer, raceline_index_array, params);
+    auto [wayptGraph, splineMap] = splineHandler.genEdges(stMap, nodesPerLayer, raceline_index_array, params);
     cout << "Initial generated splines: ";
     wayptGraph.printGraph();
     
@@ -412,7 +502,7 @@ int main() {
             MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
             MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
             // spline 위의 점들을 샘플링(no_interp_points개수만큼)
-            auto [points_xy, kappa] = samplingSpline(coeffs_x, coeffs_y, params);
+            auto [points_xy, kappa] = splineHandler.samplingSpline(coeffs_x, coeffs_y, params);
             // 점들을 기준으로 pruneEdges에 가서 1.곡률 2.트랙내 여부 에 따라 remove를 한다.
             if (kappa.size() == 0 || points_xy.size() == 0) {
                 cerr << "Invalid spline sampling" << endl;
@@ -450,7 +540,7 @@ int main() {
     }
     cout << "Number of splines deleted due to curvature conditions: " << rmv_cnt << endl;
 
-    pruneEdge(splineMap, wayptGraph, nodesPerLayer);
+    splineHandler.pruneEdge(splineMap, wayptGraph, nodesPerLayer);
 
     cout << "The number of splines generated finally: ";
     wayptGraph.printGraph();

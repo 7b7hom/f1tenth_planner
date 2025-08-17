@@ -1,6 +1,6 @@
 CMakeFiles/main.dir/src/main.cpp.o: \
  /home/misys/f1tenth_planner/src/main.cpp /usr/include/stdc-predef.h \
- /home/misys/f1tenth_planner/include/spline.h \
+ /home/misys/f1tenth_planner/include/spline.hpp \
  /home/misys/f1tenth_planner/include/graph.hpp \
  /home/misys/f1tenth_planner/include/graph_planner.hpp \
  /usr/include/c++/11/iostream \
@@ -604,4 +604,5 @@ CMakeFiles/main.dir/src/main.cpp.o: \
  /usr/include/aarch64-linux-gnu/bits/ss_flags.h \
  /usr/include/aarch64-linux-gnu/bits/types/struct_sigstack.h \
  /usr/include/aarch64-linux-gnu/bits/sigthread.h \
- /usr/include/aarch64-linux-gnu/bits/signal_ext.h
+ /usr/include/aarch64-linux-gnu/bits/signal_ext.h \
+ /home/misys/f1tenth_planner/include/spline.h

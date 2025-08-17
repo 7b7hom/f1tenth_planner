@@ -13,12 +13,6 @@ pair<Graph, SplineMap> genEdges(DMap &stMap,
                                 
 pair<vector<Vector2d>, VectorXd> samplingSpline(MatrixXd &coeffs_x, MatrixXd &coeffs_y, YAML::Node &params);
 
-bool checkInsideBounds(DMap &stMap,
-                       const Vector2d &pos,
-                       const float veh_width);
-
 void pruneEdge(SplineMap &splineMap,
                Graph &wayptGraph,
                NodeMap &nodesPerLayer);
-
-bool checkInside(const DMap& stMap, const Vector2d& pos, double veh_width);

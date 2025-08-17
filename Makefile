@@ -174,30 +174,6 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-include/spline.o: include/spline.cpp.o
-.PHONY : include/spline.o
-
-# target to build an object file
-include/spline.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/spline.cpp.o
-.PHONY : include/spline.cpp.o
-
-include/spline.i: include/spline.cpp.i
-.PHONY : include/spline.i
-
-# target to preprocess a source file
-include/spline.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/spline.cpp.i
-.PHONY : include/spline.cpp.i
-
-include/spline.s: include/spline.cpp.s
-.PHONY : include/spline.s
-
-# target to generate assembly for a file
-include/spline.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/include/spline.cpp.s
-.PHONY : include/spline.cpp.s
-
 src/helper_func.o: src/helper_func.cpp.o
 .PHONY : src/helper_func.o
 
@@ -283,9 +259,6 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... main"
-	@echo "... include/spline.o"
-	@echo "... include/spline.i"
-	@echo "... include/spline.s"
 	@echo "... src/helper_func.o"
 	@echo "... src/helper_func.i"
 	@echo "... src/helper_func.s"
