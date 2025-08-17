@@ -362,6 +362,7 @@ auto samplingSpline(MatrixXd &coeffs_x, MatrixXd &coeffs_y, YAML::Node &params) 
 void pruneEdge(SplineMap &splineMap,
                Graph &wayptGraph,
                NodeMap &nodesPerLayer) {
+    int rmv_cnt = 0;
 
     for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
         for (int nodeIdx = 0; nodeIdx < nodesPerLayer[layerIdx].size(); ++nodeIdx) {
@@ -380,9 +381,12 @@ void pruneEdge(SplineMap &splineMap,
                     for (auto& child : childs) {
                         // cout << "remove!" << endl;
                         wayptGraph.removeEdge(srcNodeIdx, child, &splineMap, static_cast<int>(nodesPerLayer.size()));
+                        rmv_cnt++;
                     }
                 }
             }
         }
     }
+    if (rmv_cnt > 0)
+        cout << "Removed splines due to isolated nodes: " << rmv_cnt << endl;
 }

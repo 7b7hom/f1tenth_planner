@@ -70,7 +70,7 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
             plt::text(layer_idx, node_idx, label.str());
             
 
-#if 0
+            #if 0
             x_line = {node.x, node.x + dx};
             y_line = {node.y, node.y + dy};
             plt::plot(x_line, y_line, {{"color", "purple"}});

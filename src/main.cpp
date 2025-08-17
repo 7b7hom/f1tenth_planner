@@ -393,10 +393,12 @@ int main() {
     auto [wayptGraph, splineMap] = genEdges(stMap, nodesPerLayer, raceline_index_array, params);
     cout << "Initial generated splines: ";
     wayptGraph.printGraph();
+    
     float veh_turn = params["vehicle"]["veh_turn"].as<float>();
     float min_vel_race = params["lattice"]["min_vel_race"].as<float>();
     float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();
     float veh_width = params["vehicle"]["veh_width"].as<float>();
+    int rmv_cnt = 0;
 
     for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
       int srcLayerIdx = layer_idx;
@@ -432,24 +434,25 @@ int main() {
 
                     double kappa_val = abs(kappa(j));
                     
-                    if ((kappa_val > 1.0 / veh_turn || kappa_val > 1.0 / min_turn) ||
-                        !checkInside(stMap, points_xy[j], veh_width))
+                    if ((kappa_val > 1.0 / veh_turn || kappa_val > 1.0 / min_turn))
                     {
                         toRemove = true;
                         break;
                     }
                 }
-                if (toRemove)
+                if (toRemove) {
                     wayptGraph.removeEdge(start, end, &splineMap, static_cast<int>(nodesPerLayer.size()));
-
+                    rmv_cnt++;
+                    }
                 }
             }
         }
     }
-    cout << "After Removing based on curvature: ";
-    wayptGraph.printGraph();
+    cout << "Number of splines deleted due to curvature conditions: " << rmv_cnt << endl;
+
     pruneEdge(splineMap, wayptGraph, nodesPerLayer);
-    cout << "After Removing isolated node: ";
+
+    cout << "The number of splines generated finally: ";
     wayptGraph.printGraph();
 
     // 결과: splineMap의 spline 구조체에 cost저장 
