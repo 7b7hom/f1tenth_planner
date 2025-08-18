@@ -66,7 +66,7 @@ public:
     }
 
     void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int num_layers) {
-        // 1. srcIdx의 자식 리스트에서 dstIdx를 삭제
+
         IPairVector& childs = adjLists[srcIdx];
         auto it = remove(childs.begin(), childs.end(), dstIdx);
         if (it != childs.end()) {

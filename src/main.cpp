@@ -124,69 +124,6 @@ auto genNode(DMap &stMap, const YAML::Node &params) -> pair<NodeMap, IVector> {
     return {nodesPerLayer, raceline_index_array};
 }
 
-void calcOfflineCost(SplineMap& splineMap,
-                   IVector& raceline_index_array,
-                   YAML::Node& params) {
-    if (splineMap.size() <= 0) {
-        throw invalid_argument("SplineMap's Size is zero!!");
-    }
-
-    float w_raceline = params["cost"]["w_raceline"].as<float>();
-    float w_raceline_sat = params["cost"]["w_raceline_sat"].as<float>();
-    float w_length = params["cost"]["w_length"].as<float>();
-    float w_curv_avg = params["cost"]["w_curv_avg"].as<float>();
-    float w_curv_peak = params["cost"]["w_curv_peak"].as<float>();
-    float lat_resolution = params["lattice"]["lat_resolution"].as<float>();
-
-    for (auto& [startPoint, endPoints] : splineMap) {
-        for (auto& [endPoint, spline] : endPoints) {
-            double offline_cost = 0.0;
-            int end_layer = endPoint.first;
-            int end_node = endPoint.second;
-
-            // 디버깅용 
-            // cout << "kappa: ";
-            // for (int i = 0; i < spline.kappa.size(); ++i) cout << spline.kappa[i] << " ";
-            // cout << endl;
-
-            if (end_layer < 0 || end_layer >= raceline_index_array.size())
-            {
-                cerr << "[WARNNING] Skipping spline: end_layer=" << end_layer 
-              << " out of bounds (0.." << raceline_index_array.size()-1 << ")\n";
-                continue;
-            }
-
-            if (spline.kappa.size() == 0)
-            {
-                // cerr << "[WARNNING] Skipping spline: empty curvature data\n";
-                continue;
-            }
-
-            double abs_kappa = spline.kappa.array().abs().sum();
-            double s_length = spline.el_lengths.sum();
-            // cout << "s_length: " << s_length << endl;
-            // average curvature
-            offline_cost += w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
-            // peak curvature
-            double max_min = abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
-            offline_cost += w_curv_peak * pow(max_min, 2) * s_length;
-
-            // path length
-            offline_cost += w_length * s_length;
-
-            // raceline cost
-
-            double raceline_dist = abs(raceline_index_array[end_layer] - end_node) * lat_resolution;
-            double raceline_cost = min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
-
-            offline_cost += raceline_cost;
-
-            spline.cost = offline_cost;
-            // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
-        }   
-    } 
-}
-
 bool checkInsideBounds(DMap &stMap, const Vector2d& pos, const float veh_width) {
 
     if (stMap.find(LB_X) == stMap.end() || 
@@ -478,9 +415,9 @@ int main() {
     auto [nodesPerLayer, raceline_index_array] = genNode(stMap, params);
     
     // writeDMapToCSV("inputs/stMap.csv", stMap);
-    SplineHandler splineHandler;
+    SplineHandler splineMap;
 
-    auto [wayptGraph, splineMap] = splineHandler.genEdges(stMap, nodesPerLayer, raceline_index_array, params);
+    auto wayptGraph = splineMap.genEdges(stMap, nodesPerLayer, raceline_index_array, params);
     cout << "Initial generated splines: ";
     wayptGraph.printGraph();
     
@@ -499,20 +436,20 @@ int main() {
 
         // 연결된 노드와 loop
         for (auto& end : childNodes) {
-            MatrixXd& coeffs_x = splineMap[start][end].coeffs_x;
-            MatrixXd& coeffs_y = splineMap[start][end].coeffs_y;
+            MatrixXd& coeffs_x = splineMap.at(start, end).coeffs_x;
+            MatrixXd& coeffs_y = splineMap.at(start, end).coeffs_y;
             // spline 위의 점들을 샘플링(no_interp_points개수만큼)
-            auto [points_xy, kappa] = splineHandler.samplingSpline(coeffs_x, coeffs_y, params);
+            auto [points_xy, kappa] = splineMap.samplingSpline(coeffs_x, coeffs_y, params);
             // 점들을 기준으로 pruneEdges에 가서 1.곡률 2.트랙내 여부 에 따라 remove를 한다.
             if (kappa.size() == 0 || points_xy.size() == 0) {
                 cerr << "Invalid spline sampling" << endl;
                 continue;
             }
             // 해당 spline위에서 샘플링한 점이 track을 벗어나면 pruneEdges()에 갈 수 있도록.
-            splineMap[start][end].kappa = kappa;
-            splineMap[start][end].points_xy = points_xy;
+            splineMap.at(start, end).kappa = kappa;
+            splineMap.at(start, end).points_xy = points_xy;
 
-            if (!splineMap[start][end].raceline) {
+            if (!splineMap.at(start, end).raceline) {
 
                 int layer_idx = start.first;
                 double vel_rl = stMap[RL_VX][layer_idx] * min_vel_race;
@@ -531,7 +468,7 @@ int main() {
                     }
                 }
                 if (toRemove) {
-                    wayptGraph.removeEdge(start, end, &splineMap, static_cast<int>(nodesPerLayer.size()));
+                    wayptGraph.removeEdge(start, end, &splineMap.getSplineMap(), static_cast<int>(nodesPerLayer.size()));
                     rmv_cnt++;
                     }
                 }
@@ -540,15 +477,13 @@ int main() {
     }
     cout << "Number of splines deleted due to curvature conditions: " << rmv_cnt << endl;
 
-    splineHandler.pruneEdge(splineMap, wayptGraph, nodesPerLayer);
+    splineMap.pruneEdge(wayptGraph, nodesPerLayer);
 
     cout << "The number of splines generated finally: ";
     wayptGraph.printGraph();
 
     // 결과: splineMap의 spline 구조체에 cost저장 
-    calcOfflineCost(splineMap,
-                   raceline_index_array,
-                   params);
+    splineMap.calcOfflineCost(raceline_index_array, params);
     f_time = clock();
     
     // 결과: 초기경로 시각화
@@ -564,7 +499,7 @@ int main() {
     
     // printSplineInfo(splineMap, nodesPerLayer);
     // 결과: 시각화
-    visual(gtMap, stMap, nodesPerLayer, splineMap);
+    visual(gtMap, stMap, nodesPerLayer, splineMap.getSplineMap());
 
     return 0;
 }

@@ -1,8 +1,20 @@
 #include "graph.hpp"
-#include "spline.h"
 // #include "graph_planner.hpp"
 class SplineHandler {
+private:
+    SplineMap splineMap;
+
 public:
+    SplineMap& getSplineMap() { return splineMap; }
+    
+    Spline& at(const IPair& start, const IPair& end) {
+        return splineMap[start][end];
+    }
+
+    const Spline& at(const IPair& start, const IPair& end) const {
+        return splineMap.at(start).at(end);
+    }
+
     auto calcSplines(MatrixXd &path,
                      double psi_s,
                      double psi_e,
@@ -100,10 +112,9 @@ public:
     auto genEdges(DMap &stMap,
                 NodeMap &nodesPerLayer,
                 const IVector &raceline_index_array,
-                YAML::Node &params) -> pair<Graph, SplineMap> {
+                YAML::Node &params) -> Graph {
 
         Graph wayptGraph; // a graph of waypoints
-        SplineMap splineMap;
 
         float lat_offset = params["lattice"]["lat_offset"].as<float>();
         float lat_resolution = params["lattice"]["lat_resolution"].as<float>();
@@ -214,7 +225,7 @@ public:
                     }
             }
         }
-        return {wayptGraph, splineMap};
+        return wayptGraph;
     }
 
     // 단일 스플라인에 대한 spline에 대한 샘플링
@@ -272,9 +283,8 @@ public:
         /////////////////////////////제거 과정///////////////////////////////
         ///////////////////////////////////////////////////////////////////
 
-    void pruneEdge(SplineMap &splineMap,
-                Graph &wayptGraph,
-                NodeMap &nodesPerLayer) {
+    void pruneEdge(Graph &wayptGraph,
+                   NodeMap &nodesPerLayer) {
         int rmv_cnt = 0;
 
         for (int layerIdx = 0; layerIdx < nodesPerLayer.size(); ++layerIdx) {
@@ -304,4 +314,68 @@ public:
             cout << "Removed splines due to isolated nodes: " << rmv_cnt << endl;
     }
 
+    void calcOfflineCost(IVector &raceline_index_array,
+                         YAML::Node &params)  {
+        if (splineMap.size() <= 0)
+        {
+            throw invalid_argument("SplineMap's Size is zero!!");
+        }
+
+        float w_raceline = params["cost"]["w_raceline"].as<float>();
+        float w_raceline_sat = params["cost"]["w_raceline_sat"].as<float>();
+        float w_length = params["cost"]["w_length"].as<float>();
+        float w_curv_avg = params["cost"]["w_curv_avg"].as<float>();
+        float w_curv_peak = params["cost"]["w_curv_peak"].as<float>();
+        float lat_resolution = params["lattice"]["lat_resolution"].as<float>();
+
+        for (auto &[startPoint, endPoints] : splineMap)
+        {
+            for (auto &[endPoint, spline] : endPoints)
+            {
+                double offline_cost = 0.0;
+                int end_layer = endPoint.first;
+                int end_node = endPoint.second;
+
+                // 디버깅용
+                // cout << "kappa: ";
+                // for (int i = 0; i < spline.kappa.size(); ++i) cout << spline.kappa[i] << " ";
+                // cout << endl;
+
+                if (end_layer < 0 || end_layer >= raceline_index_array.size())
+                {
+                    cerr << "[WARNNING] Skipping spline: end_layer=" << end_layer
+                         << " out of bounds (0.." << raceline_index_array.size() - 1 << ")\n";
+                    continue;
+                }
+
+                if (spline.kappa.size() == 0)
+                {
+                    // cerr << "[WARNNING] Skipping spline: empty curvature data\n";
+                    continue;
+                }
+
+                double abs_kappa = spline.kappa.array().abs().sum();
+                double s_length = spline.el_lengths.sum();
+                // cout << "s_length: " << s_length << endl;
+                // average curvature
+                offline_cost += w_curv_avg * pow(abs_kappa / float(spline.kappa.size()), 2) * s_length;
+                // peak curvature
+                double max_min = abs(spline.kappa.array().maxCoeff() - spline.kappa.array().minCoeff());
+                offline_cost += w_curv_peak * pow(max_min, 2) * s_length;
+
+                // path length
+                offline_cost += w_length * s_length;
+
+                // raceline cost
+
+                double raceline_dist = abs(raceline_index_array[end_layer] - end_node) * lat_resolution;
+                double raceline_cost = min(w_raceline * s_length * raceline_dist, w_raceline_sat * s_length);
+
+                offline_cost += raceline_cost;
+
+                spline.cost = offline_cost;
+                // cout << "(" << startPoint.first << ", " << startPoint.second << ") " << " -> " << "(" << end_layer << ", " << end_node << "): " << offline_cost << endl;
+            }
+        }
+    }
 };
