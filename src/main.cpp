@@ -28,11 +28,11 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
 int main() {
     Offline_Params params;
 
-    std::string map_file_in = "/home/subin/subin/AID/planner_project/f1tenth_planner/inputs/traj_ltpl_cl_modena.csv";
-    std::string map_file_out = "/home/subin/subin/AID/planner_project/f1tenth_planner/inputs/traj_ltpl_cl_modena_out.csv";
+    string map_file_in = "/home/uiiiqns/f1tenth_planner/inputs/traj_ltpl_cl_modena.csv";
+    string map_file_out = "/home/uiiiqns/f1tenth_planner/inputs/traj_ltpl_cl_modena_out.csv";
 
     // 1. 트랙 데이터 로드 및 전처리
-    readDMapFromCSV(map_file_in, gtpl_map); // gen_spline.cpp의 전역 gtpl_map에 로드
+    readDMapFromCSV(map_file_in, gtpl_map);
     addDVectorToMap(gtpl_map, "bound_r", nullptr);
     addDVectorToMap(gtpl_map, "bound_l", nullptr);
     addDVectorToMap(gtpl_map, "raceline", nullptr);

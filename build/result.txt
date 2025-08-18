@@ -3381,6 +3381,5 @@ Total edges removed during pruning: 89
 (133,8): 6 -> 7 -> 8 -> 9 -> 10 -> NULL (5559.25)
 (133,9): 7 -> 8 -> 9 -> 10 -> NULL (3424.84)
 (133,10): 8 -> 9 -> 10 -> NULL (2851.70)
-First raceline heading: -2.21 rad
 [FIXED] (0,1)->(1,1)
 Edge created? YES
