@@ -6,13 +6,113 @@ private:
 
 public:
     SplineMap& getSplineMap() { return splineMap; }
-    
+
     Spline& at(const IPair& start, const IPair& end) {
         return splineMap[start][end];
     }
 
     const Spline& at(const IPair& start, const IPair& end) const {
         return splineMap.at(start).at(end);
+    }
+
+    void writeSplineMapToCSV(const string& filename) {
+        ofstream fout(filename);
+        if (!fout.is_open()) throw runtime_error("Cannot open file");
+
+        // 헤더
+        fout << "start_layer,start_idx,end_layer,end_idx,coeffs_x,coeffs_y,kappa,points_x,points_y,raceline\n";
+
+        for (const auto& [start, endMap] : splineMap) {
+            for (const auto& [end, spline] : endMap) {
+                fout << start.first << "," << start.second << ","
+                    << end.first << "," << end.second << ",";
+
+                // coeffs_x
+                for (int i = 0; i < spline.coeffs_x.rows(); ++i)
+                    for (int j = 0; j < spline.coeffs_x.cols(); ++j)
+                        fout << spline.coeffs_x(i,j) << (i==spline.coeffs_x.rows()-1 && j==spline.coeffs_x.cols()-1 ? "," : " ");
+
+                // coeffs_y
+                for (int i = 0; i < spline.coeffs_y.rows(); ++i)
+                    for (int j = 0; j < spline.coeffs_y.cols(); ++j)
+                        fout << spline.coeffs_y(i,j) << (i==spline.coeffs_y.rows()-1 && j==spline.coeffs_y.cols()-1 ? "," : " ");
+
+                // kappa
+                for (int i = 0; i < spline.kappa.size(); ++i)
+                    fout << spline.kappa(i) << (i==spline.kappa.size()-1 ? "," : " ");
+
+                // points_xy
+                for (int i = 0; i < spline.points_xy.size(); ++i)
+                    fout << spline.points_xy[i].x() << " " << spline.points_xy[i].y() 
+                        << (i==spline.points_xy.size()-1 ? "," : " ");
+
+                fout << (spline.raceline ? 1 : 0) << "\n";
+            }
+        }
+        fout.close();
+    }
+
+    void readSplineMapFromCSV(const string& filename) {
+        ifstream fin(filename);
+        if (!fin.is_open()) throw runtime_error("Cannot open file");
+
+        string line;
+        getline(fin, line); // 헤더 스킵
+
+        while (getline(fin, line)) {
+            stringstream ss(line);
+            string item;
+
+            IPair start, end;
+            Spline spline;
+
+            // start_layer, start_idx, end_layer, end_idx
+            getline(ss, item, ','); start.first = stoi(item);
+            getline(ss, item, ','); start.second = stoi(item);
+            getline(ss, item, ','); end.first = stoi(item);
+            getline(ss, item, ','); end.second = stoi(item);
+
+            // coeffs_x
+            getline(ss, item, ',');
+            stringstream sx(item);
+            DVector vx;
+            double val;
+            while (sx >> val) vx.push_back(val);
+            int n = vx.size()/2; // 예시: 2x? 행렬 가정
+            spline.coeffs_x = MatrixXd(2, n);
+            for (int i=0;i<2;i++) for(int j=0;j<n;j++) spline.coeffs_x(i,j)=vx[i*n+j];
+
+            // coeffs_y
+            getline(ss, item, ',');
+            stringstream sy(item);
+            DVector vy;
+            while (sy >> val) vy.push_back(val);
+            spline.coeffs_y = MatrixXd(2, n);
+            for (int i=0;i<2;i++) for(int j=0;j<n;j++) spline.coeffs_y(i,j)=vy[i*n+j];
+
+            // kappa
+            getline(ss, item, ',');
+            stringstream sk(item);
+            DVector vk;
+            while (sk >> val) vk.push_back(val);
+            spline.kappa = VectorXd::Map(vk.data(), vk.size());
+
+            // points_xy
+            getline(ss, item, ',');
+            stringstream sp(item);
+            vector<Vector2d> pts;
+            double x,y;
+            while (sp >> x >> y) pts.emplace_back(x,y);
+            spline.points_xy = pts;
+
+            // raceline
+            getline(ss, item, ',');
+            spline.raceline = (stoi(item) != 0);
+
+            splineMap[start][end] = spline;
+        }
+
+        fin.close();
     }
 
     auto calcSplines(MatrixXd &path,

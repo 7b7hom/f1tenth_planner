@@ -420,7 +420,8 @@ int main() {
     auto wayptGraph = splineMap.genEdges(stMap, nodesPerLayer, raceline_index_array, params);
     cout << "Initial generated splines: ";
     wayptGraph.printGraph();
-    
+    splineMap.writeSplineMapToCSV("outputs/splineMap.csv");
+
     float veh_turn = params["vehicle"]["veh_turn"].as<float>();
     float min_vel_race = params["lattice"]["min_vel_race"].as<float>();
     float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();
@@ -496,7 +497,8 @@ int main() {
 
     // visual process 
     cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
-    
+
+    splineMap.readSplineMapFromCSV("splineMap.csv");
     // printSplineInfo(splineMap, nodesPerLayer);
     // 결과: 시각화
     visual(gtMap, stMap, nodesPerLayer, splineMap.getSplineMap());
