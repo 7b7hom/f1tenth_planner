@@ -1,4 +1,4 @@
-#include "spline.hpp"
+#include "SplineHandler.hpp"
 // #include "graph_planner.hpp"
 
 void visual(DMap &gtMap, DMap &stMap, const NodeMap &nodesPerLayer, SplineMap &splineMap);
@@ -309,6 +309,11 @@ void setInitialPose(DMap &stMap,
         path.block<1, 2>(1, 0) = end_pos.transpose();
 
         auto result = handler.calcSplines(path, start_heading, goal_heading); // coeffs_x, coeffs_y, kappa, el_lengths, cost
+        if (!result) {
+            cerr << "calcSplines failed for edge: " << endl;
+        continue;
+    }
+
         auto [points_xy, kappa] = handler.samplingSpline(result->coeffs_x, result->coeffs_y, params);
 
         if (kappa.size() == 0 || points_xy.size() == 0) {
@@ -347,7 +352,9 @@ void setInitialPose(DMap &stMap,
 
 int main() {
     clock_t s_time, f_time;
-    s_time = clock();
+    clock_t total_s, total_y;
+    total_s = clock();
+    // s_time = clock();
 
     string yaml_path = "config/offline_params.yaml";
     YAML::Node params = YAML::LoadFile(yaml_path);
@@ -360,7 +367,9 @@ int main() {
     // global planner로부터 받은 csv를 기반으로 map에 저장 <label, data> 
     // 결과: gtpl_map
     DMap gtMap = readDMapFromCSV(map_file_in);
-
+    // f_time = clock();
+    // cout << "Read Global Data && Load DMap " << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+    
     // 결과: gtpl_map에 삽입
     auto [rb_x, rb_y] = computeBoundRight(gtMap[POS_X], gtMap[POS_Y],
                                           gtMap[NORM_X], gtMap[NORM_Y],
@@ -383,8 +392,9 @@ int main() {
 
     // 결과: map_file_out 
     // [지민] gtpl_mp은 이미 전역변수라 삽입해줄 필요가 없음.
-    writeDMapToCSV(map_file_out, gtMap);
-    
+    // writeDMapToCSV(map_file_out, gtMap);
+
+    s_time = clock();
     // layer 간격을 위한 raceline points sampling 
     IVector idx_sampling = samplePointsFromRaceline(gtMap[RL_KAPPA],
                                                     gtMap[RL_dS],
@@ -400,6 +410,7 @@ int main() {
             }
         }
     }
+
     // writeDMapToCSV("inputs/stMap", stMap);
     // map_size(stMap); // (51, 3)
 
@@ -413,95 +424,49 @@ int main() {
     stMap[RB_PSI] = calcHeading(stMap[RB_X], stMap[RB_Y]);  
     
     auto [nodesPerLayer, raceline_index_array] = genNode(stMap, params);
-    
+    // f_time = clock();
+    // cout << "Generate Layers and Nodes " << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+
     // writeDMapToCSV("inputs/stMap.csv", stMap);
-    SplineHandler splineMap;
-
-    auto wayptGraph = splineMap.genEdges(stMap, nodesPerLayer, raceline_index_array, params);
+    SplineHandler SplineHandler;
+    // s_time = clock();
+    SplineHandler.setNumLayers(nodesPerLayer);
+    SplineHandler.genEdges(nodesPerLayer, raceline_index_array, params);
+    // f_time = clock();
+    // cout << "Generate Edges " << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+ 
     cout << "Initial generated splines: ";
-    wayptGraph.printGraph();
-    splineMap.writeSplineMapToCSV("outputs/splineMap.csv");
+    SplineHandler.printGraph();
+    SplineHandler.writeSplineMapToCSV("outputs/splineMap.csv");
 
-    float veh_turn = params["vehicle"]["veh_turn"].as<float>();
-    float min_vel_race = params["lattice"]["min_vel_race"].as<float>();
-    float max_lateral_accel = params["lattice"]["max_lateral_accel"].as<float>();
-    float veh_width = params["vehicle"]["veh_width"].as<float>();
-    int rmv_cnt = 0;
-
-    for (size_t layer_idx = 0; layer_idx < nodesPerLayer.size();++layer_idx) {
-      int srcLayerIdx = layer_idx;
-      for (size_t node_idx = 0; node_idx < nodesPerLayer[srcLayerIdx].size(); ++node_idx) {
-        IPairVector childNodes;
-        IPair start = make_pair(layer_idx ,node_idx);
-        wayptGraph.getChildNodes(start, childNodes);
-
-        // 연결된 노드와 loop
-        for (auto& end : childNodes) {
-            MatrixXd& coeffs_x = splineMap.at(start, end).coeffs_x;
-            MatrixXd& coeffs_y = splineMap.at(start, end).coeffs_y;
-            // spline 위의 점들을 샘플링(no_interp_points개수만큼)
-            auto [points_xy, kappa] = splineMap.samplingSpline(coeffs_x, coeffs_y, params);
-            // 점들을 기준으로 pruneEdges에 가서 1.곡률 2.트랙내 여부 에 따라 remove를 한다.
-            if (kappa.size() == 0 || points_xy.size() == 0) {
-                cerr << "Invalid spline sampling" << endl;
-                continue;
-            }
-            // 해당 spline위에서 샘플링한 점이 track을 벗어나면 pruneEdges()에 갈 수 있도록.
-            splineMap.at(start, end).kappa = kappa;
-            splineMap.at(start, end).points_xy = points_xy;
-
-            if (!splineMap.at(start, end).raceline) {
-
-                int layer_idx = start.first;
-                double vel_rl = stMap[RL_VX][layer_idx] * min_vel_race;
-                double min_turn = pow(vel_rl, 2) / max_lateral_accel;
-
-                bool toRemove = false;
-
-                for (int j = 0; j < kappa.size(); ++j) {
-
-                    double kappa_val = abs(kappa(j));
-                    
-                    if ((kappa_val > 1.0 / veh_turn || kappa_val > 1.0 / min_turn))
-                    {
-                        toRemove = true;
-                        break;
-                    }
-                }
-                if (toRemove) {
-                    wayptGraph.removeEdge(start, end, &splineMap.getSplineMap(), static_cast<int>(nodesPerLayer.size()));
-                    rmv_cnt++;
-                    }
-                }
-            }
-        }
-    }
-    cout << "Number of splines deleted due to curvature conditions: " << rmv_cnt << endl;
-
-    splineMap.pruneEdge(wayptGraph, nodesPerLayer);
-
+    SplineHandler.pruneEdge(nodesPerLayer, stMap[RL_VX], params);
+    // f_time = clock();
+    // cout << "Prune Edges " << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+ 
     cout << "The number of splines generated finally: ";
-    wayptGraph.printGraph();
+    SplineHandler.printGraph();
 
+    // s_time = clock();
     // 결과: splineMap의 spline 구조체에 cost저장 
-    splineMap.calcOfflineCost(raceline_index_array, params);
-    f_time = clock();
-    
+    SplineHandler.calcOfflineCost(raceline_index_array, params);
+
+    // f_time = clock();
+    // cout << "Calculate Offline Cost " << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+ 
     // 결과: 초기경로 시각화
     setInitialPose(stMap,
                    nodesPerLayer,
                    raceline_index_array,
                    params);
-
+    total_y = clock();
     // wayptGraph.printGraph();
 
     // visual process 
-    cout << (double)(f_time - s_time) / CLOCKS_PER_SEC << "s 소요" << endl;
+    cout << "Total: "<< (double)(total_y - total_s) / CLOCKS_PER_SEC << "s" << endl;
 
-    splineMap.readSplineMapFromCSV("splineMap.csv");
     // printSplineInfo(splineMap, nodesPerLayer);
     // 결과: 시각화
-    visual(gtMap, stMap, nodesPerLayer, splineMap.getSplineMap());
+    visual(gtMap, stMap, nodesPerLayer, SplineHandler.getSplineMap());
 
     return 0;
 }

@@ -65,7 +65,7 @@ public:
         return true;
     }
 
-    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* splineMap, int num_layers) {
+    void removeEdge(const IPair& srcIdx, const IPair& dstIdx, SplineMap* spineMap, int num_layers) {
 
         IPairVector& childs = adjLists[srcIdx];
         auto it = remove(childs.begin(), childs.end(), dstIdx);
@@ -90,10 +90,10 @@ public:
         }
 
         if (childs.empty()) {
-            IPairVector parents;
-            if (getParentNodes(srcIdx, parents, num_layers)) {
+            IPairVector parentList = getParentList(srcIdx);
+            if (!parentList.empty()) {
                 for (const auto& parentIdx : parents) {
-                    removeEdge(parentIdx, srcIdx, splineMap, num_layers);
+                    removeEdge(parentIdx, srcIdx, splineMap);
                 }
             }
             

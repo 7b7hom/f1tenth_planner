@@ -699,8 +699,7 @@ CMakeFiles/main.dir/src/helper_func.cpp.o: src/helper_func.cpp \
 
 CMakeFiles/main.dir/src/main.cpp.o: src/main.cpp \
   /usr/include/stdc-predef.h \
-  include/spline.hpp \
-  include/graph.hpp \
+  include/SplineHandler.hpp \
   include/graph_planner.hpp \
   /usr/include/c++/11/iostream \
   /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h \
@@ -2094,8 +2093,6 @@ CMakeFiles/main.dir/src/visualization.cpp.o: src/visualization.cpp \
 
 src/visualization.cpp:
 
-include/spline.hpp:
-
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
@@ -2586,8 +2583,6 @@ include/spline.hpp:
 
 /usr/include/c++/11/streambuf:
 
-include/graph.hpp:
-
 /usr/include/c++/11/bits/unique_ptr.h:
 
 /usr/include/c++/11/ostream:
@@ -2775,6 +2770,8 @@ include/graph.hpp:
 /usr/include/c++/11/bits/range_access.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
+
+include/SplineHandler.hpp:
 
 /usr/include/eigen3/Eigen/src/Core/Redux.h:
 

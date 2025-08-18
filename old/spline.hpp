@@ -78,17 +78,17 @@ public:
             DVector vx;
             double val;
             while (sx >> val) vx.push_back(val);
-            int n = vx.size()/2; // 예시: 2x? 행렬 가정
-            spline.coeffs_x = MatrixXd(2, n);
-            for (int i=0;i<2;i++) for(int j=0;j<n;j++) spline.coeffs_x(i,j)=vx[i*n+j];
+
+            spline.coeffs_x = MatrixXd(4, 1);
+            for (int i=0;i<4;i++) for(int j=0;j<1;j++) spline.coeffs_x(i,j)=vx[i*1+j];
 
             // coeffs_y
             getline(ss, item, ',');
             stringstream sy(item);
             DVector vy;
             while (sy >> val) vy.push_back(val);
-            spline.coeffs_y = MatrixXd(2, n);
-            for (int i=0;i<2;i++) for(int j=0;j<n;j++) spline.coeffs_y(i,j)=vy[i*n+j];
+            spline.coeffs_y = MatrixXd(4 ,1);
+            for (int i=0;i<4;i++) for(int j=0;j<1;j++) spline.coeffs_y(i,j)=vy[i*1+j];
 
             // kappa
             getline(ss, item, ',');

@@ -701,8 +701,7 @@ CMakeFiles/main.dir/src/helper_func.cpp.o
 CMakeFiles/main.dir/src/main.cpp.o
  /home/seop/misys/f1tenth_planner/src/main.cpp
  /usr/include/stdc-predef.h
- /home/seop/misys/f1tenth_planner/include/spline.hpp
- /home/seop/misys/f1tenth_planner/include/graph.hpp
+ /home/seop/misys/f1tenth_planner/include/SplineHandler.hpp
  /home/seop/misys/f1tenth_planner/include/graph_planner.hpp
  /usr/include/c++/11/iostream
  /usr/include/x86_64-linux-gnu/c++/11/bits/c++config.h

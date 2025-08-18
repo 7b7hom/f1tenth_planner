@@ -128,7 +128,7 @@ void plotAllSplines(SplineMap& splineMap, const NodeMap& nodesPerLayer, const st
 void plotSpline(const Spline& spline, const string& color) {
 
     if (spline.points_xy.empty()) {
-        cerr << "Warning: spline.points_xy is empty! Nothing to plot." << endl;
+        // cerr << "Warning: spline.points_xy is empty! Nothing to plot." << endl;
         return;
     }
 
