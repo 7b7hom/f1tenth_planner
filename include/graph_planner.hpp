@@ -61,7 +61,7 @@ struct Node {
 struct Spline {
     MatrixXd coeffs_x;          
     MatrixXd coeffs_y;          
-    VectorXd kappa;
+    VectorXd kappaVector;
     VectorXd el_lengths;
     vector<Vector2d> points_xy;
     double cost;
@@ -87,25 +87,9 @@ typedef map<IPair, map<IPair, Spline>> SplineMap;
 //     vector<IPair> node_idx; // [0, path.size()-1]
 // };
 
-// helper_func.cpp
+// utilities.cpp
+double normalizeAngle(double angle);
+void map_size(DMap &map);
 unique_ptr<string> Load(const string &filename);
 DMap readDMapFromCSV(const string &pathname);
-pair<DVector, DVector> computeBoundRight(DVector &pos_x, DVector &pos_y,
-                                         DVector &norm_x, DVector &norm_y,
-                                         DVector &width_r);
-pair<DVector, DVector> computeBoundLeft(DVector &pos_x, DVector &pos_y,
-                                        DVector &norm_x, DVector &norm_y,
-                                        DVector &width_l);
-pair<DVector, DVector> computeRaceline(DVector &pos_x, DVector &pos_y,
-                                       DVector &norm_x, DVector &norm_y,
-                                       DVector &norm_l);
-DVector computeDeltaS(DVector &rl_s);
-DVector calcHeading(DVector &x_raceline,
-                    DVector &y_raceline);
-double normalizeAngle(double angle);
-void writeDMapToCSV(const string &pathname,
-                    DMap &map,
-                    char delimiter = ',');
-void map_size(DMap &map);
-void printSplineInfo(const SplineMap &splineMap,
-                     const NodeMap &nodesPerLayer);
+void writeDMapToCSV(const string &pathname, DMap &map, char delimiter = ',');

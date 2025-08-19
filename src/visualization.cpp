@@ -50,11 +50,11 @@ void plotHeading(const DVector &x,
         #endif
 }
 
-void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
+void plotHeading(const NodeMap& nodeMap, double scale = 0.5) {
     DVector x_line, y_line;
     DVector node_x, node_y;
     int layer_idx, node_idx;
-    for (const auto& layer_nodes : nodesPerLayer) {
+    for (const auto& layer_nodes : nodeMap) {
         for (const auto& node : layer_nodes) {
             double dx = scale * cos(node.psi + M_PI_2);
             double dy = scale * sin(node.psi + M_PI_2);
@@ -95,14 +95,14 @@ void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
     }
 }
 
-void plotAllSplines(SplineMap& splineMap, const NodeMap& nodesPerLayer, const string &color) {
+void plotAllSplines(SplineMap& splineMap, const NodeMap& nodeMap, const string &color) {
     unordered_set<int> plotted_layers;
 
     for (auto& [startPoint, endPoints] : splineMap) {
         for (auto& [endPoint, spline] : endPoints) {
 
-            const Node& startNode = nodesPerLayer[startPoint.first][startPoint.second];
-            const Node& endNode = nodesPerLayer[endPoint.first][endPoint.second];
+            const Node& startNode = nodeMap[startPoint.first][startPoint.second];
+            const Node& endNode = nodeMap[endPoint.first][endPoint.second];
 
             DVector xs, ys;
             for (auto& pt : spline.points_xy) {
@@ -147,9 +147,9 @@ void plotSpline(const Spline& spline, const string& color) {
     // plt::show();
 }
 
-void visual(DMap &gtMap,
+void visualizeTrajectories(DMap &gtMap,
             DMap &stMap,
-            const NodeMap &nodesPerLayer,
+            const NodeMap &nodeMap,
             SplineMap &splineMap) {
 
     plt::plot(gtMap[LB_X], gtMap[LB_Y], {{"color", "orange"}});
@@ -173,9 +173,9 @@ void visual(DMap &gtMap,
     //             psi_bound_r);
 
     // 노드마다 psi확인할 수 있는 용도 
-    plotHeading(nodesPerLayer);
+    plotHeading(nodeMap);
 
-    plotAllSplines(splineMap, nodesPerLayer, "gray");
+    plotAllSplines(splineMap, nodeMap, "gray");
 
     plt::title("Track");
     plt::grid(true);

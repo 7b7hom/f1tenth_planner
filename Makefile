@@ -174,29 +174,29 @@ main/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
 .PHONY : main/fast
 
-src/helper_func.o: src/helper_func.cpp.o
-.PHONY : src/helper_func.o
+src/graph_planner.o: src/graph_planner.cpp.o
+.PHONY : src/graph_planner.o
 
 # target to build an object file
-src/helper_func.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/helper_func.cpp.o
-.PHONY : src/helper_func.cpp.o
+src/graph_planner.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/graph_planner.cpp.o
+.PHONY : src/graph_planner.cpp.o
 
-src/helper_func.i: src/helper_func.cpp.i
-.PHONY : src/helper_func.i
+src/graph_planner.i: src/graph_planner.cpp.i
+.PHONY : src/graph_planner.i
 
 # target to preprocess a source file
-src/helper_func.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/helper_func.cpp.i
-.PHONY : src/helper_func.cpp.i
+src/graph_planner.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/graph_planner.cpp.i
+.PHONY : src/graph_planner.cpp.i
 
-src/helper_func.s: src/helper_func.cpp.s
-.PHONY : src/helper_func.s
+src/graph_planner.s: src/graph_planner.cpp.s
+.PHONY : src/graph_planner.s
 
 # target to generate assembly for a file
-src/helper_func.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/helper_func.cpp.s
-.PHONY : src/helper_func.cpp.s
+src/graph_planner.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/graph_planner.cpp.s
+.PHONY : src/graph_planner.cpp.s
 
 src/main.o: src/main.cpp.o
 .PHONY : src/main.o
@@ -221,6 +221,30 @@ src/main.s: src/main.cpp.s
 src/main.cpp.s:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/main.cpp.s
 .PHONY : src/main.cpp.s
+
+src/utilities.o: src/utilities.cpp.o
+.PHONY : src/utilities.o
+
+# target to build an object file
+src/utilities.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utilities.cpp.o
+.PHONY : src/utilities.cpp.o
+
+src/utilities.i: src/utilities.cpp.i
+.PHONY : src/utilities.i
+
+# target to preprocess a source file
+src/utilities.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utilities.cpp.i
+.PHONY : src/utilities.cpp.i
+
+src/utilities.s: src/utilities.cpp.s
+.PHONY : src/utilities.s
+
+# target to generate assembly for a file
+src/utilities.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/src/utilities.cpp.s
+.PHONY : src/utilities.cpp.s
 
 src/visualization.o: src/visualization.cpp.o
 .PHONY : src/visualization.o
@@ -259,12 +283,15 @@ help:
 	@echo "... list_install_components"
 	@echo "... rebuild_cache"
 	@echo "... main"
-	@echo "... src/helper_func.o"
-	@echo "... src/helper_func.i"
-	@echo "... src/helper_func.s"
+	@echo "... src/graph_planner.o"
+	@echo "... src/graph_planner.i"
+	@echo "... src/graph_planner.s"
 	@echo "... src/main.o"
 	@echo "... src/main.i"
 	@echo "... src/main.s"
+	@echo "... src/utilities.o"
+	@echo "... src/utilities.i"
+	@echo "... src/utilities.s"
 	@echo "... src/visualization.o"
 	@echo "... src/visualization.i"
 	@echo "... src/visualization.s"

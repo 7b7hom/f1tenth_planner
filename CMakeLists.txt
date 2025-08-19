@@ -36,7 +36,8 @@ endif()
 add_executable(main
     src/main.cpp
     src/visualization.cpp
-    src/helper_func.cpp
+    src/graph_planner.cpp
+    src/utilities.cpp
 )
 target_link_libraries(main PRIVATE
     matplotlib_cpp
