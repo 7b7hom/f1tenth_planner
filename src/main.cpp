@@ -37,9 +37,9 @@ int main() {
     nodeGraph.printGraph();
 
     nodeGraph.computeSplineCost(nodeIndexesOnRaceline, params);
+    total_y = clock();
 
     setInitialPose(stMap, nodeMap, nodeIndexesOnRaceline, params);
-    total_y = clock();
     // nodeGraph.printGraph();
 
     cout << "Total: "<< (double)(total_y - total_s) / CLOCKS_PER_SEC << "s" << endl;

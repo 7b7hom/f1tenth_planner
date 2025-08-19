@@ -1,0 +1,22 @@
+[
+{
+  "directory": "/home/seop/misys/f1tenth_planner/build",
+  "command": "/usr/bin/g++ -I/home/seop/misys/f1tenth_planner/include -isystem /usr/include/python3.10 -isystem /home/seop/.local/lib/python3.10/site-packages/numpy/core/include -isystem /usr/include/eigen3 -g -std=c++17 -o CMakeFiles/main.dir/src/main.cpp.o -c /home/seop/misys/f1tenth_planner/src/main.cpp",
+  "file": "/home/seop/misys/f1tenth_planner/src/main.cpp"
+},
+{
+  "directory": "/home/seop/misys/f1tenth_planner/build",
+  "command": "/usr/bin/g++ -I/home/seop/misys/f1tenth_planner/include -isystem /usr/include/python3.10 -isystem /home/seop/.local/lib/python3.10/site-packages/numpy/core/include -isystem /usr/include/eigen3 -g -std=c++17 -o CMakeFiles/main.dir/src/visualization.cpp.o -c /home/seop/misys/f1tenth_planner/src/visualization.cpp",
+  "file": "/home/seop/misys/f1tenth_planner/src/visualization.cpp"
+},
+{
+  "directory": "/home/seop/misys/f1tenth_planner/build",
+  "command": "/usr/bin/g++ -I/home/seop/misys/f1tenth_planner/include -isystem /usr/include/python3.10 -isystem /home/seop/.local/lib/python3.10/site-packages/numpy/core/include -isystem /usr/include/eigen3 -g -std=c++17 -o CMakeFiles/main.dir/src/graph_planner.cpp.o -c /home/seop/misys/f1tenth_planner/src/graph_planner.cpp",
+  "file": "/home/seop/misys/f1tenth_planner/src/graph_planner.cpp"
+},
+{
+  "directory": "/home/seop/misys/f1tenth_planner/build",
+  "command": "/usr/bin/g++ -I/home/seop/misys/f1tenth_planner/include -isystem /usr/include/python3.10 -isystem /home/seop/.local/lib/python3.10/site-packages/numpy/core/include -isystem /usr/include/eigen3 -g -std=c++17 -o CMakeFiles/main.dir/src/utilities.cpp.o -c /home/seop/misys/f1tenth_planner/src/utilities.cpp",
+  "file": "/home/seop/misys/f1tenth_planner/src/utilities.cpp"
+}
+]

@@ -93,3 +93,6 @@ void map_size(DMap &map);
 unique_ptr<string> Load(const string &filename);
 DMap readDMapFromCSV(const string &pathname);
 void writeDMapToCSV(const string &pathname, DMap &map, char delimiter = ',');
+
+auto sampleSingleSpline(MatrixXd &coeffs_x, MatrixXd &coeffs_y, YAML::Node &params) -> pair<vector<Vector2d>, VectorXd> ;
+auto computeSplines(const MatrixXd &path, double psi_s, double psi_e, bool use_dist_scaling = true) -> unique_ptr<Spline>;
