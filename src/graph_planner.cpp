@@ -109,30 +109,30 @@ DVector computeHeading(DVector &x_raceline, DVector &y_raceline) {
 }
 
 DMap loadGlobalTrajectoryMap(string fname) {
-  DMap gtMap = readDMapFromCSV(fname);
+    DMap gtMap = readDMapFromCSV(fname);
 
-  auto [rb_x, rb_y] = computeBoundRight(gtMap[POS_X], gtMap[POS_Y],
+    auto [rb_x, rb_y] = computeBoundRight(gtMap[POS_X], gtMap[POS_Y],
+                                            gtMap[NORM_X], gtMap[NORM_Y],
+                                            gtMap[WIDTH_R]);
+    gtMap[RB_X] = rb_x;
+    gtMap[RB_Y] = rb_y;
+
+    auto [lb_x, lb_y] = computeBoundLeft(gtMap[POS_X], gtMap[POS_Y],
                                         gtMap[NORM_X], gtMap[NORM_Y],
-                                        gtMap[WIDTH_R]);
-  gtMap[RB_X] = rb_x;
-  gtMap[RB_Y] = rb_y;
+                                        gtMap[WIDTH_L]);
+    gtMap[LB_X] = lb_x;
+    gtMap[LB_Y] = lb_y;
 
-  auto [lb_x, lb_y] = computeBoundLeft(gtMap[POS_X], gtMap[POS_Y],
-                                       gtMap[NORM_X], gtMap[NORM_Y],
-                                       gtMap[WIDTH_L]);
-  gtMap[LB_X] = lb_x;
-  gtMap[LB_Y] = lb_y;
+    auto [rl_x, rl_y] = computeRaceline(gtMap[POS_X], gtMap[POS_Y],
+                                        gtMap[NORM_X], gtMap[NORM_Y],
+                                        gtMap[NORM_L]);
+    gtMap[RL_X] = rl_x;
+    gtMap[RL_Y] = rl_y;
 
-  auto [rl_x, rl_y] = computeRaceline(gtMap[POS_X], gtMap[POS_Y],
-                                      gtMap[NORM_X], gtMap[NORM_Y],
-                                      gtMap[NORM_L]);
-  gtMap[RL_X] = rl_x;
-  gtMap[RL_Y] = rl_y;
+    DVector rl_ds = computeDeltaS(gtMap[RL_S]);
+    gtMap[RL_dS] = rl_ds;
 
-  DVector rl_ds = computeDeltaS(gtMap[RL_S]);
-  gtMap[RL_dS] = rl_ds;
-
-  return gtMap;
+    return gtMap;
 }
 
 IVector sampleLayersFromRaceline(const DVector& kappaVector,
