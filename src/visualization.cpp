@@ -1,18 +1,6 @@
 #include "graph_planner.hpp"
 #include "config_modena.h"
 
-extern DMap gtpl_map;
-extern DMap sampling_map;
-
-struct SplineResult;
-struct SplinePoint;
-SplineResult calcSplines(const MatrixXd& path,
-                         const VectorXd* el_lengths_ptr,
-                         double psi_s, double psi_e, bool use_dist_scaling);
-SplinePoint evaluateSpline(const RowVector4d& coeff_x,
-                           const RowVector4d& coeff_y,
-                           double t, double ds_current, bool normalized_t);
-
 // ---- 내부 유틸: 헤딩 화살표 ----
 static void plotHeading(const DVector &x, const DVector &y, const DVector &psi, double scale = 0.1) {
     for (size_t i = 0; i < x.size(); ++i) {
@@ -49,18 +37,19 @@ static void plotHeading(const NodeMap& nodesPerLayer, double scale = 0.5) {
 }
 
 // ---- 공개 함수: 전체 시각화 ----
-void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params,
+void visual(const DMap& gtpl_map, const DMap& sampled_map,
+            const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& params,
             const Vector2d& pos_est, double heading_est, const ITuple& start_key, int next_idx) {
     plt::clf();
 
     // 트랙 경계
-    plt::plot(gtpl_map[__x_bound_l], gtpl_map[__y_bound_l], {{"color", "orange"}});
-    plt::plot(gtpl_map[__x_bound_r], gtpl_map[__y_bound_r], {{"color", "orange"}});
+    plt::plot(gtpl_map.at(__x_bound_l), gtpl_map.at(__y_bound_l), {{"color", "orange"}});
+    plt::plot(gtpl_map.at(__x_bound_r), gtpl_map.at(__y_bound_r), {{"color", "orange"}});
 
     // 레이싱 라인 + 샘플링된 포인트 + 헤딩
-    plt::plot(gtpl_map[__x_raceline], gtpl_map[__y_raceline], {{"color", "red"}, {"label", "Raceline"}});
-    plt::scatter(sampling_map[__x_raceline], sampling_map[__y_raceline], 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
-    plotHeading(sampling_map[__x_raceline], sampling_map[__y_raceline], sampling_map[__psi]);
+    plt::plot(gtpl_map.at(__x_raceline), gtpl_map.at(__y_raceline), {{"color", "red"}, {"label", "Raceline"}});
+    plt::scatter(sampled_map.at(__x_raceline), sampled_map.at(__y_raceline), 30.0, {{"color", "red"}, {"label", "Sampled Raceline"}});
+    plotHeading(sampled_map.at(__x_raceline), sampled_map.at(__y_raceline), sampled_map.at(__psi));
 
     // 노드
     //plotHeading(nodesPerLayer);
@@ -95,7 +84,7 @@ void visual(const NodeMap& nodesPerLayer, Graph& graph, const Offline_Params& pa
         
         int start_layer_idx = get<0>(start_key);
         int start_node_idx = get<1>(start_key);
-
+        
         // 3. start_key 노드 하이라이트 (라임색)
         if (start_layer_idx < nodesPerLayer.size() && start_node_idx < nodesPerLayer[start_layer_idx].size()) {
             const Node& start_node = nodesPerLayer[start_layer_idx][start_node_idx];
