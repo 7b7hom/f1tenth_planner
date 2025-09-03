@@ -1,3 +1,7 @@
+[T] read csv: 8 ms
+[T] sampling + copy: 0 ms
+[T] headings: 1 ms
+[T] nodes grid+heading: 1 ms
 REJECTED (OUT OF BOUNDS): Spline from 240.188,-212.214 is out of bounds.
 REJECTED (OUT OF BOUNDS): Spline from 240.803,-213.426 is out of bounds.
 REJECTED (OUT OF BOUNDS): Spline from 239.91,-212.507 is out of bounds.
@@ -270,6 +274,7 @@ REJECTED (OUT OF BOUNDS): Spline from -177.32,114.374 is out of bounds.
 REJECTED (OUT OF BOUNDS): Spline from -178.387,115.131 is out of bounds.
 REJECTED (OUT OF BOUNDS): Spline from -178.511,114.989 is out of bounds.
 REJECTED (OUT OF BOUNDS): Spline from -179.581,115.866 is out of bounds.
+[T] edges (spline+check): 1100 ms
 (0,0): 0 -> 1 -> 2 -> NULL (0.00)
 (0,1): 0 -> 1 -> 2 -> 3 -> NULL (0.00)
 (0,2): 0 -> 1 -> 2 -> 3 -> 4 -> NULL (0.00)
@@ -1826,6 +1831,8 @@ REJECTED (OUT OF BOUNDS): Spline from -179.581,115.866 is out of bounds.
 Iteration 0: Removed 89 edges.
 Iteration 1: Removed 0 edges.
 Total edges removed during pruning: 89
+[T] prune: 216 ms
+[T] offline cost: 159 ms
 
 --- 최종 생성된 그래프 (유효한 스플라인 엣지 포함) ---
 (0,0): 0 -> 1 -> 2 -> NULL (220.07)
@@ -3382,4 +3389,5 @@ Total edges removed during pruning: 89
 (133,9): 7 -> 8 -> 9 -> 10 -> NULL (3424.84)
 (133,10): 8 -> 9 -> 10 -> NULL (2851.70)
 [FIXED] (0,1)->(1,1)
-Edge created? YES
+Edge created?YES
+[T] TOTAL: 1505 ms
