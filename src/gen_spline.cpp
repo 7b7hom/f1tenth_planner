@@ -171,67 +171,6 @@ DVector calcHeading(const DVector& x, const DVector& y) {
     return psi;
 }
 
-#if 0
-// 샘플링된 레이어마다 경로 계획을 위한 Node(차량이 횡방향으로 이동 가능한 위치들) 생성
-NodeMap genNode(const DMap& sampled_map, const double veh_width, float lat_resolution) {
-    const size_t N = sampled_map.at(__alpha).size();
-    NodeMap nodes(N);
-
-    for (size_t i = 0; i < N; ++i){ // 각 레이어(층)에 대해 반복
-        const double wL = sampled_map.at(__width_left)[i];
-        const double wR = sampled_map.at(__width_right)[i];
-        const double alpha = sampled_map.at(__alpha)[i];
-
-        const int raceline_index = (int)floor((wL + alpha - veh_width / 2.0) / lat_resolution);
-        const double start_alpha = alpha - raceline_index * lat_resolution;
-        const int num_nodes = (int)((wL + wR - veh_width) / lat_resolution) + 1;
-
-        nodes[i].resize(max(num_nodes, 1));
-        
-        Vector2d ref_xy(sampled_map.at(__x_ref)[i], sampled_map.at(__y_ref)[i]);
-        Vector2d norm_vec(sampled_map.at(__x_normvec)[i], sampled_map.at(__y_normvec)[i]);
-        
-        for (int idx = 0; idx < (int)nodes[i].size(); ++idx) { 
-            double alphaI = start_alpha + idx * lat_resolution; // 현재 노드의 횡방향 오프셋 계산
-            Vector2d node_pos = ref_xy + alphaI * norm_vec; // 노드의 (x, y) 좌표 계산 (여기서 선언)
-
-            Node node; // 각 노드 인스턴스를 이 루프 안에서 새로 생성하여 초기화 문제를 방지
-            
-            // 필수 멤버 초기화 및 할당
-            node.layer_idx = i; // 현재 레이어 인덱스
-            node.node_idx = idx; // 노드 인덱스
-            node.x = node_pos.x();
-            node.y = node_pos.y();
-            node.kappa = sampled_map.at(__kappa)[i];
-            node.raceline = (idx == raceline_index);
-
-            // --- 노드의 헤딩(psi) 계산 (보간) ---
-            double psi_interp;
-            if (idx < raceline_index) { 
-                double bl = sampled_map.at(__psi_bound_l)[i];
-                double pr = sampled_map.at(__psi)[i];
-                if(abs(bl - pr) >= M_PI){
-                    bl += 2*M_PI * (bl < 0);
-                    pr += 2*M_PI * (pr < 0);
-                }
-                psi_interp = bl + (pr - bl) * (double)(idx + 1) / max(raceline_index, 1);
-            } else if (idx == raceline_index) { 
-                psi_interp = sampled_map.at(__psi)[i];
-            }
-            else { 
-                int remain = max((int)(nodes[i].size()) - raceline_index - 1, 1);
-                double t = double(idx - raceline_index) / remain;
-                psi_interp = sampled_map.at(__psi)[i] + t * (sampled_map.at(__psi_bound_r)[i] - sampled_map.at(__psi)[i]);
-            }
-            node.psi = normalizeAngle(psi_interp);
-            
-            nodes[i][idx] = node; // <-- 생성된 노드 인스턴스를 NodeMap에 할당
-        }
-    }
-    return nodes;
-}
-#endif
-
 // --- genNode 3단계 체인 ---
 
 // 1. layer 파라미터 전처리
@@ -283,8 +222,8 @@ NodeMap buildNodeGrid(const vector<LayerParams>& layers, const DMap& map, float 
     return nodes;
 }
 
-// 3. 노드 헤딩 보간, 채우기
-void fillNodeHeadings(NodeMap& nodes, const vector<LayerParams>& layers, const DMap& map){
+// 3. 노드 헤딩 보간 후 채우기
+NodeMap fillNodeHeadings(NodeMap& nodes, const vector<LayerParams>& layers, const DMap& map){
     for (size_t i = 0; i < nodes.size(); ++i){
         if (nodes[i].empty()) continue;
 
@@ -319,6 +258,7 @@ void fillNodeHeadings(NodeMap& nodes, const vector<LayerParams>& layers, const D
             nodes[i][idx].psi = psi_interp;
         }
     }
+    return nodes;
 }
 
 // --- spline 관련 함수들 ---
@@ -556,90 +496,6 @@ bool checkSplineValidity(const RowVector4d& coeff_x, const RowVector4d& coeff_y,
     return true;
 }
 
-#if 0
-Graph genEdges(const NodeMap& nodesPerLayer, const Offline_Params& params, const DMap& sampled_map){
-    Graph graph(true);
-    const size_t layers = nodesPerLayer.size();
-
-    auto& adj = graph.getAdjLists_mutable();
-    for (size_t l = 0; l < layers; ++l) {
-        for (size_t j = 0; j < nodesPerLayer[l].size(); ++j) {
-            adj[ ITuple((int)l, (int)j) ]; // touch: 빈 map 생성
-        }
-    }
-
-    // raceline 추종 엣지 살리기
-    for(size_t currLayer = 0; currLayer < layers; ++currLayer){
-        size_t nextLayer = (currLayer + 1) % layers;
-
-        // 현재 layer의 레이스 라인 노드 찾기
-        const Node* currN = nullptr;
-        for(const auto& nd : nodesPerLayer[currLayer]) if(nd.raceline) { currN = &nd; break; }
-
-        // 다음 layer의 레이스 라인 노드 찾기
-        const Node* nextN = nullptr;
-        for(const auto& nd : nodesPerLayer[nextLayer]) if(nd.raceline) { nextN = &nd; break; }
-        
-        if(!currN || !nextN) continue;
-
-        Eigen::MatrixXd P(2,2); P << currN->x, currN->y, nextN->x, nextN->y;
-        Eigen::VectorXd lengths(1); lengths(0) = (P.row(1) - P.row(0)).norm();
-
-        SplineResult res = calcSplines(P, &lengths, currN->psi, nextN->psi, true);
-        if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params, sampled_map)){
-            graph.addEdge(ITuple(currN->layer_idx, currN->node_idx), nextN->node_idx, res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0));
-        }
-    }
-
-    // layer 순회
-    for(size_t currLayer = 0; currLayer < layers; ++currLayer){
-        size_t nextLayer = (currLayer + 1) % layers;
-
-        const auto& currNodes = nodesPerLayer[currLayer];
-        const auto& nextNodes = nodesPerLayer[nextLayer];
-
-        // 현재 layer의 node 순회
-        for(const auto& currNode : currNodes){
-            // lat_steps 로직
-            int refDestIdx = clamp(currNode.node_idx, 0, (int)nextNodes.size()-1);
-            const Node& refEndNode = nextNodes[refDestIdx];
-
-            // 현재 layer와 다음 layer 기준 노드 사이의 거리 계산
-            double dist = (Vector2d(refEndNode.x, refEndNode.y) - Vector2d(currNode.x, currNode.y)).norm();
-
-            double ratio = (params.curve_thr > 1e-9) ? min(abs(currNode.kappa)/params.curve_thr, 2.0) : 0.0;
-            
-            // factor -> 직선보다 곡선에서 더 넓은 노드 탐색을 가능하게 하는 계수
-            double factor = 1.0 / (1.0 + 0.5 * ratio); // 곡률 높을수록 lat_steps 줄이기
-
-            // 곡률이 높고 거리가 멀수록 더 많은 노드를 살펴봄
-            int lat_steps = static_cast<int>(round(factor * dist * params.lat_offset / params.lat_resolution));
-            lat_steps = min(lat_steps, (int)params.max_lat_steps);
-
-            for(int destNode = max(0, refDestIdx - lat_steps); destNode <= min(static_cast<int>(nextNodes.size() - 1), refDestIdx + lat_steps); ++destNode){
-                const Node& nextNode = nextNodes[destNode];
-
-                MatrixXd P(2, 2); P << currNode.x, currNode.y, nextNode.x, nextNode.y;
-                VectorXd lengths(1); lengths(0) = (P.row(1) - P.row(0)).norm();
-
-                SplineResult res = calcSplines(P, &lengths, currNode.psi, nextNode.psi, true);
-                
-                if(checkSplineValidity(res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0), params, sampled_map)){
-                    ITuple src_key(currNode.layer_idx, currNode.node_idx);
-                    graph.addEdge(src_key, nextNode.node_idx, res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0)); 
-                    //cout << "SPLINE PASSED!!!! from (" << current_node.layer_idx << "," << current_node.node_idx
-                         //<< ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
-                }else{
-                    //cout << "SPLINE REJECTED from (" << current_node.layer_idx << "," << current_node.node_idx
-                         //<< ") to (" << next_layer_idx << "," << next_node.node_idx << ")" << "\n" << endl;
-                }
-            }
-        }
-    }
-    return graph;
-}
-#endif
-
 // --- genEdge 3단계 체인 ---
 
 // 1. 빈 그래프/노드 키 초기화
@@ -654,7 +510,7 @@ Graph makeEmptyGraph(const NodeMap& nodesPerLayer){
 }
 
 // 2. 레이스라인 edge 추가
-void addRacelineEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& map){
+Graph addRacelineEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& map){
     const size_t L = nodes.size();
     for(size_t curr = 0; curr < L; ++curr){
         size_t next = (curr + 1) % L;
@@ -671,10 +527,11 @@ void addRacelineEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& 
             graph.addEdge(ITuple(currN->layer_idx, currN->node_idx), nextN->node_idx, res.coeffs_x.row(0), res.coeffs_y.row(0), res.ds(0));
         }
     }
+    return graph;
 }
 
 // 3. 일반 후보 edge 추가
-void addCandidateEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& map){
+Graph addCandidateEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& map){
     const size_t L = nodes.size();
     for(size_t curr = 0; curr < L; ++curr){
         size_t next = (curr + 1) % L;
@@ -705,6 +562,7 @@ void addCandidateEdges(Graph& graph, const NodeMap& nodes, const Offline_Params&
             }
         }
     }
+    return graph;
 }
 
 Graph prune_graph(Graph graph, int num_layers, bool closed) {

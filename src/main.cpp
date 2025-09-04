@@ -63,16 +63,14 @@ int main() {
     sampled_map[__psi_bound_r] = calcHeading(sampled_map[__x_bound_r], sampled_map[__y_bound_r]);
 
     // 3. 노드 그리드 생성
-    auto layers = computeLayerParams(sampled_map, params.veh_width, params.lat_resolution);
-    NodeMap nodes = buildNodeGrid(layers, sampled_map, params.lat_resolution);
-    fillNodeHeadings(nodes, layers, sampled_map);
-
-    //NodeMap nodesPerLayer = genNode(sampled_map, params.veh_width, params.lat_resolution);
+    auto layers = computeLayerParams(sampled_map, params.veh_width, params.lat_resolution); // 1) layer 파라미터 전처리
+    NodeMap nodes = buildNodeGrid(layers, sampled_map, params.lat_resolution); // 2) 좌표/기본 필드로 Node 그리드 생성
+    nodes = fillNodeHeadings(nodes, layers, sampled_map); // 3) 노드 헤딩 보간 후 채우기
 
     // 4. 스플라인 생성 및 유효성 검사, 최종 그래프 구축
     Graph graph = makeEmptyGraph(nodes); // 1) 빈 그래프/노드 키 초기화
-    addRacelineEdges(graph, nodes, params, sampled_map); // 2) 레이스라인 edge 추가
-    addCandidateEdges(graph, nodes, params, sampled_map); // 3) 일반 후보 edge 추가
+    graph = addRacelineEdges(graph, nodes, params, sampled_map); // 2) 레이스라인 edge 추가
+    graph = addCandidateEdges(graph, nodes, params, sampled_map); // 3) 일반 후보 edge 추가
 
     //Graph graph = genEdges(nodesPerLayer, params, sampled_map);
     graph.printGraph(); 

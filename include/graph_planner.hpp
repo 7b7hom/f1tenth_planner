@@ -137,7 +137,10 @@ double  normalizeAngle(double angle);
 DVector calcHeading(const DVector& x, const DVector& y);
 
 // 노드/스플라인/검증
-NodeMap      genNode(const DMap& sampled_map, double veh_width, float lat_resolution);
+vector<LayerParams> computeLayerParams(const DMap& sampled_map, double veh_width, float lat_resolution);
+NodeMap buildNodeGrid(const vector<LayerParams>& layers, const DMap& sampled_map, float lat_resolution);
+NodeMap fillNodeHeadings(NodeMap& nodes, const vector<LayerParams>& layers, const DMap& map);
+
 SplineResult calcSplines(const MatrixXd& path,
                          const VectorXd* el_lengths_ptr,
                          double psi_s, double psi_e, bool use_dist_scaling);
@@ -149,14 +152,9 @@ bool checkSplineValidity(const RowVector4d& coeff_x, const RowVector4d& coeff_y,
                          const DMap& sampled_map);
 
 // 그래프 생성/정리/코스트
-Graph genEdges(const NodeMap& nodesPerLayer, const Offline_Params& params, const DMap& sampled_map);
 Graph makeEmptyGraph(const NodeMap& nodesPerLayer);
-void addRacelineEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& sampled_map);
-void addCandidateEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& sampled_map);
-
-vector<LayerParams> computeLayerParams(const DMap& sampled_map, double veh_width, float lat_resolution);
-NodeMap buildNodeGrid(const vector<LayerParams>& layers, const DMap& sampled_map, float lat_resolution);
-void fillNodeHeadings(NodeMap& nodes, const vector<LayerParams>& layers, const DMap& map);
+Graph addRacelineEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& sampled_map);
+Graph addCandidateEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& sampled_map);
 
 Graph prune_graph(Graph graph, int num_layers, bool closed);
 Graph gen_offline_cost(Graph graph, const Offline_Params& params, const NodeMap& nodesPerLayer);
