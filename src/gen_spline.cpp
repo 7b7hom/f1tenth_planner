@@ -673,7 +673,7 @@ void addRacelineEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& 
     }
 }
 
-// 3. 일반 후보 엣지 추가
+// 3. 일반 후보 edge 추가
 void addCandidateEdges(Graph& graph, const NodeMap& nodes, const Offline_Params& params, const DMap& map){
     const size_t L = nodes.size();
     for(size_t curr = 0; curr < L; ++curr){
